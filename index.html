@@ -1774,7 +1774,7 @@
                                                             className="form-control"
                                                             data-testid="output-period"
                                                         />
-                                                        <span></span> 
+                                                        <span></span>
                                                     </div>
                                                 </div>
                                                 <div className="form-group">
@@ -1793,24 +1793,17 @@
                                                     </div>
                                                 </div>
                                                 <div className="form-group">
-                                                    <label className=" text-sm font-medium text-foreground mb-2">
-                                                        Payback Period (tahun bulan)
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Payback Period
                                                     </label>
                                                     <div className="currency-input">
                                                         <input
                                                             type="text"
-                                                            value={`${results.paybackPeriod.years}`}
+                                                            value={`${results.paybackPeriod.years}<span> Tahun </span>.${results.paybackPeriod.months}`}<span> Bulan</span>
                                                             readOnly
                                                             className="form-control"
                                                             data-testid="output-payback-period"
-                                                        /> 
-                                                        <input
-                                                            type="text"
-                                                            value={`${results.paybackPeriod.months}`}
-                                                            readOnly
-                                                            className="form-control"
-                                                            data-testid="output-payback-period"
-                                                        /> 
+                                                        />
                                                         <span></span>
                                                     </div>
                                                 </div>
