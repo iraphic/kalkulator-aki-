@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astinet FIT - Kalkulator Tarif Bandwidth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+            background-color: #d1d5db;
+            border-radius: 3px;
+        }
+        .scrollbar-track-gray-100::-webkit-scrollbar-track {
+            background-color: #f3f4f6;
+        }
+        .bg-primary { background-color: #dc2626; }
+        .text-primary-foreground { color: white; }
+        .bg-accent { background-color: #fee2e2; }
+        .border-border { border-color: #e5e7eb; }
+        .bg-muted { background-color: #f9fafb; }
+        .text-muted-foreground { color: #6b7280; }
+        .bg-background { background-color: #ffffff; }
+        .text-foreground { color: #111827; }
+        .text-primary { color: #dc2626; }
+        .highlighted {
+            background-color: #fef2f2;
+            border: 1px solid #dc2626;
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background">
+    <!-- Header -->
+    <header class="bg-primary text-primary-foreground shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-network-wired text-2xl"></i>
+                    <h1 class="text-2xl font-bold">Astinet FIT</h1>
+                </div>
+                <div class="text-sm opacity-90">
+                    Kalkulator Tarif Bandwidth
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Calculator Section -->
+        <div class="grid lg:grid-cols-3 gap-8 mb-12">
+            <!-- Input Section -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white shadow-md rounded-lg border border-gray-200">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold mb-6 text-foreground">Kalkulator Tarif</h2>
+                        
+                        <!-- Area Selection -->
+                        <div class="mb-6">
+                            <label class="flex items-center text-sm font-medium text-muted-foreground mb-2">
+                                <i class="fas fa-map-marker-alt text-sm mr-2"></i>
+                                Area
+                            </label>
+                            <select 
+                                id="select-area"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                            >
+                                <option value="jabodetabek">Jabodetabek</option>
+                                <option value="jawa">Jawa</option>
+                                <option value="sumatera">Sumatera</option>
+                                <option value="kalimantan">Kalimantan & KTI</option>
+                            </select>
+                        </div>
+
+                        <!-- Bandwidth Input -->
+                        <div class="mb-6">
+                            <label class="flex items-center text-sm font-medium text-muted-foreground mb-2">
+                                <i class="fas fa-tachometer-alt text-sm mr-2"></i>
+                                Bandwidth
+                            </label>
+                            <div class="relative">
+                                <input
+                                    id="input-bandwidth"
+                                    type="number"
+                                    min="1"
+                                    max="100"
+                                    value="10"
+                                    class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-16"
+                                    placeholder="Masukkan bandwidth"
+                                />
+                                <span class="absolute right-3 top-2 text-muted-foreground">Mbps</span>
+                            </div>
+                        </div>
+
+                        <!-- Custom Discount Input -->
+                        <div class="mb-6">
+                            <label class="flex items-center text-sm font-medium text-muted-foreground mb-2">
+                                <i class="fas fa-percent text-sm mr-2"></i>
+                                Asumsi Diskon (%)
+                            </label>
+                            <div class="relative">
+                                <input
+                                    id="input-custom-discount"
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="0.1"
+                                    value="0"
+                                    class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-8"
+                                    placeholder="0"
+                                />
+                                <span class="absolute right-3 top-2 text-muted-foreground">%</span>
+                            </div>
+                        </div>
+
+                        <!-- Calculate Button -->
+                        <button
+                            id="button-calculate"
+                            class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center justify-center"
+                        >
+                            <i class="fas fa-calculator mr-2"></i>
+                            Hitung Tarif
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Authority Levels Reference Table -->
+                <div class="bg-white shadow-md rounded-lg border border-gray-200">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-foreground flex items-center">
+                            <i class="fas fa-user-check text-red-500 mr-2"></i>
+                            Level Kewenangan Diskon
+                        </h3>
+                        <div class="space-y-3">
+                            <div id="authority-level-am" class="flex justify-between items-center py-2 px-3 bg-gray-100 rounded-lg">
+                                <span class="text-sm font-medium">AM</span>
+                                <span class="text-sm font-bold text-red-600">5%</span>
+                            </div>
+                            <div id="authority-level-mgr" class="flex justify-between items-center py-2 px-3 bg-gray-100 rounded-lg">
+                                <span class="text-sm font-medium">MGR SALES ES / MGR BGES WITEL</span>
+                                <span class="text-sm font-bold text-red-600">10%</span>
+                            </div>
+                            <div id="authority-level-gm" class="flex justify-between items-center py-2 px-3 bg-gray-100 rounded-lg">
+                                <span class="text-sm font-medium">GM ES</span>
+                                <span class="text-sm font-bold text-red-600">25%</span>
+                            </div>
+                            <div id="authority-level-evp" class="flex justify-between items-center py-2 px-3 bg-gray-100 rounded-lg">
+                                <span class="text-sm font-medium">EVP DES</span>
+                                <span class="text-sm font-bold text-red-600">30%</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-muted-foreground mt-4">
+                            <i class="fas fa-info-circle text-xs mr-1"></i>
+                            Level kewenangan akan tersorot otomatis berdasarkan nilai asumsi diskon
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="lg:col-span-2">
+                <div class="bg-white shadow-md rounded-lg border border-gray-200">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold mb-6 text-foreground">Hasil Perhitungan</h2>
+                        
+                        <!-- Service Details -->
+                        <div class="bg-gray-100 rounded-lg p-4 mb-6">
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <div>
+                                    <div class="text-sm text-muted-foreground">Layanan</div>
+                                    <div class="font-semibold" id="text-service-name">Astinet FIT</div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-muted-foreground">Area</div>
+                                    <div class="font-semibold" id="text-selected-area">Jabodetabek</div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-muted-foreground">Bandwidth</div>
+                                    <div class="font-semibold" id="text-selected-bandwidth">10 Mbps</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pricing Breakdown -->
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                                <span class="text-muted-foreground">Tarif per Bulan</span>
+                                <span class="font-semibold text-lg" id="text-monthly-price">Rp 560.000</span>
+                            </div>
+                            
+                            <div id="discounted-monthly-container" class="hidden">
+                                <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                                    <span class="text-muted-foreground" id="discounted-monthly-label">Tarif per Bulan (Setelah Asumsi Diskon 0%)</span>
+                                    <span class="font-semibold text-lg text-red-600" id="text-discounted-monthly-price">Rp 560.000</span>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-red-50 rounded-lg p-4">
+                                <h3 class="font-semibold mb-3">Paket Berlangganan 12 Bulan</h3>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span>Total 12 Bulan</span>
+                                        <span class="font-semibold" id="text-yearly-price">Rp 6.720.000</span>
+                                    </div>
+                                    <div id="custom-discount-container" class="hidden">
+                                        <div class="flex justify-between text-red-600">
+                                            <span id="custom-discount-label">Asumsi Diskon 0%</span>
+                                            <span class="font-semibold" id="text-custom-discounted-price">Rp 6.720.000</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between text-red-600 font-bold text-lg pt-2 border-t border-gray-200">
+                                        <span>Total dengan PPN 11%</span>
+                                        <span id="text-final-price">Rp 7.459.200</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Collapsible Pricing Table Section -->
+        <div class="bg-white shadow-md rounded-lg border border-gray-200">
+            <div class="p-6">
+                <button 
+                    id="button-toggle-pricing-table"
+                    class="w-full flex justify-between items-center p-0 h-auto bg-transparent border-none focus:outline-none"
+                >
+                    <h2 class="text-2xl font-semibold text-foreground flex items-center">
+                        <i class="fas fa-network-wired text-red-500 mr-2"></i>
+                        Tarif Bandwidth Layanan Astinet FIT
+                    </h2>
+                    <i id="pricing-table-chevron" class="fas fa-chevron-down"></i>
+                </button>
+
+                <div id="pricing-table-content" class="mt-6 hidden">
+                    <!-- Table Controls -->
+                    <div class="mb-4 flex flex-wrap gap-4 items-center">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-filter text-muted-foreground"></i>
+                            <span class="text-sm text-muted-foreground">Filter by area:</span>
+                            <select 
+                                id="select-table-filter"
+                                class="w-48 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                            >
+                                <option value="all">Semua Area</option>
+                                <option value="jabodetabek">Jabodetabek</option>
+                                <option value="jawa">Jawa</option>
+                                <option value="sumatera">Sumatera</option>
+                                <option value="kalimantan">Kalimantan & KTI</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Responsive Table -->
+                    <div class="overflow-x-auto overflow-y-visible">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr class="bg-red-600 border-none">
+                                    <th class="text-white font-semibold p-3 text-left whitespace-nowrap">
+                                        Bandwidth (Mbps)
+                                    </th>
+                                    <th class="text-white font-semibold p-3 text-right whitespace-nowrap area-column jabodetabek">
+                                        Jabodetabek
+                                    </th>
+                                    <th class="text-white font-semibold p-3 text-right whitespace-nowrap area-column jawa">
+                                        Jawa
+                                    </th>
+                                    <th class="text-white font-semibold p-3 text-right whitespace-nowrap area-column sumatera">
+                                        Sumatera
+                                    </th>
+                                    <th class="text-white font-semibold p-3 text-right whitespace-nowrap area-column kalimantan">
+                                        Kalimantan & KTI
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="pricing-table-body">
+                                <!-- Table rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Table Legend -->
+                    <div class="mt-4 text-xs text-muted-foreground space-y-1">
+                        <p class="flex items-center">
+                            <i class="fas fa-info-circle text-xs mr-1"></i>
+                            Harga dalam Rupiah per bulan, belum termasuk PPN 11%
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pricing data based on the uploaded table
+        const pricingData = {
+          1: { jabodetabek: 97000, jawa: 186000, sumatera: 252000, kalimantan: 265000 },
+          2: { jabodetabek: 189000, jawa: 365000, sumatera: 493000, kalimantan: 520000 },
+          3: { jabodetabek: 272000, jawa: 523000, sumatera: 707000, kalimantan: 747000 },
+          5: { jabodetabek: 416000, jawa: 798000, sumatera: 1082000, kalimantan: 1139000 },
+          10: { jabodetabek: 560000, jawa: 1073000, sumatera: 1453000, kalimantan: 1532000 },
+          20: { jabodetabek: 1085000, jawa: 2075000, sumatera: 2814000, kalimantan: 2962000 },
+          30: { jabodetabek: 1566000, jawa: 2993000, sumatera: 4060000, kalimantan: 4275000 },
+          40: { jabodetabek: 2008000, jawa: 3837000, sumatera: 5207000, kalimantan: 5478000 },
+          50: { jabodetabek: 2410000, jawa: 4602000, sumatera: 6247000, kalimantan: 6575000 },
+          60: { jabodetabek: 2773000, jawa: 5298000, sumatera: 7187000, kalimantan: 7568000 },
+          70: { jabodetabek: 3096000, jawa: 5913000, sumatera: 8025000, kalimantan: 8445000 },
+          80: { jabodetabek: 3385000, jawa: 6465000, sumatera: 8774000, kalimantan: 9233000 },
+          90: { jabodetabek: 3630000, jawa: 6933000, sumatera: 9408000, kalimantan: 9902000 },
+          100: { jabodetabek: 3901000, jawa: 7451000, sumatera: 10111000, kalimantan: 10641000 }
+        };
+
+        const areaNames = {
+          jabodetabek: 'Jabodetabek',
+          jawa: 'Jawa',
+          sumatera: 'Sumatera',
+          kalimantan: 'Kalimantan & KTI'
+        };
+
+        // State variables
+        let selectedArea = 'jabodetabek';
+        let bandwidth = '10';
+        let customDiscount = '0';
+        let tableFilter = 'all';
+        let isPricingTableOpen = false;
+
+        // Format currency
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        };
+
+        // Calculate price for given bandwidth and area
+        const calculatePrice = (bandwidth, area) => {
+            // Find the closest bandwidth tier
+            const availableBandwidths = Object.keys(pricingData).map(Number).sort((a, b) => a - b);
+            let selectedBandwidth = availableBandwidths.find(bw => bw >= bandwidth);
+            
+            if (!selectedBandwidth) {
+                selectedBandwidth = availableBandwidths[availableBandwidths.length - 1];
+            }
+            
+            const basePrice = pricingData[selectedBandwidth][area];
+            
+            // If exact bandwidth not available, interpolate for custom bandwidth
+            if (selectedBandwidth !== bandwidth && bandwidth <= 100) {
+                const lowerBandwidth = [...availableBandwidths].reverse().find(bw => bw <= bandwidth);
+                if (lowerBandwidth && selectedBandwidth) {
+                    const lowerPrice = pricingData[lowerBandwidth][area];
+                    const upperPrice = pricingData[selectedBandwidth][area];
+                    const ratio = (bandwidth - lowerBandwidth) / (selectedBandwidth - lowerBandwidth);
+                    return lowerPrice + (upperPrice - lowerPrice) * ratio;
+                }
+            }
+            
+            return basePrice;
+        };
+
+        // Highlight authority level based on discount value
+        const highlightAuthorityLevel = (discountValue) => {
+            // Remove highlight from all levels
+            document.querySelectorAll('[id^="authority-level-"]').forEach(level => {
+                level.classList.remove('highlighted');
+            });
+            
+            // Apply highlight based on discount value
+            if (discountValue >= 0 && discountValue <= 5) {
+                document.getElementById('authority-level-am').classList.add('highlighted');
+            } else if (discountValue > 5 && discountValue <= 10) {
+                document.getElementById('authority-level-mgr').classList.add('highlighted');
+            } else if (discountValue > 10 && discountValue <= 25) {
+                document.getElementById('authority-level-gm').classList.add('highlighted');
+            } else if (discountValue > 25 && discountValue <= 30) {
+                document.getElementById('authority-level-evp').classList.add('highlighted');
+            }
+        };
+
+        // Update calculation results
+        const updateResults = () => {
+            const bandwidthNum = parseInt(bandwidth) || 0;
+            const discountNum = parseFloat(customDiscount) || 0;
+            
+            if (bandwidthNum <= 0) {
+                document.getElementById('text-monthly-price').textContent = formatCurrency(0);
+                document.getElementById('text-yearly-price').textContent = formatCurrency(0);
+                document.getElementById('text-custom-discounted-price').textContent = formatCurrency(0);
+                document.getElementById('text-final-price').textContent = formatCurrency(0);
+                return;
+            }
+            
+            const monthlyPrice = calculatePrice(bandwidthNum, selectedArea);
+            const yearlyPrice = monthlyPrice * 12;
+            const customDiscountedPrice = yearlyPrice * (1 - discountNum / 100); // Apply custom discount directly to yearly price
+            const finalPrice = customDiscountedPrice * 1.11; // 11% PPN
+            
+            // Update UI with results
+            document.getElementById('text-monthly-price').textContent = formatCurrency(monthlyPrice);
+            document.getElementById('text-yearly-price').textContent = formatCurrency(yearlyPrice);
+            document.getElementById('text-custom-discounted-price').textContent = formatCurrency(customDiscountedPrice);
+            document.getElementById('text-final-price').textContent = formatCurrency(finalPrice);
+            
+            // Update discounted monthly price if custom discount is applied
+            const discountedMonthlyContainer = document.getElementById('discounted-monthly-container');
+            const discountedMonthlyLabel = document.getElementById('discounted-monthly-label');
+            const discountedMonthlyPrice = document.getElementById('text-discounted-monthly-price');
+            
+            if (discountNum > 0) {
+                const discountedMonthly = monthlyPrice * (1 - discountNum / 100);
+                discountedMonthlyLabel.textContent = `Tarif per Bulan (Setelah Asumsi Diskon ${customDiscount}%)`;
+                discountedMonthlyPrice.textContent = formatCurrency(discountedMonthly);
+                discountedMonthlyContainer.classList.remove('hidden');
+            } else {
+                discountedMonthlyContainer.classList.add('hidden');
+            }
+            
+            // Update custom discount section if custom discount is applied
+            const customDiscountContainer = document.getElementById('custom-discount-container');
+            const customDiscountLabel = document.getElementById('custom-discount-label');
+            
+            if (discountNum > 0) {
+                customDiscountLabel.textContent = `Asumsi Diskon ${customDiscount}%`;
+                customDiscountContainer.classList.remove('hidden');
+            } else {
+                customDiscountContainer.classList.add('hidden');
+            }
+            
+            // Highlight appropriate authority level
+            highlightAuthorityLevel(discountNum);
+        };
+
+        // Populate pricing table
+        const populatePricingTable = () => {
+            const tableBody = document.getElementById('pricing-table-body');
+            tableBody.innerHTML = '';
+            
+            Object.entries(pricingData).forEach(([bandwidth, prices], index) => {
+                const row = document.createElement('tr');
+                row.className = index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100';
+                
+                // Bandwidth cell
+                const bandwidthCell = document.createElement('td');
+                bandwidthCell.className = 'font-medium p-3 whitespace-nowrap';
+                bandwidthCell.textContent = `${bandwidth} Mbps`;
+                row.appendChild(bandwidthCell);
+                
+                // Price cells for each area
+                ['jabodetabek', 'jawa', 'sumatera', 'kalimantan'].forEach(area => {
+                    const priceCell = document.createElement('td');
+                    priceCell.className = `text-right p-3 whitespace-nowrap area-column ${area}`;
+                    priceCell.textContent = formatCurrency(prices[area]);
+                    row.appendChild(priceCell);
+                });
+                
+                tableBody.appendChild(row);
+            });
+        };
+
+        // Filter table based on selected filter
+        const filterTable = () => {
+            const columns = document.querySelectorAll('.area-column');
+            
+            columns.forEach(column => {
+                const area = column.classList[2]; // Get the area class (jabodetabek, jawa, etc.)
+                
+                if (tableFilter === 'all' || area === tableFilter) {
+                    column.style.display = 'table-cell';
+                } else {
+                    column.style.display = 'none';
+                }
+            });
+        };
+
+        // Initialize the application
+        const init = () => {
+            // Set up event listeners
+            document.getElementById('select-area').addEventListener('change', (e) => {
+                selectedArea = e.target.value;
+                document.getElementById('text-selected-area').textContent = areaNames[selectedArea];
+                updateResults();
+            });
+            
+            document.getElementById('input-bandwidth').addEventListener('input', (e) => {
+                bandwidth = e.target.value;
+                document.getElementById('text-selected-bandwidth').textContent = `${bandwidth} Mbps`;
+                updateResults();
+            });
+            
+            document.getElementById('input-custom-discount').addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value) || 0;
+                if (value >= 0 && value <= 100) {
+                    customDiscount = e.target.value;
+                    updateResults();
+                }
+            });
+            
+            document.getElementById('button-calculate').addEventListener('click', updateResults);
+            
+            document.getElementById('button-toggle-pricing-table').addEventListener('click', () => {
+                isPricingTableOpen = !isPricingTableOpen;
+                const content = document.getElementById('pricing-table-content');
+                const chevron = document.getElementById('pricing-table-chevron');
+                
+                if (isPricingTableOpen) {
+                    content.classList.remove('hidden');
+                    chevron.classList.remove('fa-chevron-down');
+                    chevron.classList.add('fa-chevron-up');
+                } else {
+                    content.classList.add('hidden');
+                    chevron.classList.remove('fa-chevron-up');
+                    chevron.classList.add('fa-chevron-down');
+                }
+            });
+            
+            document.getElementById('select-table-filter').addEventListener('change', (e) => {
+                tableFilter = e.target.value;
+                filterTable();
+            });
+            
+            // Initialize pricing table
+            populatePricingTable();
+            
+            // Perform initial calculation
+            updateResults();
+        };
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
