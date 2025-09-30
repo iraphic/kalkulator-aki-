@@ -1771,9 +1771,9 @@
                                             </div>
 
                                             {/* Jangka Waktu, IRR, and Payback Period - three fields in one row */}
-                                            <div style={{display: 'grid', gridTemplateColumns: '1fr', gap: '1rem', marginTop: '1.5rem'}} className="md:grid-cols-3">
+                                            <!-- Ganti bagian Jangka Waktu, IRR, dan Payback Period dengan kode berikut -->
+<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
   <!-- Jangka Waktu -->
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
   <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
     <Label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
       Jangka Waktu
@@ -1782,10 +1782,10 @@
       <div className="text-2xl font-bold text-blue-600 mb-1" data-testid="output-period">
         {inputs.contractPeriod}
       </div>
-      <div className="text-sm text-gray-500 font-medium">Bulan</div>
     </div>
   </div>
 
+  <!-- IRR -->
   <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
     <Label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
       IRR
@@ -1797,19 +1797,32 @@
       >
         {formatPercentage(results.irr).replace('%', '')}%
       </div>
-      <div className="text-sm text-gray-500 font-medium">Tingkat Pengembalian</div>
     </div>
   </div>
 
+  <!-- Payback Period - Tahun -->
   <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
     <Label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
       Payback Period
     </Label>
     <div className="text-center">
-      <div className="text-2xl font-bold text-purple-600 mb-1" data-testid="output-payback-period">
-        {results.paybackPeriod.years}<span className="text-lg">th</span> {results.paybackPeriod.months}<span className="text-lg">bln</span>
+      <div className="text-2xl font-bold text-purple-600 mb-1" data-testid="output-payback-years">
+        {results.paybackPeriod.years}
       </div>
-      <div className="text-sm text-gray-500 font-medium">Periode Pengembalian</div>
+      <div className="text-sm text-gray-500 font-medium">Tahun</div>
+    </div>
+  </div>
+
+  <!-- Payback Period - Bulan -->
+  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+    <Label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
+      &nbsp;
+    </Label>
+    <div className="text-center">
+      <div className="text-2xl font-bold text-purple-600 mb-1" data-testid="output-payback-months">
+        {results.paybackPeriod.months}
+      </div>
+      <div className="text-sm text-gray-500 font-medium">Bulan</div>
     </div>
   </div>
 </div>
