@@ -1796,16 +1796,11 @@
                                                     <label className="block text-sm font-medium text-foreground mb-2">
                                                         Payback Period
                                                     </label>
-                                                    <div className="currency-input">
-                                                        <input
-                                                            type="text"
-                                                            value={`${results.paybackPeriod.years}<span> Tahun </span>.${results.paybackPeriod.months}`}<span> Bulan</span>
-                                                            readOnly
-                                                            className="form-control"
-                                                            data-testid="output-payback-period"
-                                                        />
-                                                        <span></span>
-                                                    </div>
+                                                    
+                                                        <div className="currency-input" style={{fontSize: '1.5rem', fontWeight: '700', color: '#7c3aed', marginBottom: '0.25rem'}} data-testid="output-payback-period">
+        {results.paybackPeriod.years} <span style={{fontSize: '1.125rem'}}>tahun</span> {results.paybackPeriod.months} <span style={{fontSize: '1.125rem'}}>bulan</span>
+      </div>
+                                                    
                                                 </div>
                                             </div>
 
