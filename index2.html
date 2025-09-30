@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <title>Financial Analysis - Kelayakan Investasi</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .services-section {
+            margin-top: 30px;
+        }
+
+        .service-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            position: relative;
+        }
+
+        .service-item h4 {
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .results-section {
+            margin-top: 40px;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .summary-card h3 {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .value {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .summary-card.positive {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .summary-card.negative {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table th.text-right,
+        table td.text-right {
+            text-align: right;
+        }
+
+        table tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        table tbody tr:nth-child(even):hover {
+            background: #eeeeee;
+        }
+
+        table td {
+            padding: 12px 15px;
+        }
+
+        .positive-metric {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .negative-metric {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 30px 0 15px 0;
+            color: #333;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .form-section {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .summary-card .value {
+                font-size: 1.4rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            table th,
+            table td {
+                padding: 8px;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        /* New sections styling */
+        .info-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .info-section h3 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-item h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .info-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-detail:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #667eea;
+        }
+
+        .info-detail .label {
+            color: #666;
+        }
+
+        .info-detail .value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .summary-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .summary-section h3 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .summary-item .label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .summary-item .value {
+            font-weight: 700;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .feasibility-status {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .status-badge {
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status-badge.feasible {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .status-badge.not-feasible {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .breakdown-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .breakdown-section h3 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feasibility-status {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <!-- Refresh Button -->
+    <button class="refresh-btn" onclick="hardRefresh()">🔄 Clear Cache</button>
+
+    <script>
+        // Fungsi untuk hard refresh dengan clear cache
+        function hardRefresh() {
+            console.log('Clearing cache and refreshing...');
+            
+            // Clear semua cache
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    names.forEach(function(name) {
+                        caches.delete(name);
+                    });
+                    console.log('All caches cleared');
+                });
+            }
+            
+            // Clear localStorage jika perlu
+            // localStorage.clear();
+            // sessionStorage.clear();
+            
+            // Force reload dari server
+            window.location.reload(true);
+        }
+        
+        // Auto clear cache saat halaman dimuat (opsional)
+        window.addEventListener('load', function() {
+            console.log('Page loaded - cache management active');
+            
+            // Clear cache setiap 30 menit (opsional)
+            // setInterval(hardRefresh, 1800000);
+        });
+        
+        // Tambahkan timestamp ke resource untuk cache busting
+        const timestamp = new Date().getTime();
+        console.log(`App version: ${timestamp}`);
+    </script>
+
+    <div class="container">
+        <div class="header">
+            <h1>📊 Financial Analysis</h1>
+            <p>Analisis Kelayakan Investasi & Proyeksi Keuangan</p>
+        </div>
+
+        <div class="content">
+            <!-- Input Form Section -->
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px;">Input Parameter Utama</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="customerName">Nama Pelanggan</label>
+                        <input type="text" id="customerName" placeholder="Masukkan nama pelanggan">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="investmentCost">Biaya Investasi (BOQ)</label>
+                        <input type="text" id="investmentCost" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="periodType">Periode Kontrak</label>
+                        <select id="periodType">
+                            <option value="">Pilih periode kontrak</option>
+                            <option value="12">12 Bulan</option>
+                            <option value="24">24 Bulan</option>
+                            <option value="36">36 Bulan</option>
+                            <option value="48">48 Bulan</option>
+                            <option value="60">60 Bulan</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group hidden" id="customPeriodGroup">
+                        <label for="customPeriod">Custom Periode (Bulan)</label>
+                        <input type="number" id="customPeriod" placeholder="Masukkan jumlah bulan">
+                    </div>
+                </div>
+
+                <!-- Services Section -->
+                <div class="services-section">
+                    <h3 style="margin-bottom: 15px;">Detail Layanan</h3>
+                    <div id="servicesContainer"></div>
+                    <button class="btn btn-secondary" onclick="addService()">+ Tambah Layanan</button>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="btn-group" style="margin-top: 30px;">
+                    <button class="btn btn-primary" onclick="calculateAnalysis()">Hitung Analisis</button>
+                    <button class="btn btn-success hidden" id="exportBtn" onclick="exportToExcel()">Export ke Excel</button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="results-section hidden">
+                <h2 style="margin-bottom: 20px;">Hasil Analisis</h2>
+                
+                <!-- Summary Cards -->
+                <div class="summary-cards" id="summaryCards"></div>
+
+                <!-- New Sections -->
+                <div id="newSectionsContainer"></div>
+
+                <!-- Tables -->
+                <div id="tablesContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Constants
+        const WACC = 0.15;
+        const TAX_RATE = 0.22;
+        const BAD_DEBT_RATE = 0.05;
+        const MARKETING_RATE = 0.30;
+        const OPERATIONAL_RATE = 0.20;
+        const CAPEX_ADDITIONAL = 0.007;
+
+        let services = [];
+        let serviceCounter = 0;
+
+        // Currency Formatting Functions
+        function formatCurrency(amount) {
+            return 'Rp ' + new Intl.NumberFormat('id-ID', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format(amount);
+        }
+
+        function formatPercentage(value) {
+            return value.toFixed(2) + '%';
+        }
+
+        function parseCurrency(value) {
+            const cleaned = value.replace(/[^0-9]/g, '');
+            return parseInt(cleaned) || 0;
+        }
+
+        function formatInputCurrency(value) {
+            const cleaned = value.replace(/[^0-9]/g, '');
+            if (!cleaned) return '';
+            const number = parseInt(cleaned);
+            return new Intl.NumberFormat('id-ID').format(number);
+        }
+
+        // Initialize with one service
+        document.addEventListener('DOMContentLoaded', function() {
+            addService();
+        });
+
+        // Period Type Change Handler
+        document.getElementById('periodType').addEventListener('change', function() {
+            const customPeriodGroup = document.getElementById('customPeriodGroup');
+            if (this.value === 'custom') {
+                customPeriodGroup.classList.remove('hidden');
+            } else {
+                customPeriodGroup.classList.add('hidden');
+            }
+        });
+
+        // Currency Input Formatters
+        document.getElementById('investmentCost').addEventListener('input', function(e) {
+            const formatted = formatInputCurrency(e.target.value);
+            e.target.value = formatted;
+        });
+
+        // Add Service Function
+        function addService() {
+            serviceCounter++;
+            const serviceId = serviceCounter;
+            
+            const serviceItem = document.createElement('div');
+            serviceItem.className = 'service-item';
+            serviceItem.id = `service-${serviceId}`;
+            serviceItem.innerHTML = `
+                <h4>Layanan #${serviceId}</h4>
+                ${services.length > 0 ? `<button class="btn btn-danger remove-btn" onclick="removeService(${serviceId})">Hapus</button>` : ''}
+                <div class="service-grid">
+                    <div class="form-group">
+                        <label>Jenis & Detail Layanan</label>
+                        <input type="text" data-service="${serviceId}" data-field="serviceDetails" placeholder="Contoh: Internet Dedicated">
+                    </div>
+                    <div class="form-group">
+                        <label>Bandwidth</label>
+                        <input type="text" data-service="${serviceId}" data-field="bandwidth" placeholder="Contoh: 100 Mbps">
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="number" data-service="${serviceId}" data-field="quantity" value="1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Satuan</label>
+                        <input type="text" data-service="${serviceId}" data-field="unit" placeholder="Contoh: Link">
+                    </div>
+                    <div class="form-group">
+                        <label>Biaya Bulanan (MRC)</label>
+                        <input type="text" data-service="${serviceId}" data-field="monthlyRevenue" placeholder="0" class="currency-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Biaya Aktivasi (OTC)</label>
+                        <input type="text" data-service="${serviceId}" data-field="otcCost" placeholder="0" class="currency-input">
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('servicesContainer').appendChild(serviceItem);
+            
+            services.push({
+                id: serviceId,
+                serviceDetails: '',
+                monthlyRevenue: 0,
+                otcCost: 0,
+                bandwidth: '',
+                quantity: 1,
+                unit: ''
+            });
+
+            // Add currency formatting to new inputs
+            const currencyInputs = serviceItem.querySelectorAll('.currency-input');
+            currencyInputs.forEach(input => {
+                input.addEventListener('input', function(e) {
+                    const formatted = formatInputCurrency(e.target.value);
+                    e.target.value = formatted;
+                    updateServiceData(e.target);
+                });
+            });
+
+            // Add event listeners for other inputs
+            const allInputs = serviceItem.querySelectorAll('input');
+            allInputs.forEach(input => {
+                if (!input.classList.contains('currency-input')) {
+                    input.addEventListener('input', updateServiceData);
+                }
+            });
+        }
+
+        // Update Service Data
+        function updateServiceData(e) {
+            const target = e.target || e;
+            const serviceId = parseInt(target.dataset.service);
+            const field = target.dataset.field;
+            const value = target.value;
+
+            const service = services.find(s => s.id === serviceId);
+            if (service) {
+                if (field === 'monthlyRevenue' || field === 'otcCost') {
+                    service[field] = parseCurrency(value);
+                } else if (field === 'quantity') {
+                    service[field] = parseInt(value) || 0;
+                } else {
+                    service[field] = value;
+                }
+            }
+        }
+
+        // Remove Service Function
+        function removeService(serviceId) {
+            if (services.length <= 1) {
+                alert('Minimal harus ada 1 layanan!');
+                return;
+            }
+            
+            document.getElementById(`service-${serviceId}`).remove();
+            services = services.filter(s => s.id !== serviceId);
+        }
+
+        // Calculate Financial Analysis
+        function calculateAnalysis() {
+            const customerName = document.getElementById('customerName').value;
+            const investmentCost = parseCurrency(document.getElementById('investmentCost').value);
+            const periodType = document.getElementById('periodType').value;
+            
+            let contractPeriod = 0;
+            if (periodType === 'custom') {
+                contractPeriod = parseInt(document.getElementById('customPeriod').value) || 0;
+            } else {
+                contractPeriod = parseInt(periodType) || 0;
+            }
+
+            // Validation
+            if (!customerName.trim()) {
+                alert('Nama pelanggan harus diisi!');
+                return;
+            }
+
+            if (investmentCost <= 0) {
+                alert('Biaya investasi harus lebih dari 0!');
+                return;
+            }
+
+            if (contractPeriod <= 0) {
+                alert('Periode kontrak harus lebih dari 0!');
+                return;
+            }
+
+            const hasValidServices = services.some(s => 
+                s.serviceDetails.trim() !== '' && (s.monthlyRevenue > 0 || s.otcCost > 0)
+            );
+
+            if (!hasValidServices) {
+                alert('Minimal harus ada 1 layanan dengan data yang valid!');
+                return;
+            }
+
+            // Calculate
+            const inputs = {
+                customerName,
+                investmentCost,
+                contractPeriod,
+                services: services.filter(s => s.serviceDetails.trim() !== '')
+            };
+
+            const results = performFinancialCalculations(inputs);
+            displayResults(results, inputs);
+            
+            document.getElementById('exportBtn').classList.remove('hidden');
+        }
+
+        // Financial Calculations
+        function performFinancialCalculations(inputs) {
+            const { investmentCost, contractPeriod, services } = inputs;
+
+            const monthlyRevenue = services.reduce((sum, s) => sum + (s.monthlyRevenue * s.quantity), 0);
+            const otcCost = services.reduce((sum, s) => sum + (s.otcCost * s.quantity), 0);
+
+            const otcRevenue = otcCost;
+            const monthlyTotal = monthlyRevenue * contractPeriod;
+            const totalRevenue = otcRevenue + monthlyTotal;
+
+            const otcCogs = otcRevenue * 0.7;
+            const monthlyCogs = monthlyTotal * 0.7;
+            const totalCogs = otcCogs + monthlyCogs;
+
+            const depreciationPeriod = contractPeriod > 0 ? Math.ceil(contractPeriod / 12) : 1;
+            const actualCapex = investmentCost * (1 + CAPEX_ADDITIONAL);
+            const annualDepreciation = actualCapex / depreciationPeriod;
+
+            // Yearly Projections
+            const yearlyProjections = [];
+            for (let year = 0; year <= 6; year++) {
+                let yearlyRevenue = 0;
+                
+                if (year === 0) {
+                    yearlyRevenue = otcRevenue;
+                } else if (year <= Math.ceil(contractPeriod / 12)) {
+                    yearlyRevenue = Math.min(monthlyRevenue * 12, monthlyTotal - (monthlyRevenue * 12 * (year - 1)));
+                }
+
+                const badDebt = yearlyRevenue * BAD_DEBT_RATE;
+                const depreciation = year === 0 || year > depreciationPeriod ? 0 : annualDepreciation;
+                
+                yearlyProjections.push({
+                    year,
+                    revenue: yearlyRevenue,
+                    badDebt,
+                    depreciation
+                });
+            }
+
+            // COGS Projections
+            const cogsProjections = [];
+            for (let year = 0; year <= 6; year++) {
+                let yearlyOtcCogs = 0;
+                let yearlyMonthlyCogs = 0;
+                
+                if (year === 0) {
+                    yearlyOtcCogs = otcCogs;
+                } else if (year <= Math.ceil(contractPeriod / 12)) {
+                    const yearlyMonthlyRevenue = Math.min(monthlyRevenue * 12, monthlyTotal - (monthlyRevenue * 12 * (year - 1)));
+                    yearlyMonthlyCogs = yearlyMonthlyRevenue * 0.7;
+                }
+                
+                cogsProjections.push({
+                    year,
+                    otcCogs: yearlyOtcCogs,
+                    monthlyCogs: yearlyMonthlyCogs,
+                    totalCogs: yearlyOtcCogs + yearlyMonthlyCogs
+                });
+            }
+
+            // OPEX Projections
+            const opexProjections = [];
+            for (let year = 0; year <= 6; year++) {
+                let yearlyMarketingCost = 0;
+                let yearlyOperationalCost = 0;
+                
+                if (year === 0) {
+                    yearlyOperationalCost = otcRevenue * OPERATIONAL_RATE;
+                } else if (year <= Math.ceil(contractPeriod / 12)) {
+                    const yearlyMonthlyRevenue = Math.min(monthlyRevenue * 12, monthlyTotal - (monthlyRevenue * 12 * (year - 1)));
+                    const yearlyTotalRevenue = yearlyProjections[year].revenue;
+                    
+                    yearlyMarketingCost = yearlyMonthlyRevenue * MARKETING_RATE;
+                    yearlyOperationalCost = yearlyTotalRevenue * OPERATIONAL_RATE;
+                }
+                
+                opexProjections.push({
+                    year,
+                    marketingCost: yearlyMarketingCost,
+                    operationalCost: yearlyOperationalCost,
+                    totalOpex: yearlyMarketingCost + yearlyOperationalCost
+                });
+            }
+
+            // Update yearly projections with OPEX
+            for (let i = 0; i < yearlyProjections.length; i++) {
+                const opexValue = opexProjections[i].totalOpex;
+                yearlyProjections[i].opex = opexValue;
+                yearlyProjections[i].ebitda = yearlyProjections[i].revenue - yearlyProjections[i].badDebt - opexValue;
+                yearlyProjections[i].ebit = yearlyProjections[i].ebitda - yearlyProjections[i].depreciation;
+                yearlyProjections[i].tax = yearlyProjections[i].ebit > 0 ? yearlyProjections[i].ebit * TAX_RATE : 0;
+                yearlyProjections[i].netIncome = yearlyProjections[i].ebit - yearlyProjections[i].tax;
+            }
+
+            // Cash Flow Projections
+            const cashFlowProjections = [];
+            let cumulativeCashFlow = 0;
+
+            for (let year = 0; year <= 6; year++) {
+                const projection = yearlyProjections[year];
+                const capex = year === 0 ? actualCapex : 0;
+                const totalCashInflow = projection.netIncome + projection.depreciation;
+                const netCashFlow = totalCashInflow - capex;
+                cumulativeCashFlow += netCashFlow;
+
+                cashFlowProjections.push({
+                    year,
+                    netIncome: projection.netIncome,
+                    addBackDepreciation: projection.depreciation,
+                    totalCashInflow,
+                    capex,
+                    netCashFlow,
+                    cumulativeCashFlow
+                });
+            }
+
+            // NPV, IRR, Payback Period
+            const cashFlows = cashFlowProjections.map(cf => cf.netCashFlow);
+            const npv = calculateNPV(cashFlows, WACC);
+            const irr = calculateIRR(cashFlows) * 100;
+            const paybackPeriod = calculatePaybackPeriod(cashFlowProjections);
+
+            const totalOpex = opexProjections.reduce((sum, p) => sum + p.totalOpex, 0);
+            const marketingCost = opexProjections.reduce((sum, p) => sum + p.marketingCost, 0);
+            const operationalCost = opexProjections.reduce((sum, p) => sum + p.operationalCost, 0);
+            const grossProfit = totalRevenue - totalCogs;
+            const grossProfitMargin = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
+            const totalNetIncome = yearlyProjections.reduce((sum, p) => sum + p.netIncome, 0);
+            const netIncomeMargin = totalRevenue > 0 ? (totalNetIncome / totalRevenue) * 100 : 0;
+
+            return {
+                totalRevenue,
+                otcRevenue,
+                monthlyTotal,
+                otcCogs,
+                monthlyCogs,
+                totalCogs,
+                totalOpex,
+                marketingCost,
+                operationalCost,
+                grossProfit,
+                grossProfitMargin,
+                totalNetIncome,
+                netIncomeMargin,
+                yearlyProjections,
+                cashFlowProjections,
+                cogsProjections,
+                opexProjections,
+                npv,
+                irr,
+                paybackPeriod,
+                isViable: npv > 0 && (irr / 100) > WACC
+            };
+        }
+
+        function calculateNPV(cashFlows, discountRate) {
+            return cashFlows.reduce((npv, cashFlow, index) => {
+                return npv + cashFlow / Math.pow(1 + discountRate, index);
+            }, 0);
+        }
+
+        function calculateIRR(cashFlows) {
+            let rate = 0.1;
+            const maxIterations = 100;
+            const precision = 1e-6;
+
+            for (let i = 0; i < maxIterations; i++) {
+                let npv = 0;
+                let dnpv = 0;
+
+                for (let j = 0; j < cashFlows.length; j++) {
+                    const factor = Math.pow(1 + rate, j);
+                    npv += cashFlows[j] / factor;
+                    dnpv -= j * cashFlows[j] / (factor * (1 + rate));
+                }
+
+                const newRate = rate - npv / dnpv;
+                
+                if (Math.abs(newRate - rate) < precision) {
+                    return newRate;
+                }
+                
+                rate = newRate;
+            }
+
+            return rate;
+        }
+
+        function calculatePaybackPeriod(cashFlowProjections) {
+            let cumulativeCashFlow = 0;
+            
+            for (let i = 0; i < cashFlowProjections.length; i++) {
+                cumulativeCashFlow += cashFlowProjections[i].netCashFlow;
+                
+                if (cumulativeCashFlow >= 0) {
+                    if (i === 0) {
+                        return { years: 0, months: 0, totalMonths: 0 };
+                    }
+                    
+                    const previousCumulativeCashFlow = cumulativeCashFlow - cashFlowProjections[i].netCashFlow;
+                    const currentYearCashFlow = cashFlowProjections[i].netCashFlow;
+                    const fractionOfYear = Math.abs(previousCumulativeCashFlow) / currentYearCashFlow;
+                    const totalYears = (i - 1) + fractionOfYear;
+                    
+                    const years = Math.floor(totalYears);
+                    const months = Math.round((totalYears - years) * 12);
+                    const totalMonths = Math.round(totalYears * 12);
+                    
+                    return { years, months, totalMonths };
+                }
+            }
+            
+            return { years: 6, months: 12, totalMonths: 84 };
+        }
+
+        // Display Results
+        function displayResults(results, inputs) {
+            window.currentResults = results;
+            window.currentInputs = inputs;
+
+            // Show results section
+            document.getElementById('resultsSection').classList.remove('hidden');
+
+            // Summary Cards
+            const summaryCardsHTML = `
+                <div class="summary-card">
+                    <h3>Total Revenue</h3>
+                    <div class="value">${formatCurrency(results.totalRevenue)}</div>
+                </div>
+                <div class="summary-card ${results.npv > 0 ? 'positive' : 'negative'}">
+                    <h3>NPV</h3>
+                    <div class="value">${formatCurrency(results.npv)}</div>
+                </div>
+                <div class="summary-card ${results.irr >= 15 ? 'positive' : 'negative'}">
+                    <h3>IRR</h3>
+                    <div class="value">${formatPercentage(results.irr)}</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Payback Period</h3>
+                    <div class="value">${results.paybackPeriod.years}y ${results.paybackPeriod.months}m</div>
+                </div>
+                <div class="summary-card ${results.isViable ? 'positive' : 'negative'}">
+                    <h3>Status Kelayakan</h3>
+                    <div class="value">${results.isViable ? 'LAYAK ✓' : 'TIDAK LAYAK ✗'}</div>
+                </div>
+            `;
+            document.getElementById('summaryCards').innerHTML = summaryCardsHTML;
+
+            // Generate New Sections
+            const infoSectionHTML = generateInfoSection(results, inputs);
+            const summarySectionHTML = generateSummarySection(results, inputs);
+            const breakdownSectionHTML = generateBreakdownSection(results, inputs);
+
+            // Insert new sections before tables
+            let newSectionsHTML = infoSectionHTML + summarySectionHTML + breakdownSectionHTML;
+            document.getElementById('newSectionsContainer').innerHTML = newSectionsHTML;
+
+            // Generate Tables
+            let tablesHTML = '';
+
+            // COGS Table
+            tablesHTML += '<h3 class="table-title">COGS (Cost of Goods Sold)</h3>';
+            tablesHTML += generateCogsTable(results.cogsProjections);
+
+            // OPEX Table
+            tablesHTML += '<h3 class="table-title">OPEX (Operating Expenses)</h3>';
+            tablesHTML += generateOpexTable(results.opexProjections);
+
+            // P&L Table
+            tablesHTML += '<h3 class="table-title">Profit & Loss Statement</h3>';
+            tablesHTML += generatePLTable(results.yearlyProjections);
+
+            // Cash Flow Table
+            tablesHTML += '<h3 class="table-title">Cash Flow Analysis</h3>';
+            tablesHTML += generateCashFlowTable(results.cashFlowProjections);
+
+            document.getElementById('tablesContainer').innerHTML = tablesHTML;
+
+            // Scroll to results
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Generate Informasi Umum Section
+        function generateInfoSection(results, inputs) {
+            const monthlyRevenue = inputs.services.reduce((sum, s) => sum + (s.monthlyRevenue * s.quantity), 0);
+            const otcCost = inputs.services.reduce((sum, s) => sum + (s.otcCost * s.quantity), 0);
+
+            let html = '<div class="info-section">';
+            html += '<h3>Informasi Umum</h3>';
+            html += '<div class="info-grid">';
+            
+            // Revenue (Bruto)
+            html += '<div class="info-item">';
+            html += '<h4>Revenue (Bruto)</h4>';
+            html += `<div class="info-detail"><span class="label">OTC:</span><span class="value">${formatCurrency(results.otcRevenue)}</span></div>`;
+            html += `<div class="info-detail"><span class="label">Bulanan: ${formatCurrency(monthlyRevenue)} × ${inputs.contractPeriod} bulan =</span><span class="value">${formatCurrency(results.monthlyTotal)}</span></div>`;
+            html += `<div class="info-detail"><span class="label">Total:</span><span class="value">${formatCurrency(results.totalRevenue)}</span></div>`;
+            html += '</div>';
+            
+            // COGS (70% dari harga)
+            html += '<div class="info-item">';
+            html += '<h4>COGS (70% dari harga)</h4>';
+            html += `<div class="info-detail"><span class="label">OTC:</span><span class="value">${formatCurrency(results.otcCogs)}</span></div>`;
+            html += `<div class="info-detail"><span class="label">Bulanan:</span><span class="value">${formatCurrency(results.monthlyCogs)}</span></div>`;
+            html += `<div class="info-detail"><span class="label">Total:</span><span class="value">${formatCurrency(results.totalCogs)}</span></div>`;
+            html += '</div>';
+            
+            // Cost IBL
+            html += '<div class="info-item">';
+            html += '<h4>Cost IBL</h4>';
+            html += `<div class="info-detail"><span class="label">OTC Akhir:</span><span class="value">${formatCurrency(results.otcRevenue)}</span></div>`;
+            html += `<div class="info-detail"><span class="label">Bulanan Akhir: ${formatCurrency(monthlyRevenue)} × ${inputs.contractPeriod} =</span><span class="value">${formatCurrency(results.monthlyTotal)}</span></div>`;
+            html += `<div class="info-detail"><span class="label">Total:</span><span class="value">${formatCurrency(results.totalRevenue)}</span></div>`;
+            html += '</div>';
+            
+            // Cost OBL
+            html += '<div class="info-item">';
+            html += '<h4>Cost OBL</h4>';
+            html += `<div class="info-detail"><span class="label">OTC:</span><span class="value">Rp 0</span></div>`;
+            html += `<div class="info-detail"><span class="label">Bulanan: Rp 0 × ${inputs.contractPeriod} =</span><span class="value">Rp 0</span></div>`;
+            html += `<div class="info-detail"><span class="label">Total:</span><span class="value">Rp 0</span></div>`;
+            html += '</div>';
+            
+            html += '</div>'; // end info-grid
+            
+            // OPEX Info
+            html += '<div style="margin-top: 20px; background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #667eea;">';
+            html += '<h4 style="margin-bottom: 15px;">OPEX (Operasional + Marketing)</h4>';
+            html += `<p style="color: #666; margin-bottom: 8px;">Biaya Marketing: 30% dari revenue bulanan (${formatCurrency(results.marketingCost)})</p>`;
+            html += `<p style="color: #666; margin-bottom: 8px;">Biaya Operasional: 20% dari total revenue (${formatCurrency(results.operationalCost)})</p>`;
+            html += `<p style="font-weight: 700; font-size: 1.1rem; color: #667eea; margin-top: 15px;">Total: ${formatCurrency(results.totalOpex)}</p>`;
+            html += '</div>';
+            
+            html += '</div>'; // end info-section
+            return html;
+        }
+
+        // Generate Ringkasan Analisis Keuangan Section
+        function generateSummarySection(results, inputs) {
+            const npvStatus = results.npv > 0 ? 'Layak' : 'Tidak Layak';
+            const irrStatus = results.irr >= 15 ? 'Layak' : 'Tidak Layak';
+            const actualCapex = inputs.investmentCost * (1 + CAPEX_ADDITIONAL);
+
+            let html = '<div class="summary-section">';
+            html += '<h3>Ringkasan Analisis Keuangan</h3>';
+            
+            html += '<div class="summary-grid">';
+            html += `<div class="summary-item full-width"><span class="label">Nilai CAPEX (Cost)</span><span class="value">${formatCurrency(actualCapex)}</span></div>`;
+            html += `<div class="summary-item"><span class="label">Nilai COGS</span><span class="value">${formatCurrency(results.totalCogs)}</span></div>`;
+            html += `<div class="summary-item"><span class="label">Nilai OPEX</span><span class="value">${formatCurrency(results.totalOpex)}</span></div>`;
+            html += `<div class="summary-item full-width"><span class="label">Estimasi Revenue</span><span class="value">${formatCurrency(results.totalRevenue)}</span></div>`;
+            html += `<div class="summary-item"><span class="label">Gross Profit</span><span class="value">${formatCurrency(results.grossProfit)}</span></div>`;
+            html += `<div class="summary-item"><span class="label">Gross Profit Margin</span><span class="value">${results.grossProfitMargin.toFixed(2)} %</span></div>`;
+            html += `<div class="summary-item"><span class="label">Net Income</span><span class="value">${formatCurrency(results.totalNetIncome)}</span></div>`;
+            html += `<div class="summary-item"><span class="label">Net Income Margin</span><span class="value">${results.netIncomeMargin.toFixed(2)} %</span></div>`;
+            html += `<div class="summary-item full-width" style="background: ${results.npv > 0 ? '#d4edda' : '#f8d7da'}; color: ${results.npv > 0 ? '#155724' : '#721c24'}; font-weight: 700;"><span class="label">NPV</span><span class="value">${formatCurrency(results.npv)}</span></div>`;
+            html += `<div class="summary-item"><span class="label">Jangka Waktu</span><span class="value">${inputs.contractPeriod} Month</span></div>`;
+            html += `<div class="summary-item"><span class="label">IRR</span><span class="value">${formatPercentage(results.irr)}</span></div>`;
+            html += `<div class="summary-item"><span class="label">Payback Period</span><span class="value">${results.paybackPeriod.totalMonths} Month</span></div>`;
+            html += '</div>';
+            
+            // Status Kelayakan
+            html += '<div class="feasibility-status">';
+            html += `<div class="status-badge ${results.npv > 0 ? 'feasible' : 'not-feasible'}">NPV: ${npvStatus}</div>`;
+            html += `<div class="status-badge ${results.irr >= 15 ? 'feasible' : 'not-feasible'}">IRR: ${irrStatus}</div>`;
+            html += '</div>';
+            
+            html += '</div>'; // end summary-section
+            return html;
+        }
+
+        // Generate Detail Breakdown Layanan Section
+        function generateBreakdownSection(results, inputs) {
+            let html = '<div class="breakdown-section">';
+            html += '<h3>Detail Breakdown Layanan</h3>';
+            
+            html += '<div class="table-container">';
+            html += '<table>';
+            html += '<thead><tr>';
+            html += '<th>Layanan</th>';
+            html += '<th class="text-right">BW (Mbps)</th>';
+            html += '<th class="text-right">Qty</th>';
+            html += '<th>Satuan</th>';
+            html += '<th class="text-right">OTC</th>';
+            html += '<th class="text-right">MRC</th>';
+            html += '<th class="text-right">Total OTC</th>';
+            html += '<th class="text-right">Total MRC</th>';
+            html += `<th class="text-right">Total MRC ${inputs.contractPeriod} Bulan</th>`;
+            html += '</tr></thead>';
+            html += '<tbody>';
+            
+            let totalQty = 0;
+            let totalOtc = 0;
+            let totalMrc = 0;
+            let totalMrcContract = 0;
+            
+            inputs.services.forEach(service => {
+                const totalServiceOtc = service.otcCost * service.quantity;
+                const totalServiceMrc = service.monthlyRevenue * service.quantity;
+                const totalServiceMrcContract = totalServiceMrc * inputs.contractPeriod;
+                
+                totalQty += service.quantity;
+                totalOtc += totalServiceOtc;
+                totalMrc += totalServiceMrc;
+                totalMrcContract += totalServiceMrcContract;
+                
+                html += '<tr>';
+                html += `<td>${service.serviceDetails || 'Layanan'}</td>`;
+                html += `<td class="text-right">${service.bandwidth || '-'}</td>`;
+                html += `<td class="text-right">${service.quantity}</td>`;
+                html += `<td>${service.unit || '-'}</td>`;
+                html += `<td class="text-right">${formatCurrency(service.otcCost)}</td>`;
+                html += `<td class="text-right">${formatCurrency(service.monthlyRevenue)}</td>`;
+                html += `<td class="text-right">${formatCurrency(totalServiceOtc)}</td>`;
+                html += `<td class="text-right">${formatCurrency(totalServiceMrc)}</td>`;
+                html += `<td class="text-right">${formatCurrency(totalServiceMrcContract)}</td>`;
+                html += '</tr>';
+            });
+            
+            // Total row
+            html += '<tr style="background: #f8f9fa; font-weight: bold;">';
+            html += `<td>Total (exc. PPN)</td>`;
+            html += `<td class="text-right">-</td>`;
+            html += `<td class="text-right">${totalQty}</td>`;
+            html += `<td>${inputs.services.length > 0 ? (inputs.services[0].unit || '-') : '-'}</td>`;
+            html += `<td class="text-right">-</td>`;
+            html += `<td class="text-right">-</td>`;
+            html += `<td class="text-right">${formatCurrency(totalOtc)}</td>`;
+            html += `<td class="text-right">${formatCurrency(totalMrc)}</td>`;
+            html += `<td class="text-right">${formatCurrency(totalMrcContract)}</td>`;
+            html += '</tr>';
+            
+            // Grand total row
+            html += '<tr style="background: #667eea; color: white; font-weight: bold;">';
+            html += `<td colspan="8">Total OTC + MRC ${inputs.contractPeriod} Bulan (exc. PPN)</td>`;
+            html += `<td class="text-right">${formatCurrency(totalOtc + totalMrcContract)}</td>`;
+            html += '</tr>';
+            
+            html += '</tbody></table></div>';
+            html += '</div>'; // end breakdown-section
+            return html;
+        }
+
+        function generateCogsTable(projections) {
+            const totals = {
+                otcCogs: projections.reduce((sum, p) => sum + p.otcCogs, 0),
+                monthlyCogs: projections.reduce((sum, p) => sum + p.monthlyCogs, 0),
+                totalCogs: projections.reduce((sum, p) => sum + p.totalCogs, 0)
+            };
+
+            let html = '<div class="table-container"><table><thead><tr>';
+            html += '<th>Label</th><th class="text-right">Jumlah</th>';
+            for (let i = 0; i <= 6; i++) {
+                html += `<th class="text-right">Tahun ke-${i}</th>`;
+            }
+            html += '</tr></thead><tbody>';
+
+            // OTC COGS
+            html += '<tr><td><strong>OTC COGS</strong></td>';
+            html += `<td class="text-right">${formatCurrency(totals.otcCogs)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right">${formatCurrency(p.otcCogs)}</td>`;
+            });
+            html += '</tr>';
+
+            // Monthly COGS
+            html += '<tr><td><strong>Monthly COGS</strong></td>';
+            html += `<td class="text-right">${formatCurrency(totals.monthlyCogs)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right">${formatCurrency(p.monthlyCogs)}</td>`;
+            });
+            html += '</tr>';
+
+            // Total COGS
+            html += '<tr><td><strong>TOTAL COGS</strong></td>';
+            html += `<td class="text-right"><strong>${formatCurrency(totals.totalCogs)}</strong></td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right"><strong>${formatCurrency(p.totalCogs)}</strong></td>`;
+            });
+            html += '</tr>';
+
+            html += '</tbody></table></div>';
+            return html;
+        }
+
+        function generateOpexTable(projections) {
+            const totals = {
+                marketingCost: projections.reduce((sum, p) => sum + p.marketingCost, 0),
+                operationalCost: projections.reduce((sum, p) => sum + p.operationalCost, 0),
+                totalOpex: projections.reduce((sum, p) => sum + p.totalOpex, 0)
+            };
+
+            let html = '<div class="table-container"><table><thead><tr>';
+            html += '<th>Label</th><th class="text-right">Jumlah</th>';
+            for (let i = 0; i <= 6; i++) {
+                html += `<th class="text-right">Tahun ke-${i}</th>`;
+            }
+            html += '</tr></thead><tbody>';
+
+            // Marketing Cost
+            html += '<tr><td><strong>Marketing Cost</strong></td>';
+            html += `<td class="text-right">${formatCurrency(totals.marketingCost)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right">${formatCurrency(p.marketingCost)}</td>`;
+            });
+            html += '</tr>';
+
+            // Operational Cost
+            html += '<tr><td><strong>Operational Cost</strong></td>';
+            html += `<td class="text-right">${formatCurrency(totals.operationalCost)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right">${formatCurrency(p.operationalCost)}</td>`;
+            });
+            html += '</tr>';
+
+            // Total OPEX
+            html += '<tr><td><strong>TOTAL OPEX</strong></td>';
+            html += `<td class="text-right"><strong>${formatCurrency(totals.totalOpex)}</strong></td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right"><strong>${formatCurrency(p.totalOpex)}</strong></td>`;
+            });
+            html += '</tr>';
+
+            html += '</tbody></table></div>';
+            return html;
+        }
+
+        function generatePLTable(projections) {
+            const totals = {
+                revenue: projections.reduce((sum, p) => sum + p.revenue, 0),
+                badDebt: projections.reduce((sum, p) => sum + p.badDebt, 0),
+                opex: projections.reduce((sum, p) => sum + p.opex, 0),
+                ebitda: projections.reduce((sum, p) => sum + p.ebitda, 0),
+                depreciation: projections.reduce((sum, p) => sum + p.depreciation, 0),
+                ebit: projections.reduce((sum, p) => sum + p.ebit, 0),
+                tax: projections.reduce((sum, p) => sum + p.tax, 0),
+                netIncome: projections.reduce((sum, p) => sum + p.netIncome, 0)
+            };
+
+            let html = '<div class="table-container"><table><thead><tr>';
+            html += '<th>Label</th><th class="text-right">Jumlah</th>';
+            for (let i = 0; i <= 6; i++) {
+                html += `<th class="text-right">Tahun ke-${i}</th>`;
+            }
+            html += '</tr></thead><tbody>';
+
+            // Revenue
+            html += '<tr><td><strong>Revenue</strong></td>';
+            html += `<td class="text-right">${formatCurrency(totals.revenue)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right">${formatCurrency(p.revenue)}</td>`;
+            });
+            html += '</tr>';
+
+            // Bad Debt
+            html += '<tr><td><strong>Bad Debt</strong></td>';
+            html += `<td class="text-right">${formatCurrency(totals.badDebt)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right">${formatCurrency(p.badDebt)}</td>`;
+            });
+            html += '</tr>';
+
+            // OPEX
+            html += '<tr><td><strong>OPEX</strong></td>';
+            html += `<td class="text-right">${formatCurrency(totals.opex)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right">${formatCurrency(p.opex)}</td>`;
+            });
+            html += '</tr>';
+
+            // EBITDA
+            html += '<tr><td><strong>EBITDA</strong></td>';
+            html += `<td class="text-right ${totals.ebitda >= 0 ? 'positive-metric' : 'negative-metric'}">${formatCurrency(totals.ebitda)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right ${p.ebitda >= 0 ? 'positive-metric' : 'negative-metric'}">${formatCurrency(p.ebitda)}</td>`;
+            });
+            html += '</tr>';
+
+            // Depreciation
+            html += '<tr><td><strong>Depresiasi</strong></td>';
+            html += `<td class="text-right">${formatCurrency(totals.depreciation)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right">${formatCurrency(p.depreciation)}</td>`;
+            });
+            html += '</tr>';
+
+            // EBIT
+            html += '<tr><td><strong>EBIT</strong></td>';
+            html += `<td class="text-right ${totals.ebit >= 0 ? 'positive-metric' : 'negative-metric'}">${formatCurrency(totals.ebit)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right ${p.ebit >= 0 ? 'positive-metric' : 'negative-metric'}">${formatCurrency(p.ebit)}</td>`;
+            });
+            html += '</tr>';
+
+            // Tax
+            html += '<tr><td><strong>Pajak</strong></td>';
+            html += `<td class="text-right">${formatCurrency(totals.tax)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right">${formatCurrency(p.tax)}</td>`;
+            });
+            html += '</tr>';
+
+            // Net Income
+            html += '<tr><td><strong>Net Income</strong></td>';
+            html += `<td class="text-right ${totals.netIncome >= 0 ? 'positive-metric' : 'negative-metric'}"><strong>${formatCurrency(totals.netIncome)}</strong></td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right ${p.netIncome >= 0 ? 'positive-metric' : 'negative-metric'}"><strong>${formatCurrency(p.netIncome)}</strong></td>`;
+            });
+            html += '</tr>';
+
+            html += '</tbody></table></div>';
+            return html;
+        }
+
+        function generateCashFlowTable(projections) {
+            const totals = {
+                netIncome: projections.reduce((sum, p) => sum + p.netIncome, 0),
+                addBackDepreciation: projections.reduce((sum, p) => sum + p.addBackDepreciation, 0),
+                totalCashInflow: projections.reduce((sum, p) => sum + p.totalCashInflow, 0),
+                capex: projections.reduce((sum, p) => sum + p.capex, 0),
+                netCashFlow: projections.reduce((sum, p) => sum + p.netCashFlow, 0),
+                cumulativeCashFlow: projections.length > 0 ? projections[projections.length - 1].cumulativeCashFlow : 0
+            };
+
+            let html = '<div class="table-container"><table><thead><tr>';
+            html += '<th>Label</th><th class="text-right">Jumlah</th>';
+            for (let i = 0; i <= 6; i++) {
+                html += `<th class="text-right">Tahun ke-${i}</th>`;
+            }
+            html += '</tr></thead><tbody>';
+
+            // Net Income
+            html += '<tr><td><strong>Net Income</strong></td>';
+            html += `<td class="text-right">${formatCurrency(totals.netIncome)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right">${formatCurrency(p.netIncome)}</td>`;
+            });
+            html += '</tr>';
+
+            // Add Back Depreciation
+            html += '<tr><td><strong>Add Back Depresiasi</strong></td>';
+            html += `<td class="text-right">${formatCurrency(totals.addBackDepreciation)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right">${formatCurrency(p.addBackDepreciation)}</td>`;
+            });
+            html += '</tr>';
+
+            // Total Cash Inflow
+            html += '<tr><td><strong>TOTAL CASH INFLOW</strong></td>';
+            html += `<td class="text-right"><strong>${formatCurrency(totals.totalCashInflow)}</strong></td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right"><strong>${formatCurrency(p.totalCashInflow)}</strong></td>`;
+            });
+            html += '</tr>';
+
+            // CAPEX
+            html += '<tr><td><strong>CAPEX</strong></td>';
+            html += `<td class="text-right">${formatCurrency(totals.capex)}</td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right">${formatCurrency(p.capex)}</td>`;
+            });
+            html += '</tr>';
+
+            // Net Cash Flow
+            html += '<tr><td><strong>Net Cash Flow</strong></td>';
+            html += `<td class="text-right ${totals.netCashFlow >= 0 ? 'positive-metric' : 'negative-metric'}"><strong>${formatCurrency(totals.netCashFlow)}</strong></td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right ${p.netCashFlow >= 0 ? 'positive-metric' : 'negative-metric'}"><strong>${formatCurrency(p.netCashFlow)}</strong></td>`;
+            });
+            html += '</tr>';
+
+            // Cumulative Cash Flow
+            html += '<tr><td><strong>Cum Cash Flow</strong></td>';
+            html += `<td class="text-right ${totals.cumulativeCashFlow >= 0 ? 'positive-metric' : 'negative-metric'}"><strong>${formatCurrency(totals.cumulativeCashFlow)}</strong></td>`;
+            projections.forEach(p => {
+                html += `<td class="text-right ${p.cumulativeCashFlow >= 0 ? 'positive-metric' : 'negative-metric'}"><strong>${formatCurrency(p.cumulativeCashFlow)}</strong></td>`;
+            });
+            html += '</tr>';
+
+            html += '</tbody></table></div>';
+            return html;
+        }
+
+        // Export to Excel Function
+        function exportToExcel() {
+            if (!window.currentResults || !window.currentInputs) {
+                alert('Belum ada hasil analisis untuk di-export!');
+                return;
+            }
+
+            const results = window.currentResults;
+            const inputs = window.currentInputs;
+
+            const wb = XLSX.utils.book_new();
+
+            // Summary Sheet
+            const summaryData = [
+                ['FINANCIAL ANALYSIS REPORT'],
+                [''],
+                ['Nama Pelanggan', inputs.customerName],
+                ['Tanggal', new Date().toLocaleDateString('id-ID')],
+                [''],
+                ['RINGKASAN INVESTASI'],
+                ['Total Investasi', results.totalRevenue],
+                ['NPV', results.npv],
+                ['IRR', results.irr / 100],
+                ['Payback Period', `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`],
+                ['Status Kelayakan', results.isViable ? 'LAYAK' : 'TIDAK LAYAK'],
+                [''],
+                ['DETAIL KEUANGAN'],
+                ['Total Revenue', results.totalRevenue],
+                ['Total COGS', results.totalCogs],
+                ['Total OPEX', results.totalOpex],
+                ['Gross Profit', results.grossProfit],
+                ['Gross Profit Margin', results.grossProfitMargin / 100],
+                ['Net Income', results.totalNetIncome],
+                ['Net Income Margin', results.netIncomeMargin / 100]
+            ];
+
+            const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+
+            // Profit & Loss Sheet
+            const plHeaders = ['Label', 'Total', 'Tahun 0', 'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5', 'Tahun 6'];
+            const plData = [
+                plHeaders,
+                ['Revenue', results.yearlyProjections.reduce((s, p) => s + p.revenue, 0), ...results.yearlyProjections.map(p => p.revenue)],
+                ['Bad Debt', results.yearlyProjections.reduce((s, p) => s + p.badDebt, 0), ...results.yearlyProjections.map(p => p.badDebt)],
+                ['OPEX', results.yearlyProjections.reduce((s, p) => s + p.opex, 0), ...results.yearlyProjections.map(p => p.opex)],
+                ['EBITDA', results.yearlyProjections.reduce((s, p) => s + p.ebitda, 0), ...results.yearlyProjections.map(p => p.ebitda)],
+                ['Depreciation', results.yearlyProjections.reduce((s, p) => s + p.depreciation, 0), ...results.yearlyProjections.map(p => p.depreciation)],
+                ['EBIT', results.yearlyProjections.reduce((s, p) => s + p.ebit, 0), ...results.yearlyProjections.map(p => p.ebit)],
+                ['Tax', results.yearlyProjections.reduce((s, p) => s + p.tax, 0), ...results.yearlyProjections.map(p => p.tax)],
+                ['Net Income', results.yearlyProjections.reduce((s, p) => s + p.netIncome, 0), ...results.yearlyProjections.map(p => p.netIncome)]
+            ];
+
+            const wsPL = XLSX.utils.aoa_to_sheet(plData);
+            XLSX.utils.book_append_sheet(wb, wsPL, 'Profit & Loss');
+
+            // Cash Flow Sheet
+            const cfData = [
+                plHeaders,
+                ['Net Income', results.cashFlowProjections.reduce((s, p) => s + p.netIncome, 0), ...results.cashFlowProjections.map(p => p.netIncome)],
+                ['Add Back Depreciation', results.cashFlowProjections.reduce((s, p) => s + p.addBackDepreciation, 0), ...results.cashFlowProjections.map(p => p.addBackDepreciation)],
+                ['Total Cash Inflow', results.cashFlowProjections.reduce((s, p) => s + p.totalCashInflow, 0), ...results.cashFlowProjections.map(p => p.totalCashInflow)],
+                ['CAPEX', results.cashFlowProjections.reduce((s, p) => s + p.capex, 0), ...results.cashFlowProjections.map(p => p.capex)],
+                ['Net Cash Flow', results.cashFlowProjections.reduce((s, p) => s + p.netCashFlow, 0), ...results.cashFlowProjections.map(p => p.netCashFlow)],
+                ['Cumulative Cash Flow', results.cashFlowProjections[results.cashFlowProjections.length - 1].cumulativeCashFlow, ...results.cashFlowProjections.map(p => p.cumulativeCashFlow)]
+            ];
+
+            const wsCF = XLSX.utils.aoa_to_sheet(cfData);
+            XLSX.utils.book_append_sheet(wb, wsCF, 'Cash Flow');
+
+            // Save file
+            const fileName = `Financial_Analysis_${inputs.customerName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        }
+    </script>
+</body>
+</html>
