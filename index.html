@@ -412,16 +412,6 @@
             color: #6b7280;
             font-size: 0.75rem;
         }
-         .text-green-600 { color: #059669; }
-  .text-red-600 { color: #dc2626; }
-  .text-blue-600 { color: #2563eb; }
-  .text-purple-600 { color: #7c3aed; }
-  .text-gray-500 { color: #6b7280; }
-  .text-gray-700 { color: #374151; }
-  .bg-white { background: white; }
-  .border-gray-200 { border-color: #e5e7eb; }
-  .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-  .rounded-lg { border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -1771,61 +1761,53 @@
                                             </div>
 
                                             {/* Jangka Waktu, IRR, and Payback Period - three fields in one row */}
-                                            <!-- Ganti bagian Jangka Waktu, IRR, dan Payback Period dengan kode berikut -->
-<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-  <!-- Jangka Waktu -->
-  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-    <Label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
-      Jangka Waktu
-    </Label>
-    <div className="text-center">
-      <div className="text-2xl font-bold text-blue-600 mb-1" data-testid="output-period">
-        {inputs.contractPeriod}
-      </div>
-    </div>
-  </div>
-
-  <!-- IRR -->
-  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-    <Label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
-      IRR
-    </Label>
-    <div className="text-center">
-      <div 
-        className={`text-2xl font-bold mb-1 ${results.irr >= 15 ? 'text-green-600' : 'text-red-600'}`}
-        data-testid="output-irr"
-      >
-        {formatPercentage(results.irr).replace('%', '')}%
-      </div>
-    </div>
-  </div>
-
-  <!-- Payback Period - Tahun -->
-  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-    <Label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
-      Payback Period
-    </Label>
-    <div className="text-center">
-      <div className="text-2xl font-bold text-purple-600 mb-1" data-testid="output-payback-years">
-        {results.paybackPeriod.years}
-      </div>
-      <div className="text-sm text-gray-500 font-medium">Tahun</div>
-    </div>
-  </div>
-
-  <!-- Payback Period - Bulan -->
-  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
-    <Label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
-      &nbsp;
-    </Label>
-    <div className="text-center">
-      <div className="text-2xl font-bold text-purple-600 mb-1" data-testid="output-payback-months">
-        {results.paybackPeriod.months}
-      </div>
-      <div className="text-sm text-gray-500 font-medium">Bulan</div>
-    </div>
-  </div>
-</div>
+                                            <div className="grid grid-cols-1 md-grid-cols-3 gap-4">
+                                                <div className="form-group">
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Jangka Waktu
+                                                    </label>
+                                                    <div className="currency-input">
+                                                        <input
+                                                            type="text"
+                                                            value={inputs.contractPeriod.toString()}
+                                                            readOnly
+                                                            className="form-control"
+                                                            data-testid="output-period"
+                                                        />
+                                                        <span>Month</span>
+                                                    </div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        IRR
+                                                    </label>
+                                                    <div className="currency-input">
+                                                        <input
+                                                            type="text"
+                                                            value={formatPercentage(results.irr).replace('%', '')}
+                                                            readOnly
+                                                            className={`form-control ${results.irr >= 0.15 ? 'text-green' : 'text-red'}`}
+                                                            data-testid="output-irr"
+                                                        />
+                                                        <span>%</span>
+                                                    </div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Payback Period
+                                                    </label>
+                                                    <div className="currency-input">
+                                                        <input
+                                                            type="text"
+                                                            value={`${results.paybackPeriod.years}.${results.paybackPeriod.months}`}
+                                                            readOnly
+                                                            className="form-control"
+                                                            data-testid="output-payback-period"
+                                                        />
+                                                        <span>Month</span>
+                                                    </div>
+                                                </div>
+                                            </div>
 
                                             {/* Status Summary */}
                                             <div className="mt-8 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-lg border">
