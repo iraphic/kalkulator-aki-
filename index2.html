@@ -1,0 +1,2444 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisis Kelayakan Investasi</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 1.125rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: #1e40af;
+            color: white;
+            padding: 1rem 1.5rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        @media (min-width: 768px) {
+            .md-grid-cols-2 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .md-grid-cols-3 {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #1e40af;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3a8a;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #d1d5db;
+            color: #374151;
+        }
+
+        .btn-outline:hover {
+            background: #f9fafb;
+        }
+
+        .service-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            background: #f9fafb;
+            margin-bottom: 1rem;
+        }
+
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .service-title {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table th {
+            background: #f3f4f6;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .table-striped tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-green {
+            color: #059669;
+        }
+
+        .text-red {
+            color: #dc2626;
+        }
+
+        .text-muted {
+            color: #6b7280;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .mt-8 {
+            margin-top: 2rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-8 {
+            margin-bottom: 2rem;
+        }
+
+        .p-4 {
+            padding: 1rem;
+        }
+
+        .p-6 {
+            padding: 1.5rem;
+        }
+
+        .border-t {
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .border-b {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .footer a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .currency-input {
+            position: relative;
+        }
+
+        .currency-input span {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .currency-input input {
+            padding-left: 30px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .status-badge.danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .summary-box {
+            background: #eff6ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .summary-box h3 {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-box .value {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .sheet {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .sheet.open {
+            transform: translateX(0);
+        }
+
+        .sheet-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .sheet-content {
+            padding: 1.5rem;
+            height: calc(100% - 80px);
+            overflow-y: auto;
+        }
+
+        .sheet-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+        }
+
+        .select {
+            position: relative;
+        }
+
+        .select select {
+            appearance: none;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            background: white;
+        }
+
+        .select::after {
+            content: "▼";
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #6b7280;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // Konstanta untuk perhitungan finansial
+        const WACC = 0.15; // 15%
+        const TAX_RATE = 0.22; // 22%
+        const BAD_DEBT_RATE = 0.05; // 5%
+        const MARKETING_RATE = 0.30; // 30%
+        const OPERATIONAL_RATE = 0.20; // 20%
+        const CAPEX_ADDITIONAL = 0.007; // 0.70% untuk biaya tak terduga
+
+        // Fungsi utilitas untuk format mata uang
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format(amount).replace('IDR', 'Rp');
+        }
+
+        function formatPercentage(value) {
+            return `${value.toFixed(2)}%`;
+        }
+
+        function parseCurrency(value) {
+            const cleaned = value.replace(/[^0-9]/g, '');
+            return parseInt(cleaned) || 0;
+        }
+
+        function formatInputCurrency(value) {
+            // Hapus semua karakter non-digit
+            const cleaned = value.replace(/[^0-9]/g, '');
+            if (!cleaned) return '';
+            
+            // Format dengan pemisah ribuan
+            const number = parseInt(cleaned);
+            return new Intl.NumberFormat('id-ID').format(number);
+        }
+
+        function stripCurrencyPrefix(formattedCurrency) {
+            // Tangani nilai negatif dengan mempertahankan tanda minus
+            const isNeg = formattedCurrency.trim().startsWith('-');
+            const cleaned = formattedCurrency.replace(/^\s*-?\s*Rp[\s\u00A0]*/i, '');
+            return (isNeg ? '-' : '') + cleaned.trim();
+        }
+
+        // Fungsi untuk perhitungan finansial
+        function calculateFinancialAnalysis(inputs) {
+            const { investmentCost, contractPeriod, services = [] } = inputs;
+
+            // Helper function untuk mendapatkan multiplier kuantitas yang aman
+            const getSafeQuantity = (quantity) => {
+                return Number.isFinite(quantity) ? Math.max(quantity, 0) : 1;
+            };
+
+            // Hitung total dari semua layanan - pastikan services tidak pernah undefined
+            const monthlyRevenue = services?.length ? services.reduce((sum, service) => sum + (service.monthlyRevenue * getSafeQuantity(service.quantity)), 0) : 0;
+            const otcCost = services?.length ? services.reduce((sum, service) => sum + (service.otcCost * getSafeQuantity(service.quantity)), 0) : 0;
+
+            // Perhitungan dasar
+            const otcRevenue = otcCost; // Gunakan OTC cost aktual dari input pengguna
+            const monthlyTotal = monthlyRevenue * contractPeriod;
+            const totalRevenue = otcRevenue + monthlyTotal;
+
+            // Perhitungan COGS (70% dari harga)
+            const otcCogs = otcRevenue * 0.7;
+            const monthlyCogs = monthlyTotal * 0.7;
+            const totalCogs = otcCogs + monthlyCogs;
+
+            // Biaya
+            const costIBL = totalRevenue; // Sama dengan revenue untuk IBL
+            const costOBL = 0; // Tidak ada biaya OBL
+            
+            // Perhitungan OPEX akan dihitung per tahun, total akan dihitung nanti
+
+            // Depresiasi - berdasarkan CAPEX aktual termasuk biaya tambahan
+            // Hitung periode depresiasi berdasarkan periode kontrak (dalam tahun, dibulatkan ke atas)
+            // Lindungi dari pembagian dengan nol ketika contractPeriod adalah 0
+            const depreciationPeriod = contractPeriod > 0 ? Math.ceil(contractPeriod / 12) : 1;
+            const actualCapex = investmentCost * (1 + CAPEX_ADDITIONAL);
+            const annualDepreciation = actualCapex / depreciationPeriod;
+
+            // Proyeksi tahunan
+            const yearlyProjections = [];
+            
+            for (let year = 0; year <= 6; year++) {
+                let yearlyRevenue = 0;
+                
+                if (year === 0) {
+                    yearlyRevenue = otcRevenue;
+                } else if (year <= Math.ceil(contractPeriod / 12)) {
+                    yearlyRevenue = Math.min(monthlyRevenue * 12, monthlyTotal - (monthlyRevenue * 12 * (year - 1)));
+                }
+
+                const badDebt = yearlyRevenue * BAD_DEBT_RATE;
+                // OPEX akan dihitung secara terpisah dan disimpan di opexProjections
+                let yearlyOpex = 0;
+                const ebitda = yearlyRevenue - badDebt - yearlyOpex;
+                const depreciation = year === 0 || year > depreciationPeriod ? 0 : annualDepreciation;
+                const ebit = ebitda - depreciation;
+                const tax = ebit * TAX_RATE;
+                const netIncome = ebit - tax;
+
+                yearlyProjections.push({
+                    year,
+                    revenue: yearlyRevenue,
+                    badDebt,
+                    opex: yearlyOpex,
+                    ebitda,
+                    depreciation,
+                    ebit,
+                    tax,
+                    netIncome,
+                });
+            }
+
+            // Proyeksi COGS
+            const cogsProjections = [];
+            
+            for (let year = 0; year <= 6; year++) {
+                let yearlyOtcCogs = 0;
+                let yearlyMonthlyCogs = 0;
+                
+                if (year === 0) {
+                    yearlyOtcCogs = otcCogs;
+                } else if (year <= Math.ceil(contractPeriod / 12)) {
+                    const yearlyMonthlyRevenue = Math.min(monthlyRevenue * 12, monthlyTotal - (monthlyRevenue * 12 * (year - 1)));
+                    yearlyMonthlyCogs = yearlyMonthlyRevenue * 0.7;
+                }
+                
+                const yearlyTotalCogs = yearlyOtcCogs + yearlyMonthlyCogs;
+                
+                cogsProjections.push({
+                    year,
+                    otcCogs: yearlyOtcCogs,
+                    monthlyCogs: yearlyMonthlyCogs,
+                    totalCogs: yearlyTotalCogs,
+                });
+            }
+
+            // Proyeksi OPEX - hitung per tahun berdasarkan revenue aktual
+            const opexProjections = [];
+            
+            for (let year = 0; year <= 6; year++) {
+                let yearlyMarketingCost = 0;
+                let yearlyOperationalCost = 0;
+                
+                if (year === 0) {
+                    // Tahun 0: Tidak ada biaya pemasaran, biaya operasional hanya pada revenue OTC
+                    yearlyOperationalCost = otcRevenue * OPERATIONAL_RATE;
+                } else if (year <= Math.ceil(contractPeriod / 12)) {
+                    // Hitung bagian revenue bulanan tahun ini
+                    const yearlyMonthlyRevenue = Math.min(monthlyRevenue * 12, monthlyTotal - (monthlyRevenue * 12 * (year - 1)));
+                    // Dapatkan total revenue tahunan (yang bisa mencakup revenue bulanan dan sisa revenue)
+                    const yearlyTotalRevenue = yearlyProjections[year].revenue;
+                    
+                    // Biaya pemasaran: 30% dari bagian revenue bulanan saja
+                    yearlyMarketingCost = yearlyMonthlyRevenue * MARKETING_RATE;
+                    // Biaya operasional: 20% dari total revenue tahunan
+                    yearlyOperationalCost = yearlyTotalRevenue * OPERATIONAL_RATE;
+                }
+                
+                const yearlyTotalOpex = yearlyMarketingCost + yearlyOperationalCost;
+                
+                opexProjections.push({
+                    year,
+                    marketingCost: yearlyMarketingCost,
+                    operationalCost: yearlyOperationalCost,
+                    totalOpex: yearlyTotalOpex,
+                });
+            }
+
+            // Perbarui proyeksi tahunan dengan nilai OPEX yang dihitung
+            for (let i = 0; i < yearlyProjections.length; i++) {
+                const opexValue = opexProjections[i].totalOpex;
+                yearlyProjections[i].opex = opexValue;
+                // Hitung ulang EBITDA dengan OPEX yang benar
+                yearlyProjections[i].ebitda = yearlyProjections[i].revenue - yearlyProjections[i].badDebt - opexValue;
+                // Hitung ulang EBIT
+                yearlyProjections[i].ebit = yearlyProjections[i].ebitda - yearlyProjections[i].depreciation;
+                // Hitung ulang pajak - hanya terapkan pajak jika EBIT positif
+                yearlyProjections[i].tax = yearlyProjections[i].ebit > 0 ? yearlyProjections[i].ebit * TAX_RATE : 0;
+                // Hitung ulang net income
+                yearlyProjections[i].netIncome = yearlyProjections[i].ebit - yearlyProjections[i].tax;
+            }
+
+            // Hitung total dari proyeksi
+            const totalOpex = opexProjections.reduce((sum, p) => sum + p.totalOpex, 0);
+            const marketingCost = opexProjections.reduce((sum, p) => sum + p.marketingCost, 0);
+            const operationalCost = opexProjections.reduce((sum, p) => sum + p.operationalCost, 0);
+
+            // Proyeksi arus kas
+            const cashFlowProjections = [];
+            let cumulativeCashFlow = 0;
+
+            for (let year = 0; year <= 6; year++) {
+                const projection = yearlyProjections[year];
+                const capex = year === 0 ? investmentCost * (1 + CAPEX_ADDITIONAL) : 0;
+                const totalCashInflow = projection.netIncome + projection.depreciation;
+                const netCashFlow = totalCashInflow - capex;
+                cumulativeCashFlow += netCashFlow;
+
+                cashFlowProjections.push({
+                    year,
+                    netIncome: projection.netIncome,
+                    addBackDepreciation: projection.depreciation,
+                    totalCashInflow,
+                    capex,
+                    netCashFlow,
+                    cumulativeCashFlow,
+                });
+            }
+
+            // Perhitungan NPV
+            const npv = calculateNPV(cashFlowProjections.map(cf => cf.netCashFlow), WACC);
+            
+            // Perhitungan IRR
+            const irr = calculateIRR(cashFlowProjections.map(cf => cf.netCashFlow));
+            
+            // Perhitungan Payback Period
+            const paybackPeriod = calculatePaybackPeriod(cashFlowProjections);
+
+            // Hitung metrik profit dan margin
+            const grossProfit = totalRevenue - totalCogs;
+            const grossProfitMargin = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
+            
+            // Hitung total net income dari semua tahun
+            const totalNetIncome = yearlyProjections.reduce((sum, projection) => sum + projection.netIncome, 0);
+            const netIncomeMargin = totalRevenue > 0 ? (totalNetIncome / totalRevenue) * 100 : 0;
+
+            return {
+                totalRevenue,
+                otcRevenue,
+                monthlyTotal,
+                otcCogs,
+                monthlyCogs,
+                totalCogs,
+                costIBL,
+                costOBL,
+                totalOpex,
+                marketingCost,
+                operationalCost,
+                grossProfit,
+                grossProfitMargin,
+                totalNetIncome,
+                netIncomeMargin,
+                yearlyProjections,
+                cashFlowProjections,
+                cogsProjections,
+                opexProjections,
+                npv,
+                irr: irr * 100, // Konversi ke persentase
+                paybackPeriod,
+                isViable: npv > 0 && irr > WACC,
+            };
+        }
+
+        function calculateNPV(cashFlows, discountRate) {
+            return cashFlows.reduce((npv, cashFlow, index) => {
+                return npv + cashFlow / Math.pow(1 + discountRate, index);
+            }, 0);
+        }
+
+        function calculateIRR(cashFlows) {
+            // Metode Newton-Raphson untuk perhitungan IRR
+            let rate = 0.1; // Tebakan awal
+            const maxIterations = 100;
+            const precision = 1e-6;
+
+            for (let i = 0; i < maxIterations; i++) {
+                let npv = 0;
+                let dnpv = 0;
+
+                for (let j = 0; j < cashFlows.length; j++) {
+                    const factor = Math.pow(1 + rate, j);
+                    npv += cashFlows[j] / factor;
+                    dnpv -= j * cashFlows[j] / (factor * (1 + rate));
+                }
+
+                const newRate = rate - npv / dnpv;
+                
+                if (Math.abs(newRate - rate) < precision) {
+                    return newRate;
+                }
+                
+                rate = newRate;
+            }
+
+            return rate;
+        }
+
+        function calculatePaybackPeriod(cashFlowProjections) {
+            let cumulativeCashFlow = 0;
+            
+            for (let i = 0; i < cashFlowProjections.length; i++) {
+                cumulativeCashFlow += cashFlowProjections[i].netCashFlow;
+                
+                if (cumulativeCashFlow >= 0) {
+                    // Jika mencapai break-even di tahun pertama
+                    if (i === 0) {
+                        return { years: 0, months: 0, totalMonths: 0 };
+                    }
+                    
+                    // Hitung periode pengembalian yang tepat menggunakan interpolasi
+                    const previousCumulativeCashFlow = cumulativeCashFlow - cashFlowProjections[i].netCashFlow;
+                    const currentYearCashFlow = cashFlowProjections[i].netCashFlow;
+                    
+                    // Hitung berapa banyak dari tahun ini yang dibutuhkan untuk mencapai break-even
+                    const fractionOfYear = Math.abs(previousCumulativeCashFlow) / currentYearCashFlow;
+                    const totalYears = (i - 1) + fractionOfYear;
+                    
+                    const years = Math.floor(totalYears);
+                    const months = Math.round((totalYears - years) * 12);
+                    const totalMonths = Math.round(totalYears * 12);
+                    
+                    return { years, months, totalMonths };
+                }
+            }
+            
+            // Jika periode pengembalian lebih lama dari periode proyeksi
+            return { years: 6, months: 12, totalMonths: 84 };
+        }
+
+        // Komponen utama aplikasi
+        function FinancialAnalysis() {
+            const [inputs, setInputs] = React.useState({
+                customerName: "",
+                investmentCost: 0,
+                contractPeriod: 0,
+                services: [{
+                    id: "1",
+                    serviceDetails: "",
+                    monthlyRevenue: 0,
+                    otcCost: 0,
+                    bandwidth: "",
+                    quantity: 1,
+                    unit: "",
+                }],
+            });
+
+            const [results, setResults] = React.useState(null);
+            const [inputValues, setInputValues] = React.useState({
+                customerName: "",
+                investmentCost: "",
+                contractPeriod: "",
+                services: [{
+                    id: "1",
+                    serviceDetails: "",
+                    monthlyRevenue: "",
+                    otcCost: "",
+                    bandwidth: "",
+                    quantity: "1",
+                    unit: "",
+                }],
+            });
+
+            const [periodType, setPeriodType] = React.useState("");
+            const [customPeriod, setCustomPeriod] = React.useState("");
+            const [showFixedParams, setShowFixedParams] = React.useState(false);
+
+            const handleInputChange = (field, value) => {
+                if (field === 'customerName') {
+                    setInputValues(prev => ({ ...prev, [field]: value }));
+                    setInputs(prev => ({ ...prev, [field]: value }));
+                } else if (field === 'contractPeriod') {
+                    setInputValues(prev => ({ ...prev, [field]: value }));
+                    const numValue = parseInt(value) || 0;
+                    setInputs(prev => ({ ...prev, [field]: numValue }));
+                } else if (field === 'investmentCost') {
+                    // Untuk field mata uang, format nilai tampilan dengan pemisah ribuan
+                    const formattedValue = formatInputCurrency(value);
+                    setInputValues(prev => ({ ...prev, [field]: formattedValue }));
+                    const numValue = parseCurrency(value);
+                    setInputs(prev => ({ ...prev, [field]: numValue }));
+                }
+            };
+
+            const handleServiceChange = (serviceId, field, value) => {
+                // Perbarui nilai tampilan
+                setInputValues(prev => ({
+                    ...prev,
+                    services: prev.services.map(service =>
+                        service.id === serviceId
+                            ? {
+                                ...service,
+                                [field]: (field === 'serviceDetails' || field === 'bandwidth' || field === 'unit') 
+                                    ? value 
+                                    : field === 'quantity'
+                                        ? value // quantity ditampilkan sebagai string di input
+                                        : formatInputCurrency(value) // monthlyRevenue dan otcCost
+                            }
+                            : service
+                    )
+                }));
+
+                // Perbarui nilai aktual
+                setInputs(prev => ({
+                    ...prev,
+                    services: prev.services.map(service =>
+                        service.id === serviceId
+                            ? {
+                                ...service,
+                                [field]: (field === 'serviceDetails' || field === 'bandwidth' || field === 'unit')
+                                    ? value 
+                                    : field === 'quantity'
+                                        ? parseInt(value) || 0 // quantity disimpan sebagai number
+                                        : parseCurrency(value) // monthlyRevenue dan otcCost
+                            }
+                            : service
+                    )
+                }));
+            };
+
+            const addService = () => {
+                const newId = Date.now().toString();
+                const newService = {
+                    id: newId,
+                    serviceDetails: "",
+                    monthlyRevenue: 0,
+                    otcCost: 0,
+                    bandwidth: "",
+                    quantity: 1,
+                    unit: "",
+                };
+                const newServiceDisplay = {
+                    id: newId,
+                    serviceDetails: "",
+                    monthlyRevenue: "",
+                    otcCost: "",
+                    bandwidth: "",
+                    quantity: "1",
+                    unit: "",
+                };
+
+                setInputs(prev => ({
+                    ...prev,
+                    services: [...prev.services, newService]
+                }));
+                setInputValues(prev => ({
+                    ...prev,
+                    services: [...prev.services, newServiceDisplay]
+                }));
+            };
+
+            const removeService = (serviceId) => {
+                setInputs(prev => ({
+                    ...prev,
+                    services: prev.services.filter(service => service.id !== serviceId)
+                }));
+                setInputValues(prev => ({
+                    ...prev,
+                    services: prev.services.filter(service => service.id !== serviceId)
+                }));
+            };
+
+            // Helper function untuk mendapatkan multiplier kuantitas yang aman
+            const getSafeQuantity = (quantity) => {
+                return Number.isFinite(quantity) ? Math.max(quantity, 0) : 1;
+            };
+
+            // Hitung total untuk ditampilkan
+            const totalMonthlyRevenue = inputs.services.reduce((sum, service) => sum + (service.monthlyRevenue * getSafeQuantity(service.quantity)), 0);
+            const totalOtcCost = inputs.services.reduce((sum, service) => sum + (service.otcCost * getSafeQuantity(service.quantity)), 0);
+
+            const handlePeriodTypeChange = (value) => {
+                setPeriodType(value);
+                if (value !== 'custom') {
+                    const months = parseInt(value);
+                    setInputValues(prev => ({ ...prev, contractPeriod: months.toString() }));
+                    setInputs(prev => ({ ...prev, contractPeriod: months }));
+                    setCustomPeriod("");
+                }
+            };
+
+            const handleCustomPeriodChange = (value) => {
+                setCustomPeriod(value);
+                setInputValues(prev => ({ ...prev, contractPeriod: value }));
+                const numValue = parseInt(value) || 0;
+                setInputs(prev => ({ ...prev, contractPeriod: numValue }));
+            };
+
+            const calculateAnalysis = () => {
+                const hasValidServices = inputs.services.length > 0 && inputs.services.some(service => 
+                    service.serviceDetails.trim() !== "" && (service.monthlyRevenue > 0 || service.otcCost > 0)
+                );
+                
+                if (inputs.customerName.trim() !== "" && inputs.investmentCost > 0 && inputs.contractPeriod > 0 && hasValidServices) {
+                    const calculatedResults = calculateFinancialAnalysis(inputs);
+                    setResults(calculatedResults);
+                }
+            };
+
+            const exportToExcel = (results, inputs) => {
+                const wb = XLSX.utils.book_new();
+                
+                // Hitung total untuk layanan
+                const totalMonthlyRevenue = inputs.services.reduce((sum, service) => sum + service.monthlyRevenue, 0);
+                const totalOtcCost = inputs.services.reduce((sum, service) => sum + service.otcCost, 0);
+                
+                // Hitung total dengan pertimbangan kuantitas
+                const totalMonthlyRevenueWithQty = inputs.services.reduce((sum, service) => sum + (service.monthlyRevenue * getSafeQuantity(service.quantity)), 0);
+                const totalOtcCostWithQty = inputs.services.reduce((sum, service) => sum + (service.otcCost * getSafeQuantity(service.quantity)), 0);
+                
+                // Dapatkan tanggal saat ini untuk cover sheet
+                const currentDate = new Date().toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                
+                // Tentukan status kelayakan untuk cover sheet
+                const coverIrrStatus = results.irr >= 15 ? 'Feasible' : 'Not Feasible';
+                const coverNpvStatus = results.npv > 0 ? 'Feasible' : 'Not Feasible';
+                const recommendation = results.isViable ? 'Layak untuk diimplementasikan' : 'Tidak layak untuk diimplementasikan';
+                
+                // ===== SHEET 1: BUSINESS PLAN COVER SHEET =====
+                const coverSheetData = [
+                    ['Resumen:'],
+                    ['Total Investasi', formatCurrency(inputs.investmentCost)],
+                    ['Pendapatan PSB', formatCurrency(results.otcRevenue)],
+                    ['Pendapatan Abonemen IBL', `${formatCurrency(totalMonthlyRevenueWithQty)} /bulan`],
+                    ['IRR', `${formatPercentage(results.irr)} ${coverIrrStatus}`],
+                    ['NPV', `${formatCurrency(results.npv)} ${coverNpvStatus}`],
+                    ['PAYBACK PERIODE', `${results.paybackPeriod.years} years ${results.paybackPeriod.months} months`],
+                    [''],
+                    ['Catatan:', ''],
+                    ['Rekomendasi:', recommendation]
+                ];
+                
+                const wsCoverSheet = XLSX.utils.aoa_to_sheet(coverSheetData);
+                
+                // Terapkan pemformatan ke cover sheet
+                // Atur lebar kolom
+                wsCoverSheet['!cols'] = [
+                    { wch: 25 }, // Kolom A
+                    { wch: 35 }, // Kolom B
+                    { wch: 15 }, // Kolom C
+                    { wch: 15 }  // Kolom D
+                ];
+                
+                // Gabungkan sel untuk header
+                if (!wsCoverSheet['!merges']) wsCoverSheet['!merges'] = [];
+                wsCoverSheet['!merges'].push(
+                    { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }, // Resumen
+                    { s: { r: 8, c: 1 }, e: { r: 8, c: 3 } }, // Catatan space
+                    { s: { r: 9, c: 1 }, e: { r: 9, c: 3 } }  // Rekomendasi space
+                );
+                
+                XLSX.utils.book_append_sheet(wb, wsCoverSheet, 'BUSINESS PLAN');
+                
+                // ===== SHEET 2: Detail Layanan =====
+                const serviceDetailsData = [
+                    ['Detail Layanan - Input Komponen Layanan'],
+                    [''],
+                    ['No.', 'Jenis & Detail Layanan', 'Biaya Bulanan', 'Biaya Aktivasi (OTC)', 'Subtotal Bulanan', 'Subtotal OTC'],
+                    ...inputs.services.map((service, index) => [
+                        index + 1,
+                        service.serviceDetails || `Layanan ${index + 1}`,
+                        formatCurrency(service.monthlyRevenue),
+                        formatCurrency(service.otcCost),
+                        formatCurrency(service.monthlyRevenue),
+                        formatCurrency(service.otcCost)
+                    ]),
+                    [''],
+                    ['RINGKASAN TOTAL'],
+                    ['Total Layanan', inputs.services.length, '', '', '', ''],
+                    ['Total Biaya Bulanan', '', formatCurrency(totalMonthlyRevenue), '', formatCurrency(totalMonthlyRevenue), ''],
+                    ['Total Biaya Aktivasi (OTC)', '', '', formatCurrency(totalOtcCost), '', formatCurrency(totalOtcCost)],
+                    [''],
+                    ['KETERANGAN:'],
+                    ['• Biaya Bulanan: Pendapatan recurring per bulan dari layanan'],
+                    ['• Biaya Aktivasi (OTC): One Time Cost untuk aktivasi layanan'],
+                    ['• Subtotal: Kontribusi masing-masing layanan terhadap total pendapatan'],
+                    [''],
+                    ['PARAMETER PERHITUNGAN:'],
+                    ['• Periode Kontrak:', `${inputs.contractPeriod} bulan`],
+                    ['• Total Revenue (Lifetime):', formatCurrency(results.totalRevenue)],
+                    ['• OTC Revenue:', formatCurrency(results.otcRevenue)],
+                    ['• Monthly Revenue Total:', formatCurrency(results.monthlyTotal)],
+                    [''],
+                    [''],
+                    ['DETAIL BREAKDOWN LAYANAN'],
+                    [''],
+                    ['Layanan', 'BW (Mbps)', 'Qty', 'Satuan', 'OTC', 'MRC', 'Total OTC', 'Total MRC', `Total MRC ${inputs.contractPeriod} Bulan`],
+                    ...inputs.services.map((service) => [
+                        service.serviceDetails || 'Layanan',
+                        service.bandwidth || '-',
+                        service.quantity ?? '-',
+                        service.unit || '-',
+                        formatCurrency(service.otcCost),
+                        formatCurrency(service.monthlyRevenue),
+                        formatCurrency(service.otcCost * getSafeQuantity(service.quantity)),
+                        formatCurrency(service.monthlyRevenue * getSafeQuantity(service.quantity)),
+                        formatCurrency(service.monthlyRevenue * getSafeQuantity(service.quantity) * inputs.contractPeriod)
+                    ]),
+                    ['Total (exc. PPN)', '-', inputs.services.reduce((sum, service) => sum + getSafeQuantity(service.quantity), 0), inputs.services.length > 0 ? (inputs.services[0].unit || '-') : '-', '-', '-', formatCurrency(totalOtcCostWithQty), formatCurrency(totalMonthlyRevenueWithQty), formatCurrency(totalMonthlyRevenueWithQty * inputs.contractPeriod)],
+                    [`Total OTC + MRC ${inputs.contractPeriod} Bulan (exc. PPN)`, '', '', '', '', '', '', '', formatCurrency(totalOtcCostWithQty + (totalMonthlyRevenueWithQty * inputs.contractPeriod))]
+                ];
+                
+                const wsServiceDetails = XLSX.utils.aoa_to_sheet(serviceDetailsData);
+                XLSX.utils.book_append_sheet(wb, wsServiceDetails, 'Detail Layanan');
+                
+                // ===== SHEET 2: COGS+Opex+Ringkasan Analisis (combined sheet) =====
+                const cogsOpexAnalysisData = [
+                    ['COGS+OPEX+RINGKASAN ANALISIS'],
+                    [''],
+                    
+                    // Parameter Input Section
+                    ['=== PARAMETER INPUT UTAMA ==='],
+                    ['Parameter', 'Nilai'],
+                    ['Nama Pelanggan', inputs.customerName],
+                    ['Biaya Investasi (BOQ)', formatCurrency(inputs.investmentCost)],
+                    ['Periode Kontrak (Bulan)', inputs.contractPeriod],
+                    ['Jumlah Layanan', inputs.services.length],
+                    ['Total Pendapatan per Bulan', formatCurrency(totalMonthlyRevenue)],
+                    ['Total Biaya Aktivasi (OTC)', formatCurrency(totalOtcCost)],
+                    [''],
+                    
+                    // Fixed Parameters Section
+                    ['=== PARAMETER TETAP PERHITUNGAN ==='],
+                    ['WACC (Discount Rate)', '15%'],
+                    ['Tax Rate', '22%'],
+                    ['COGS Margin', '70%'],
+                    ['Bad Debt Rate', '5%'],
+                    ['Depreciation Period', '5 Tahun'],
+                    ['Marketing Cost Rate', '30%'],
+                    ['Operational Cost Rate', '20%'],
+                    [''],
+                    
+                    // COGS Projection Section
+                    ['=== PROYEKSI COGS ==='],
+                    ['Label', 'Total', ...results.cogsProjections.map((_, i) => `Tahun ke-${i}`)],
+                    ['COGS OTC', formatCurrency(results.cogsProjections.reduce((sum, p) => sum + p.otcCogs, 0)), ...results.cogsProjections.map(p => formatCurrency(p.otcCogs))],
+                    ['COGS Bulanan', formatCurrency(results.cogsProjections.reduce((sum, p) => sum + p.monthlyCogs, 0)), ...results.cogsProjections.map(p => formatCurrency(p.monthlyCogs))],
+                    ['Total COGS', formatCurrency(results.cogsProjections.reduce((sum, p) => sum + p.totalCogs, 0)), ...results.cogsProjections.map(p => formatCurrency(p.totalCogs))],
+                    [''],
+                    
+                    // OPEX Projection Section
+                    ['=== PROYEKSI OPEX ==='],
+                    ['Label', 'Total', ...results.opexProjections.map((_, i) => `Tahun ke-${i}`)],
+                    ['Marketing Cost', formatCurrency(results.opexProjections.reduce((sum, p) => sum + p.marketingCost, 0)), ...results.opexProjections.map(p => formatCurrency(p.marketingCost))],
+                    ['Operational Cost', formatCurrency(results.opexProjections.reduce((sum, p) => sum + p.operationalCost, 0)), ...results.opexProjections.map(p => formatCurrency(p.operationalCost))],
+                    ['Total OPEX', formatCurrency(results.opexProjections.reduce((sum, p) => sum + p.totalOpex, 0)), ...results.opexProjections.map(p => formatCurrency(p.totalOpex))],
+                    [''],
+                    
+                    // Key Summary Metrics Section
+                    ['=== RINGKASAN UTAMA HASIL PERHITUNGAN ==='],
+                    ['Metric', 'Nilai'],
+                    ['Total Revenue (Lifetime)', formatCurrency(results.totalRevenue)],
+                    ['OTC Revenue', formatCurrency(results.otcRevenue)],
+                    ['Monthly Revenue Total', formatCurrency(results.monthlyTotal)],
+                    ['Cost IBL', formatCurrency(results.costIBL)],
+                    ['Cost OBL', formatCurrency(results.costOBL)],
+                    ['Total COGS', formatCurrency(results.cogsProjections.reduce((sum, p) => sum + p.totalCogs, 0))],
+                    ['Total OPEX', formatCurrency(results.totalOpex)],
+                    [''],
+                    
+                    // Quick Analysis Summary
+                    ['=== RINGKASAN ANALISIS KELAYAKAN ==='],
+                    ['NPV', formatCurrency(results.npv)],
+                    ['IRR', formatPercentage(results.irr)],
+                    ['Payback Period', `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`],
+                    ['Status Kelayakan', results.isViable ? 'LAYAK' : 'TIDAK LAYAK']
+                ];
+                
+                const wsCogsOpexAnalysis = XLSX.utils.aoa_to_sheet(cogsOpexAnalysisData);
+                XLSX.utils.book_append_sheet(wb, wsCogsOpexAnalysis, 'COGS+Opex+Ringkasan');
+                
+                // ===== SHEET 3: Revenue & P&L Summary (keep as is) =====
+                const plSummaryHeaders = ['Metrics', 'Total', ...results.yearlyProjections.slice(1).map((_, i) => `Tahun ${i + 1}`)];
+                
+                // Calculate totals excluding year 0 to match web interface columns
+                const revenueTotal = results.yearlyProjections.slice(1).reduce((sum, p) => sum + p.revenue, 0);
+                const cogsTotal = results.cogsProjections.slice(1).reduce((sum, p) => sum + p.totalCogs, 0);
+                const depreciationTotal = results.yearlyProjections.slice(1).reduce((sum, p) => sum + p.depreciation, 0);
+                const grossProfitTotal = revenueTotal - cogsTotal;
+                const netIncomeTotal = results.yearlyProjections.slice(1).reduce((sum, p) => sum + p.netIncome, 0);
+                const grossMarginTotal = revenueTotal > 0 ? (grossProfitTotal / revenueTotal) : 0;
+                const niMarginTotal = revenueTotal > 0 ? (netIncomeTotal / revenueTotal) : 0;
+                
+                const plSummaryData = [
+                    plSummaryHeaders,
+                    ['Revenue', formatCurrency(revenueTotal), ...results.yearlyProjections.slice(1).map(p => formatCurrency(p.revenue))],
+                    ['Direct Cost (COGS)', formatCurrency(cogsTotal), ...results.cogsProjections.slice(1).map(p => formatCurrency(p.totalCogs))],
+                    ['Depresiasi', formatCurrency(depreciationTotal), ...results.yearlyProjections.slice(1).map(p => formatCurrency(p.depreciation))],
+                    ['Gross Profit (GP)', formatCurrency(grossProfitTotal), ...results.yearlyProjections.slice(1).map((proj, index) => {
+                        const yearlyGrossProfit = proj.revenue - (results.cogsProjections[index + 1]?.totalCogs || 0);
+                        return formatCurrency(yearlyGrossProfit);
+                    })],
+                    ['GP Margin', formatPercentage(grossMarginTotal), ...results.yearlyProjections.slice(1).map((proj, index) => {
+                        const yearlyRevenue = proj.revenue;
+                        const yearlyCogs = results.cogsProjections[index + 1]?.totalCogs || 0;
+                        const yearlyGrossProfit = yearlyRevenue - yearlyCogs;
+                        const yearlyMargin = yearlyRevenue > 0 ? (yearlyGrossProfit / yearlyRevenue) : 0;
+                        return formatPercentage(yearlyMargin);
+                    })],
+                    ['Net Income (NI)', formatCurrency(netIncomeTotal), ...results.yearlyProjections.slice(1).map(p => formatCurrency(p.netIncome))],
+                    ['NI Margin', formatPercentage(niMarginTotal), ...results.yearlyProjections.slice(1).map((proj) => {
+                        const margin = proj.revenue > 0 ? (proj.netIncome / proj.revenue) : 0;
+                        return formatPercentage(margin);
+                    })]
+                ];
+                
+                const wsPLSummary = XLSX.utils.aoa_to_sheet(plSummaryData);
+                XLSX.utils.book_append_sheet(wb, wsPLSummary, 'Revenue & P&L Summary');
+                
+                // ===== SHEET 4: Cash Flow Summary (keep as is) =====
+                const calculatePVOfFCF = (fcf, year, discountRate = 0.15) => {
+                    if (year === 0) return fcf;
+                    return fcf / Math.pow(1 + discountRate, year);
+                };
+                
+                const cfSummaryHeaders = ['Cash Flow Metrics', 'Total', ...results.cashFlowProjections.slice(1).map((_, i) => `Tahun ${i + 1}`)];
+                
+                // Calculate totals excluding year 0 to match web interface columns
+                const cashInflowTotal = results.cashFlowProjections.slice(1).reduce((sum, proj) => sum + proj.totalCashInflow, 0);
+                const capexTotal = results.cashFlowProjections.slice(1).reduce((sum, proj) => sum + proj.capex, 0);
+                const fcfTotal = results.cashFlowProjections.slice(1).reduce((sum, proj) => sum + proj.netCashFlow, 0);
+                const pvFCFTotal = results.cashFlowProjections.slice(1).reduce((sum, proj) => sum + calculatePVOfFCF(proj.netCashFlow, proj.year), 0);
+                
+                const cfSummaryData = [
+                    cfSummaryHeaders,
+                    ['EBIT+ (after tax)', formatCurrency(cashInflowTotal), ...results.cashFlowProjections.slice(1).map(cf => formatCurrency(cf.totalCashInflow))],
+                    ['Investment (CAPEX)', formatCurrency(capexTotal), ...results.cashFlowProjections.slice(1).map(cf => formatCurrency(cf.capex))],
+                    ['Free Cash Flow', formatCurrency(fcfTotal), ...results.cashFlowProjections.slice(1).map(cf => formatCurrency(cf.netCashFlow))],
+                    ['WACC Discount Rate', '15%', ...results.cashFlowProjections.slice(1).map(() => '15%')],
+                    ['PV (Present Value) of FCF', formatCurrency(pvFCFTotal), ...results.cashFlowProjections.slice(1).map(cf => formatCurrency(calculatePVOfFCF(cf.netCashFlow, cf.year)))]
+                ];
+                
+                const wsCFSummary = XLSX.utils.aoa_to_sheet(cfSummaryData);
+                XLSX.utils.book_append_sheet(wb, wsCFSummary, 'Cash Flow Summary');
+                
+                // ===== SHEET 5: Analisis NPV, IRR, Payback & Feasibility (combined sheet) =====
+                const npvStatus = results.npv > 0 ? 'Layak' : 'Tidak Layak';
+                const irrStatus = results.irr >= 0.15 ? 'Layak' : 'Tidak Layak';
+                
+                const npvFeasibilityData = [
+                    ['ANALISIS NPV, IRR, PAYBACK & FEASIBILITY'],
+                    [''],
+                    
+                    // NPV Analysis Section
+                    ['=== ANALISIS NPV, IRR & PAYBACK PERIOD ==='],
+                    ['Analisis Kelayakan', 'Nilai', 'Kriteria', 'Status', ...results.cashFlowProjections.slice(1).map((_, i) => `Tahun ${i + 1}`)],
+                    ['NPV', formatCurrency(results.npv), '> 0', npvStatus, ...results.cashFlowProjections.slice(1).map(() => '-')],
+                    ['IRR', formatPercentage(results.irr), '>= 15%', irrStatus, ...results.cashFlowProjections.slice(1).map(() => '-')],
+                    ['Payback Period', `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`, 'Semakin Pendek Semakin Baik', '-', ...results.cashFlowProjections.slice(1).map(() => '-')],
+                    [''],
+                    
+                    // Investment Cash Flow Breakdown for Analysis
+                    ['=== BREAKDOWN CASH FLOW UNTUK ANALISIS ==='],
+                    ['Tahun', 'Net Cash Flow', 'Cumulative Cash Flow', 'PV Factor (15%)', 'Present Value'],
+                    ['0', formatCurrency(-inputs.investmentCost), formatCurrency(-inputs.investmentCost), '1.000', formatCurrency(-inputs.investmentCost)],
+                    ...results.cashFlowProjections.slice(1).map((cf, index) => {
+                        const year = index + 1;
+                        const pvFactor = 1 / Math.pow(1.15, year);
+                        const presentValue = cf.netCashFlow * pvFactor;
+                        return [
+                            year.toString(),
+                            formatCurrency(cf.netCashFlow),
+                            formatCurrency(cf.cumulativeCashFlow),
+                            pvFactor.toFixed(3),
+                            formatCurrency(presentValue)
+                        ];
+                    }),
+                    [''],
+                    
+                    // Feasibility Analysis Section
+                    ['=== ANALISIS KELAYAKAN INVESTASI ==='],
+                    ['Metrics', 'Value', 'Threshold', 'Status', 'Keterangan'],
+                    ['NPV', formatCurrency(results.npv), '> Rp 0', npvStatus, npvStatus === 'Layak' ? 'Investasi menghasilkan nilai positif' : 'Investasi tidak menghasilkan nilai positif'],
+                    ['IRR', formatPercentage(results.irr), '>= 15%', irrStatus, irrStatus === 'Layak' ? 'Return melebihi cost of capital' : 'Return di bawah cost of capital'],
+                    ['Payback Period', `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`, 'Reasonable Period', '-', 'Waktu pengembalian modal investasi'],
+                    [''],
+                    
+                    // Investment Recommendation
+                    ['=== REKOMENDASI INVESTASI ==='],
+                    ['Aspek Penilaian', 'Hasil', 'Interpretasi'],
+                    ['Profitabilitas (NPV)', results.npv > 0 ? 'POSITIF' : 'NEGATIF', results.npv > 0 ? 'Investasi menguntungkan' : 'Investasi merugikan'],
+                    ['Efisiensi Return (IRR)', results.irr >= 0.15 ? 'MEMADAI' : 'TIDAK MEMADAI', results.irr >= 0.15 ? 'Return sesuai ekspektasi' : 'Return di bawah ekspektasi'],
+                    ['Risiko Waktu (Payback)', `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`, 'Waktu pengembalian investasi'],
+                    [''],
+                    ['KESIMPULAN AKHIR', '', ''],
+                    ['Status Kelayakan', results.isViable ? 'LAYAK' : 'TIDAK LAYAK', results.isViable ? 'Investasi direkomendasikan untuk dilaksanakan' : 'Investasi tidak direkomendasikan'],
+                    ['Tingkat Kepercayaan', results.npv > 0 && results.irr >= 0.15 ? 'TINGGI' : results.npv > 0 || results.irr >= 0.15 ? 'SEDANG' : 'RENDAH', 'Berdasarkan konsistensi indikator kelayakan'],
+                    ['Rekomendasi Tindakan', 
+                        results.isViable ? 'PROCEED' : 'REVIEW/REJECT', 
+                        results.isViable ? 'Lanjutkan ke tahap implementasi' : 'Tinjau ulang parameter atau tolak investasi']
+                ];
+                
+                const wsNPVFeasibility = XLSX.utils.aoa_to_sheet(npvFeasibilityData);
+                XLSX.utils.book_append_sheet(wb, wsNPVFeasibility, 'NPV, IRR & Feasibility');
+                
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([wbout], { type: 'application/octet-stream' });
+                
+                // Generate filename with customer name or placeholder
+                const customerNameForFile = inputs.customerName ? inputs.customerName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_') : 'Nama_Customer';
+                const filename = `AKI PT ${customerNameForFile}.xlsx`;
+                
+                saveAs(blob, filename);
+            };
+
+            React.useEffect(() => {
+                const hasValidServices = inputs.services.length > 0 && inputs.services.some(service => 
+                    service.serviceDetails.trim() !== "" && (service.monthlyRevenue > 0 || service.otcCost > 0)
+                );
+                
+                if (inputs.customerName.trim() !== "" && inputs.investmentCost > 0 && inputs.contractPeriod > 0 && hasValidServices) {
+                    calculateAnalysis();
+                }
+            }, [inputs]);
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8">
+                    <div className="container">
+                        {/* Header */}
+                        <div className="header">
+                            <h1 data-testid="page-title">
+                                Analisis Kelayakan Investasi
+                            </h1>
+                            <p>Sistem Perhitungan Finansial untuk Evaluasi Proyek</p>
+                        </div>
+
+                        {/* Input Section */}
+                        <div className="card mb-8">
+                            <div className="card-header">
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-xl font-semibold">Parameter Input</h2>
+                                    <button
+                                        onClick={() => setShowFixedParams(true)}
+                                        className="btn btn-outline text-muted hover:text-foreground transition-colors"
+                                        data-testid="button-toggle-fixed-params"
+                                    >
+                                        ⚙️ Parameter Tetap
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="card-content">
+                                {/* Variable Inputs Section */}
+                                <div>
+                                    <h3 className="font-medium text-foreground mb-4">Input Variabel</h3>
+                                    
+                                    {/* 3x3 Grid Layout */}
+                                    <div className="grid grid-cols-1 md-grid-cols-3 gap-6">
+                                        {/* Row 1: Nama Pelanggan | Total BOQ Biaya Investasi | Periode Kontrak */}
+                                        <div className="form-group">
+                                            <label htmlFor="customer-name" className="block text-sm font-medium text-foreground mb-2">
+                                                Nama Pelanggan
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id="customer-name"
+                                                placeholder="Masukkan nama pelanggan"
+                                                value={inputValues.customerName}
+                                                onChange={(e) => handleInputChange('customerName', e.target.value)}
+                                                className="form-control"
+                                                data-testid="input-customer-name"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label htmlFor="investment" className="block text-sm font-medium text-foreground mb-2">
+                                                Total BOQ Biaya Investasi
+                                            </label>
+                                            <div className="currency-input">
+                                                <span>Rp</span>
+                                                <input
+                                                    type="text"
+                                                    id="investment"
+                                                    placeholder="0"
+                                                    value={inputValues.investmentCost}
+                                                    onChange={(e) => handleInputChange('investmentCost', e.target.value)}
+                                                    className="form-control"
+                                                    data-testid="input-investment"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label htmlFor="period" className="block text-sm font-medium text-foreground mb-2">
+                                                Periode Kontrak
+                                            </label>
+                                            <div className="space-y-2">
+                                                <div className="select">
+                                                    <select value={periodType} onChange={(e) => handlePeriodTypeChange(e.target.value)} data-testid="input-period">
+                                                        <option value="">Pilih periode kontrak</option>
+                                                        <option value="12">12 Bulan</option>
+                                                        <option value="24">24 Bulan</option>
+                                                        <option value="36">36 Bulan</option>
+                                                        <option value="48">48 Bulan</option>
+                                                        <option value="60">60 Bulan</option>
+                                                        <option value="72">72 Bulan</option>
+                                                        <option value="custom">Custom</option>
+                                                    </select>
+                                                </div>
+                                                {periodType === 'custom' && (
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="number"
+                                                            placeholder="0"
+                                                            value={customPeriod}
+                                                            onChange={(e) => handleCustomPeriodChange(e.target.value)}
+                                                            className="form-control"
+                                                        />
+                                                        <span className="text-sm text-muted">bulan</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    
+                                    {/* Services Section */}
+                                    <div className="mt-8">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="font-medium text-foreground">Detail Layanan</h3>
+                                            <button
+                                                type="button"
+                                                onClick={addService}
+                                                className="btn btn-primary"
+                                                data-testid="button-add-service"
+                                            >
+                                                ⊕ Tambah Layanan Lainnya
+                                            </button>
+                                        </div>
+                                        
+                                        <div className="space-y-4">
+                                            {inputs.services.map((service, index) => (
+                                                <div key={service.id} className="service-card">
+                                                    <div className="service-header">
+                                                        <h4 className="service-title">
+                                                            Layanan {index + 1}
+                                                        </h4>
+                                                        {inputs.services.length > 1 && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeService(service.id)}
+                                                                className="btn btn-danger"
+                                                                data-testid={`button-delete-service-${service.id}`}
+                                                            >
+                                                                🗑️ Hapus
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                    
+                                                    <div className="grid grid-cols-1 md-grid-cols-3 gap-4">
+                                                        <div className="form-group">
+                                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                                Jenis & Detail Layanan
+                                                            </label>
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Astinet / Metro E / Indibiz, dsb."
+                                                                value={inputValues.services.find(s => s.id === service.id)?.serviceDetails || ''}
+                                                                onChange={(e) => handleServiceChange(service.id, 'serviceDetails', e.target.value)}
+                                                                className="form-control"
+                                                                data-testid={`input-service-details-${service.id}`}
+                                                            />
+                                                        </div>
+                                                        
+                                                        <div className="form-group">
+                                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                                BW (Bandwidth)
+                                                            </label>
+                                                            <input
+                                                                type="number"
+                                                                placeholder="100"
+                                                                value={inputValues.services.find(s => s.id === service.id)?.bandwidth || ''}
+                                                                onChange={(e) => handleServiceChange(service.id, 'bandwidth', e.target.value)}
+                                                                className="form-control"
+                                                                data-testid={`input-bandwidth-${service.id}`}
+                                                            />
+                                                        </div>
+                                                        
+                                                        <div className="form-group">
+                                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                                Qty (Quantity)
+                                                            </label>
+                                                            <input
+                                                                type="number"
+                                                                min="1"
+                                                                step="1"
+                                                                placeholder="1"
+                                                                value={inputValues.services.find(s => s.id === service.id)?.quantity || ''}
+                                                                onChange={(e) => handleServiceChange(service.id, 'quantity', e.target.value)}
+                                                                className="form-control"
+                                                                data-testid={`input-quantity-${service.id}`}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div className="grid grid-cols-1 md-grid-cols-3 gap-4 mt-4">
+                                                        <div className="form-group">
+                                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                                Satuan
+                                                            </label>
+                                                            <div className="select">
+                                                                <select
+                                                                    value={inputValues.services.find(s => s.id === service.id)?.unit || ''}
+                                                                    onChange={(e) => handleServiceChange(service.id, 'unit', e.target.value)}
+                                                                    data-testid={`input-unit-${service.id}`}
+                                                                >
+                                                                    <option value="">Pilih satuan</option>
+                                                                    <option value="titik">titik</option>
+                                                                    <option value="unit">unit</option>
+                                                                    <option value="pcs">pcs</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div className="form-group">
+                                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                                Biaya Bulanan
+                                                            </label>
+                                                            <div className="currency-input">
+                                                                <span>Rp</span>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="0"
+                                                                    value={inputValues.services.find(s => s.id === service.id)?.monthlyRevenue || ''}
+                                                                    onChange={(e) => handleServiceChange(service.id, 'monthlyRevenue', e.target.value)}
+                                                                    className="form-control"
+                                                                    data-testid={`input-monthly-revenue-${service.id}`}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div className="form-group">
+                                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                                Biaya Aktivasi
+                                                            </label>
+                                                            <div className="currency-input">
+                                                                <span>Rp</span>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="0"
+                                                                    value={inputValues.services.find(s => s.id === service.id)?.otcCost || ''}
+                                                                    onChange={(e) => handleServiceChange(service.id, 'otcCost', e.target.value)}
+                                                                    className="form-control"
+                                                                    data-testid={`input-otc-cost-${service.id}`}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Totals Section */}
+                                    <div className="mt-8">
+                                        <h3 className="font-medium text-foreground mb-4">Total Keseluruhan</h3>
+                                        <div className="grid grid-cols-1 md-grid-cols-2 gap-4">
+                                            <div className="form-group">
+                                                <label className="block text-sm font-medium text-foreground mb-2">
+                                                    Total Revenue Bulanan
+                                                </label>
+                                                <div className="currency-input">
+                                                    <span>Rp</span>
+                                                    <input
+                                                        type="text"
+                                                        value={totalMonthlyRevenue > 0 ? stripCurrencyPrefix(formatCurrency(totalMonthlyRevenue)) : stripCurrencyPrefix(formatCurrency(0))}
+                                                        readOnly
+                                                        className="form-control"
+                                                        data-testid="display-total-monthly-revenue"
+                                                    />
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="form-group">
+                                                <label className="block text-sm font-medium text-foreground mb-2">
+                                                    Total Biaya Aktivasi
+                                                </label>
+                                                <div className="currency-input">
+                                                    <span>Rp</span>
+                                                    <input
+                                                        type="text"
+                                                        value={totalOtcCost > 0 ? stripCurrencyPrefix(formatCurrency(totalOtcCost)) : stripCurrencyPrefix(formatCurrency(0))}
+                                                        readOnly
+                                                        className="form-control"
+                                                        data-testid="display-total-activation-cost"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Excel Download Button */}
+                                {results && (
+                                    <div className="mt-6 pt-6 border-t border-border">
+                                        <div className="flex justify-center">
+                                            <button 
+                                                onClick={() => exportToExcel(results, inputs)}
+                                                className="btn btn-success"
+                                                data-testid="button-export-excel"
+                                            >
+                                                📊 Download Excel
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                            </div>
+                        </div>
+
+                        {/* Results Section */}
+                        {results && (
+                            <div className="space-y-8">
+                                {/* General Information */}
+                                <div className="card">
+                                    <div className="card-header">
+                                        <h2 className="text-lg font-semibold">Informasi Umum</h2>
+                                    </div>
+                                    <div className="card-content">
+                                        <div className="grid grid-cols-1 md-grid-cols-2 gap-8">
+                                            <div className="space-y-4">
+                                                <div className="flex justify-between py-2 border-b border-border">
+                                                    <span className="text-muted">Revenue (Bruto)</span>
+                                                    <div className="text-right">
+                                                        <div className="font-medium" data-testid="info-total-revenue">
+                                                            Total: <span className="font-bold">{formatCurrency(results.totalRevenue)}</span>
+                                                        </div>
+                                                        <div className="text-sm text-muted">OTC: {formatCurrency(results.otcRevenue)}</div>
+                                                        <div className="text-sm text-muted">
+                                                            Bulanan: {formatCurrency(totalMonthlyRevenue)} x {inputs.contractPeriod} bulan = {formatCurrency(results.monthlyTotal)}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="flex justify-between py-2 border-b border-border">
+                                                    <span className="text-muted">COGS (70% dari harga)</span>
+                                                    <div className="text-right">
+                                                        <div className="font-medium" data-testid="info-total-cogs">
+                                                            Total: <span className="font-bold">{formatCurrency(results.totalCogs)}</span>
+                                                        </div>
+                                                        <div className="text-sm text-muted">OTC: {formatCurrency(results.otcCogs)}</div>
+                                                        <div className="text-sm text-muted">
+                                                            Bulanan: {formatCurrency(results.monthlyCogs)}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="flex justify-between py-2 border-b border-border">
+                                                    <span className="text-muted">Cost IBL</span>
+                                                    <div className="text-right">
+                                                        <div className="font-medium" data-testid="info-cost-ibl">
+                                                            Total: <span className="font-bold">{formatCurrency(results.costIBL)}</span>
+                                                        </div>
+                                                        <div className="text-sm text-muted">OTC Akhir: {formatCurrency(results.otcRevenue)}</div>
+                                                        <div className="text-sm text-muted">
+                                                            Bulanan Akhir: {formatCurrency(totalMonthlyRevenue)} x {inputs.contractPeriod} = {formatCurrency(results.monthlyTotal)}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="flex justify-between py-2 border-b border-border">
+                                                    <span className="text-muted">Cost OBL</span>
+                                                    <div className="text-right">
+                                                        <div className="font-medium" data-testid="info-cost-obl">
+                                                            Total: <span className="font-bold">{formatCurrency(results.costOBL)}</span>
+                                                        </div>
+                                                        <div className="text-sm text-muted">OTC: Rp 0</div>
+                                                        <div className="text-sm text-muted">Bulanan: Rp 0 x {inputs.contractPeriod} = Rp 0</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="space-y-4">
+                                                <div className="summary-box">
+                                                    <h3>OPEX (Operasional + Marketing)</h3>
+                                                    <div className="value" data-testid="info-opex">
+                                                        Total: ({formatCurrency(results.totalOpex)})
+                                                    </div>
+                                                    <div className="text-sm space-y-1 mt-2">
+                                                        <div>Biaya Marketing: 30% dari revenue bulanan ({formatCurrency(results.marketingCost)})</div>
+                                                        <div>Biaya Operasional: 20% dari total revenue ({formatCurrency(results.operationalCost)})</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Financial Summary Form */}
+                                <div className="card">
+                                    <div className="card-header">
+                                        <h2 className="text-lg font-semibold">Ringkasan Analisis Keuangan</h2>
+                                    </div>
+                                    <div className="card-content">
+                                        <div className="space-y-6">
+                                            {/* Nilai CAPEX (Cost) */}
+                                            <div className="form-group">
+                                                <label className="block text-sm font-medium text-foreground mb-2">
+                                                    Nilai CAPEX (Cost)
+                                                </label>
+                                                <div className="currency-input">
+                                                    <span>Rp</span>
+                                                    <input
+                                                        type="text"
+                                                        value={formatCurrency(inputs.investmentCost).replace(/^Rp\s*/, '')}
+                                                        readOnly
+                                                        className="form-control"
+                                                        data-testid="output-capex"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Nilai COGS and Nilai OPEX - side by side */}
+                                            <div className="grid grid-cols-1 md-grid-cols-2 gap-4">
+                                                <div className="form-group">
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Nilai COGS
+                                                    </label>
+                                                    <div className="currency-input">
+                                                        <span>Rp</span>
+                                                        <input
+                                                            type="text"
+                                                            value={formatCurrency(results.totalCogs).replace(/^Rp\s*/, '')}
+                                                            readOnly
+                                                            className="form-control"
+                                                            data-testid="output-cogs"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Nilai OPEX
+                                                    </label>
+                                                    <div className="currency-input">
+                                                        <span>Rp</span>
+                                                        <input
+                                                            type="text"
+                                                            value={formatCurrency(results.totalOpex).replace(/^Rp\s*/, '')}
+                                                            readOnly
+                                                            className="form-control"
+                                                            data-testid="output-opex"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Estimasi Revenue */}
+                                            <div className="form-group">
+                                                <label className="block text-sm font-medium text-foreground mb-2">
+                                                    Estimasi Revenue
+                                                </label>
+                                                <div className="currency-input">
+                                                    <span>Rp</span>
+                                                    <input
+                                                        type="text"
+                                                        value={formatCurrency(results.totalRevenue).replace(/^Rp\s*/, '')}
+                                                        readOnly
+                                                        className="form-control"
+                                                        data-testid="output-revenue"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Gross Profit and Gross Profit Margin - side by side */}
+                                            <div className="grid grid-cols-1 md-grid-cols-2 gap-4">
+                                                <div className="form-group">
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Gross Profit
+                                                    </label>
+                                                    <div className="currency-input">
+                                                        <span>Rp</span>
+                                                        <input
+                                                            type="text"
+                                                            value={stripCurrencyPrefix(formatCurrency(results.grossProfit))}
+                                                            readOnly
+                                                            className="form-control"
+                                                            data-testid="output-gross-profit"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Gross Profit Margin
+                                                    </label>
+                                                    <div className="currency-input">
+                                                        <input
+                                                            type="text"
+                                                            value={formatPercentage(results.grossProfitMargin).replace('%', '')}
+                                                            readOnly
+                                                            className="form-control"
+                                                            data-testid="output-gross-profit-margin"
+                                                        />
+                                                        <span>%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Net Income and Net Income Margin - side by side */}
+                                            <div className="grid grid-cols-1 md-grid-cols-2 gap-4">
+                                                <div className="form-group">
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Net Income
+                                                    </label>
+                                                    <div className="currency-input">
+                                                        <span>Rp</span>
+                                                        <input
+                                                            type="text"
+                                                            value={stripCurrencyPrefix(formatCurrency(results.totalNetIncome))}
+                                                            readOnly
+                                                            className="form-control"
+                                                            data-testid="output-net-income"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Net Income Margin
+                                                    </label>
+                                                    <div className="currency-input">
+                                                        <input
+                                                            type="text"
+                                                            value={formatPercentage(results.netIncomeMargin).replace('%', '')}
+                                                            readOnly
+                                                            className="form-control"
+                                                            data-testid="output-net-income-margin"
+                                                        />
+                                                        <span>%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* NPV */}
+                                            <div className="form-group">
+                                                <label className="block text-sm font-medium text-foreground mb-2">
+                                                    NPV
+                                                </label>
+                                                <div className="currency-input">
+                                                    <span>Rp</span>
+                                                    <input
+                                                        type="text"
+                                                        value={stripCurrencyPrefix(formatCurrency(results.npv))}
+                                                        readOnly
+                                                        className={`form-control ${results.npv > 0 ? 'text-green' : 'text-red'}`}
+                                                        data-testid="output-npv"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Jangka Waktu, IRR, and Payback Period - three fields in one row */}
+                                            <div className="grid grid-cols-1 md-grid-cols-3 gap-4">
+                                                <div className="form-group">
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Jangka Waktu
+                                                    </label>
+                                                    <div className="currency-input">
+                                                        <input
+                                                            type="text"
+                                                            value={inputs.contractPeriod.toString()}
+                                                            readOnly
+                                                            className="form-control"
+                                                            data-testid="output-period"
+                                                        />
+                                                        <span>Month</span>
+                                                    </div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        IRR
+                                                    </label>
+                                                    <div className="currency-input">
+                                                        <input
+                                                            type="text"
+                                                            value={formatPercentage(results.irr).replace('%', '')}
+                                                            readOnly
+                                                            className={`form-control ${results.irr >= 0.15 ? 'text-green' : 'text-red'}`}
+                                                            data-testid="output-irr"
+                                                        />
+                                                        <span>%</span>
+                                                    </div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Payback Period
+                                                    </label>
+                                                    <div className="currency-input">
+                                                        <input
+                                                            type="text"
+                                                            value={`${results.paybackPeriod.years}.${results.paybackPeriod.months}`}
+                                                            readOnly
+                                                            className="form-control"
+                                                            data-testid="output-payback-period"
+                                                        />
+                                                        <span>Month</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Status Summary */}
+                                            <div className="mt-8 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-lg border">
+                                                <h3 className="font-semibold text-foreground mb-3">Status Kelayakan</h3>
+                                                <div className="grid grid-cols-1 md-grid-cols-2 gap-4">
+                                                    <div className={`p-3 rounded-md border ${
+                                                        results.npv > 0 ? 'status-badge success' : 'status-badge danger'
+                                                    }`}>
+                                                        <div className="font-medium text-sm">
+                                                            NPV: {results.npv > 0 ? 'Layak' : 'Tidak Layak'}
+                                                        </div>
+                                                    </div>
+                                                    <div className={`p-3 rounded-md border ${
+                                                        results.irr >= 0.15 ? 'status-badge success' : 'status-badge danger'
+                                                    }`}>
+                                                        <div className="font-medium text-sm">
+                                                            IRR: {results.irr >= 0.15 ? 'Layak' : 'Tidak Layak'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Service Breakdown Table */}
+                                            <div className="mt-8">
+                                                <h3 className="font-semibold text-foreground mb-4">Detail Breakdown Layanan</h3>
+                                                <div className="border rounded-lg overflow-hidden">
+                                                    <table className="table table-striped">
+                                                        <thead>
+                                                            <tr className="bg-muted/50">
+                                                                <th className="border-r text-center font-semibold text-foreground">Layanan</th>
+                                                                <th className="border-r text-center font-semibold text-foreground">BW (Mbps)</th>
+                                                                <th className="border-r text-center font-semibold text-foreground">Qty</th>
+                                                                <th className="border-r text-center font-semibold text-foreground">Satuan</th>
+                                                                <th className="border-r text-center font-semibold text-foreground">OTC</th>
+                                                                <th className="border-r text-center font-semibold text-foreground">MRC</th>
+                                                                <th className="border-r text-center font-semibold text-foreground">Total OTC</th>
+                                                                <th className="border-r text-center font-semibold text-foreground">Total MRC</th>
+                                                                <th className="text-center font-semibold text-foreground">Total MRC {inputs.contractPeriod} Bulan</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {inputs.services.map((service, index) => (
+                                                                <tr key={service.id} className={index % 2 === 0 ? "bg-background" : "bg-muted/30"} data-testid={`service-row-${service.id}`}>
+                                                                    <td className="border-r font-medium">{service.serviceDetails || `Layanan ${index + 1}`}</td>
+                                                                    <td className="border-r text-center" data-testid={`table-bandwidth-${service.id}`}>{service.bandwidth || "-"}</td>
+                                                                    <td className="border-r text-center" data-testid={`table-quantity-${service.id}`}>{service.quantity || "-"}</td>
+                                                                    <td className="border-r text-center" data-testid={`table-unit-${service.id}`}>{service.unit || "-"}</td>
+                                                                    <td className="border-r text-right">{formatCurrency(service.otcCost)}</td>
+                                                                    <td className="border-r text-right">{formatCurrency(service.monthlyRevenue)}</td>
+                                                                    <td className="border-r text-right">{formatCurrency(service.otcCost * getSafeQuantity(service.quantity))}</td>
+                                                                    <td className="border-r text-right">{formatCurrency(service.monthlyRevenue * getSafeQuantity(service.quantity))}</td>
+                                                                    <td className="text-right">{formatCurrency(service.monthlyRevenue * getSafeQuantity(service.quantity) * inputs.contractPeriod)}</td>
+                                                                </tr>
+                                                            ))}
+                                                            
+                                                            {/* Total (exc. PPN) Row */}
+                                                            <tr className="bg-slate-100 border-t-2 border-slate-300">
+                                                                <td className="border-r font-bold text-foreground">Total (exc. PPN)</td>
+                                                                <td className="border-r text-center text-muted">-</td>
+                                                                <td className="border-r text-center font-bold text-foreground">{inputs.services.reduce((sum, service) => sum + getSafeQuantity(service.quantity), 0)}</td>
+                                                                <td className="border-r text-center font-bold text-foreground">{inputs.services.length > 0 ? (inputs.services[0].unit || '-') : '-'}</td>
+                                                                <td className="border-r text-right font-bold">{formatCurrency(totalOtcCost)}</td>
+                                                                <td className="border-r text-right font-bold">{formatCurrency(totalMonthlyRevenue)}</td>
+                                                                <td className="border-r text-right font-bold">{formatCurrency(totalOtcCost)}</td>
+                                                                <td className="border-r text-right font-bold">{formatCurrency(totalMonthlyRevenue)}</td>
+                                                                <td className="text-right font-bold">{formatCurrency(totalMonthlyRevenue * inputs.contractPeriod)}</td>
+                                                            </tr>
+
+                                                            {/* Total OTC + MRC xxx Bulan (exc. PPN) Row */}
+                                                            <tr className="bg-blue-50 border-t border-blue-200">
+                                                                <td className="border-r font-bold text-blue-800" colSpan={8}>
+                                                                    Total OTC + MRC {inputs.contractPeriod} Bulan (exc. PPN)
+                                                                </td>
+                                                                <td className="text-right font-bold text-blue-800">
+                                                                    {formatCurrency(totalOtcCost + (totalMonthlyRevenue * inputs.contractPeriod))}
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            {/* COGS Projection Table */}
+                                            <div className="mt-8">
+                                                <div className="card">
+                                                    <div className="card-header">
+                                                        <h2 className="text-lg font-semibold">Tabel Proyeksi COGS (Cost of Goods Sold)</h2>
+                                                    </div>
+                                                    <div className="card-content p-0">
+                                                        <CogsTable projections={results.cogsProjections} />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* OPEX Projection Table */}
+                                            <div className="mt-8">
+                                                <div className="card">
+                                                    <div className="card-header">
+                                                        <h2 className="text-lg font-semibold">Tabel Proyeksi OPEX (Operating Expenses)</h2>
+                                                    </div>
+                                                    <div className="card-content p-0">
+                                                        <OpexTable projections={results.opexProjections} />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Revenue & P&L Summary Table */}
+                                            <div className="mt-8">
+                                                <div className="card">
+                                                    <div className="card-header">
+                                                        <h2 className="text-lg font-semibold">Revenue & P&L Summary</h2>
+                                                    </div>
+                                                    <div className="card-content p-0">
+                                                        <PLSummaryTable results={results} />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Cash Flow Summary Table */}
+                                            <div className="mt-8">
+                                                <div className="card">
+                                                    <div className="card-header">
+                                                        <h2 className="text-lg font-semibold">Cash Flow Summary</h2>
+                                                    </div>
+                                                    <div className="card-content p-0">
+                                                        <CashFlowSummaryTable results={results} />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* NPV Analysis Table */}
+                                            <div className="mt-8">
+                                                <div className="card">
+                                                    <div className="card-header">
+                                                        <h2 className="text-lg font-semibold">Analisis NPV, IRR & Payback Period</h2>
+                                                    </div>
+                                                    <div className="card-content p-0">
+                                                        <NPVAnalysisTable results={results} />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Feasibility Analysis Table */}
+                                            <div className="mt-8">
+                                                <div className="card">
+                                                    <div className="card-header">
+                                                        <h2 className="text-lg font-semibold">Feasibility Analysis</h2>
+                                                    </div>
+                                                    <div className="card-content p-0">
+                                                        <FeasibilityAnalysisTable results={results} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Footer */}
+                        <footer className="footer">
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.0</p>
+                        </footer>
+                    </div>
+
+                    {/* Fixed Parameters Sheet */}
+                    {showFixedParams && (
+                        <>
+                            <div className="sheet-backdrop" onClick={() => setShowFixedParams(false)}></div>
+                            <div className={`sheet ${showFixedParams ? 'open' : ''}`}>
+                                <div className="sheet-header">
+                                    <h2>Parameter Tetap</h2>
+                                    <p>Parameter perhitungan yang digunakan dalam analisis</p>
+                                </div>
+                                <div className="sheet-content">
+                                    <div className="space-y-4 pr-4">
+                                        <div>
+                                            <label className="block text-sm text-muted mb-2">WACC (Discount Rate)</label>
+                                            <div className="p-3 bg-muted rounded-md text-sm font-medium" data-testid="wacc-value">
+                                                15%
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm text-muted mb-2">Tax Rate</label>
+                                            <div className="p-3 bg-muted rounded-md text-sm font-medium" data-testid="tax-value">
+                                                22%
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm text-muted mb-2">COGS Margin</label>
+                                            <div className="p-3 bg-muted rounded-md text-sm font-medium" data-testid="cogs-margin-value">
+                                                70%
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm text-muted mb-2">Bad Debt Rate</label>
+                                            <div className="p-3 bg-muted rounded-md text-sm font-medium" data-testid="bad-debt-value">
+                                                5%
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm text-muted mb-2">Depreciation Period</label>
+                                            <div className="p-3 bg-muted rounded-md text-sm font-medium" data-testid="depreciation-value">
+                                                5 Tahun
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm text-muted mb-2">Marketing Cost Rate</label>
+                                            <div className="p-3 bg-muted rounded-md text-sm font-medium" data-testid="marketing-cost-value">
+                                                30%
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm text-muted mb-2">Operational Cost Rate</label>
+                                            <div className="p-3 bg-muted rounded-md text-sm font-medium" data-testid="operational-cost-value">
+                                                20%
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            );
+        }
+
+        // Komponen Tabel COGS
+        function CogsTable({ projections }) {
+            const totals = {
+                otcCogs: projections.reduce((sum, p) => sum + p.otcCogs, 0),
+                monthlyCogs: projections.reduce((sum, p) => sum + p.monthlyCogs, 0),
+                totalCogs: projections.reduce((sum, p) => sum + p.totalCogs, 0),
+            };
+
+            return (
+                <div className="overflow-x-auto">
+                    <table className="table table-striped">
+                        <thead>
+                            <tr className="bg-muted">
+                                <th className="px-4 py-3 text-left font-medium text-foreground w-1/3">Label</th>
+                                <th className="px-4 py-3 text-center font-medium text-foreground">Jumlah</th>
+                                {projections.map((_, index) => (
+                                    <th key={index} className="px-4 py-3 text-center font-medium text-foreground">
+                                        Tahun ke-{index}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="px-4 py-3 font-medium">COGS OTC</td>
+                                <td className={`px-4 py-3 text-right ${totals.otcCogs < 0 ? 'text-red' : ''}`} data-testid="cogs-total-otc">{formatCurrency(totals.otcCogs)}</td>
+                                {projections.map((p, index) => (
+                                    <td key={index} className={`px-4 py-3 text-right ${p.otcCogs < 0 ? 'text-red' : ''}`} data-testid={`cogs-otc-year-${index}`}>
+                                        {formatCurrency(p.otcCogs)}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="px-4 py-3 font-medium">COGS Bulanan</td>
+                                <td className={`px-4 py-3 text-right ${totals.monthlyCogs < 0 ? 'text-red' : ''}`} data-testid="cogs-total-monthly">{formatCurrency(totals.monthlyCogs)}</td>
+                                {projections.map((p, index) => (
+                                    <td key={index} className={`px-4 py-3 text-right ${p.monthlyCogs < 0 ? 'text-red' : ''}`} data-testid={`cogs-monthly-year-${index}`}>
+                                        {formatCurrency(p.monthlyCogs)}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr className="border-t-2 border-primary">
+                                <td className="px-4 py-3 font-bold text-primary">Total COGS</td>
+                                <td className={`px-4 py-3 text-right font-bold ${totals.totalCogs < 0 ? 'text-red' : 'text-primary'}`} data-testid="cogs-total-all">{formatCurrency(totals.totalCogs)}</td>
+                                {projections.map((p, index) => (
+                                    <td key={index} className={`px-4 py-3 text-right font-bold ${p.totalCogs < 0 ? 'text-red' : 'text-primary'}`} data-testid={`cogs-total-year-${index}`}>
+                                        {formatCurrency(p.totalCogs)}
+                                    </td>
+                                ))}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            );
+        }
+
+        // Komponen Tabel OPEX
+        function OpexTable({ projections }) {
+            const totals = {
+                marketingCost: projections.reduce((sum, p) => sum + p.marketingCost, 0),
+                operationalCost: projections.reduce((sum, p) => sum + p.operationalCost, 0),
+                totalOpex: projections.reduce((sum, p) => sum + p.totalOpex, 0),
+            };
+
+            return (
+                <div className="overflow-x-auto">
+                    <table className="table table-striped">
+                        <thead>
+                            <tr className="bg-muted">
+                                <th className="px-4 py-3 text-left font-medium text-foreground w-1/3">Expense Group</th>
+                                <th className="px-4 py-3 text-center font-medium text-foreground">Jumlah</th>
+                                {projections.map((_, index) => (
+                                    <th key={index} className="px-4 py-3 text-center font-medium text-foreground">
+                                        Tahun ke-{index}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="px-4 py-3 font-medium">BHP, Marketing, BUA, SDM</td>
+                                <td className={`px-4 py-3 text-right ${totals.marketingCost < 0 ? 'text-red' : ''}`} data-testid="opex-total-marketing">{formatCurrency(totals.marketingCost)}</td>
+                                {projections.map((p, index) => (
+                                    <td key={index} className={`px-4 py-3 text-right ${p.marketingCost < 0 ? 'text-red' : ''}`} data-testid={`opex-marketing-year-${index}`}>
+                                        {formatCurrency(p.marketingCost)}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="px-4 py-3 font-medium">O & M (include QQ)</td>
+                                <td className={`px-4 py-3 text-right ${totals.operationalCost < 0 ? 'text-red' : ''}`} data-testid="opex-total-operational">{formatCurrency(totals.operationalCost)}</td>
+                                {projections.map((p, index) => (
+                                    <td key={index} className={`px-4 py-3 text-right ${p.operationalCost < 0 ? 'text-red' : ''}`} data-testid={`opex-operational-year-${index}`}>
+                                        {formatCurrency(p.operationalCost)}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr className="border-t-2 border-primary">
+                                <td className="px-4 py-3 font-bold text-primary">Sub Total (exc. PPN)</td>
+                                <td className={`px-4 py-3 text-right font-bold ${totals.totalOpex < 0 ? 'text-red' : 'text-primary'}`} data-testid="opex-total-all">{formatCurrency(totals.totalOpex)}</td>
+                                {projections.map((p, index) => (
+                                    <td key={index} className={`px-4 py-3 text-right font-bold ${p.totalOpex < 0 ? 'text-red' : 'text-primary'}`} data-testid={`opex-total-year-${index}`}>
+                                        {formatCurrency(p.totalOpex)}
+                                    </td>
+                                ))}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            );
+        }
+
+        // Komponen Tabel Ringkasan P&L
+        function PLSummaryTable({ results }) {
+            return (
+                <div className="overflow-x-auto">
+                    <table className="table table-striped">
+                        <thead>
+                            <tr className="bg-muted">
+                                <th className="px-4 py-3 text-left font-medium text-foreground w-1/3">Metrics</th>
+                                <th className="px-4 py-3 text-center font-medium text-foreground">Total</th>
+                                {results.yearlyProjections.slice(1).map((_, index) => (
+                                    <th key={index} className="px-4 py-3 text-center font-medium text-foreground">
+                                        Tahun {index + 1}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="px-4 py-3 font-semibold bg-muted">Revenue</td>
+                                <td className={`px-4 py-3 text-center ${results.totalRevenue < 0 ? 'text-red' : ''}`} data-testid="pl-revenue-total">{formatCurrency(results.totalRevenue)}</td>
+                                {results.yearlyProjections.slice(1).map((proj, index) => (
+                                    <td key={index} className={`px-4 py-3 text-center ${proj.revenue < 0 ? 'text-red' : ''}`} data-testid={`pl-revenue-year-${index + 1}`}>
+                                        {formatCurrency(proj.revenue)}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="px-4 py-3 font-semibold">Direct Cost (COGS)</td>
+                                <td className={`px-4 py-3 text-center ${results.totalCogs < 0 ? 'text-red' : ''}`} data-testid="pl-cogs-total">{formatCurrency(results.totalCogs)}</td>
+                                {results.cogsProjections.slice(1).map((cogs, index) => (
+                                    <td key={index} className={`px-4 py-3 text-center ${cogs.totalCogs < 0 ? 'text-red' : ''}`} data-testid={`pl-cogs-year-${index + 1}`}>
+                                        {formatCurrency(cogs.totalCogs)}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="px-4 py-3 font-semibold">Depresiasi</td>
+                                <td className={`px-4 py-3 text-center ${results.yearlyProjections.reduce((sum, proj) => sum + proj.depreciation, 0) < 0 ? 'text-red' : ''}`} data-testid="pl-depreciation-total">{formatCurrency(results.yearlyProjections.reduce((sum, proj) => sum + proj.depreciation, 0))}</td>
+                                {results.yearlyProjections.slice(1).map((proj, index) => (
+                                    <td key={index} className={`px-4 py-3 text-center ${proj.depreciation < 0 ? 'text-red' : ''}`} data-testid={`pl-depreciation-year-${index + 1}`}>
+                                        {formatCurrency(proj.depreciation)}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr className="bg-muted">
+                                <td className="px-4 py-3 font-semibold">Gross Profit (GP)</td>
+                                <td className={`px-4 py-3 text-center font-semibold ${results.grossProfit < 0 ? 'text-red' : ''}`} data-testid="pl-gross-profit-total">{formatCurrency(results.grossProfit)}</td>
+                                {results.yearlyProjections.slice(1).map((proj, index) => {
+                                    const yearlyGrossProfit = proj.revenue - (results.cogsProjections[index + 1]?.totalCogs || 0);
+                                    return (
+                                        <td key={index} className={`px-4 py-3 text-center font-semibold ${yearlyGrossProfit < 0 ? 'text-red' : ''}`} data-testid={`pl-gross-profit-year-${index + 1}`}>
+                                            {formatCurrency(yearlyGrossProfit)}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                            <tr>
+                                <td className="px-4 py-3 font-semibold">GP Margin</td>
+                                <td className="px-4 py-3 text-center" data-testid="pl-gp-margin-total">
+                                    30%
+                                </td>
+                                {results.yearlyProjections.slice(1).map((_, index) => (
+                                    <td key={index} className="px-4 py-3 text-center" data-testid={`pl-gp-margin-year-${index + 1}`}>
+                                        30%
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr className="bg-muted">
+                                <td className="px-4 py-3 font-semibold">Net Income (NI)</td>
+                                <td className={`px-4 py-3 text-center font-semibold ${results.totalNetIncome < 0 ? 'text-red' : ''}`} data-testid="pl-net-income-total">{formatCurrency(results.totalNetIncome)}</td>
+                                {results.yearlyProjections.slice(1).map((proj, index) => (
+                                    <td key={index} className={`px-4 py-3 text-center font-semibold ${proj.netIncome < 0 ? 'text-red' : ''}`} data-testid={`pl-net-income-year-${index + 1}`}>
+                                        {formatCurrency(proj.netIncome)}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="px-4 py-3 font-semibold">NI Margin</td>
+                                <td className={`px-4 py-3 text-center ${results.netIncomeMargin < 0 ? 'text-red' : ''}`} data-testid="pl-ni-margin-total">{formatPercentage(results.netIncomeMargin)}</td>
+                                {results.yearlyProjections.slice(1).map((proj, index) => {
+                                    const margin = proj.revenue > 0 ? (proj.netIncome / proj.revenue) * 100 : 0;
+                                    return (
+                                        <td key={index} className={`px-4 py-3 text-center ${margin < 0 ? 'text-red' : ''}`} data-testid={`pl-ni-margin-year-${index + 1}`}>
+                                            {formatPercentage(margin)}
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            );
+        }
+
+        // Komponen Tabel Ringkasan Arus Kas
+        function CashFlowSummaryTable({ results }) {
+            // Hitung Present Value of Free Cash Flow
+            const calculatePVOfFCF = (fcf, year, discountRate = 0.15) => {
+                if (year === 0) return fcf; // Tahun 0 sudah present value
+                return fcf / Math.pow(1 + discountRate, year);
+            };
+
+            const pvOfFCFTotal = results.cashFlowProjections.slice(1).reduce((sum, proj) => {
+                return sum + calculatePVOfFCF(proj.netCashFlow, proj.year);
+            }, 0);
+
+            return (
+                <div className="overflow-x-auto">
+                    <table className="table table-striped">
+                        <thead>
+                            <tr className="bg-muted">
+                                <th className="px-4 py-3 text-left font-medium text-foreground w-1/3">Cash Flow Metrics</th>
+                                <th className="px-4 py-3 text-center font-medium text-foreground">Total</th>
+                                {results.cashFlowProjections.slice(1).map((_, index) => (
+                                    <th key={index} className="px-4 py-3 text-center font-medium text-foreground">
+                                        Tahun {index + 1}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="px-4 py-3 font-semibold">EBIT+ (after tax)</td>
+                                <td className="px-4 py-3 text-center" data-testid="cf-ebit-total">
+                                    {formatCurrency(results.cashFlowProjections.reduce((sum, proj) => sum + proj.totalCashInflow, 0))}
+                                </td>
+                                {results.cashFlowProjections.slice(1).map((cf, index) => (
+                                    <td key={index} className="px-4 py-3 text-center" data-testid={`cf-ebit-year-${index + 1}`}>
+                                        {formatCurrency(cf.totalCashInflow)}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="px-4 py-3 font-semibold">Investment (CAPEX)</td>
+                                <td className="px-4 py-3 text-center" data-testid="cf-investment-total">
+                                    {formatCurrency(results.cashFlowProjections.reduce((sum, proj) => sum + proj.capex, 0))}
+                                </td>
+                                {results.cashFlowProjections.slice(1).map((cf, index) => (
+                                    <td key={index} className="px-4 py-3 text-center" data-testid={`cf-investment-year-${index + 1}`}>
+                                        {formatCurrency(cf.capex)}
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr className="bg-muted">
+                                <td className="px-4 py-3 font-semibold">Free Cash Flow</td>
+                                <td className="px-4 py-3 text-center font-semibold" data-testid="cf-free-cashflow-total">
+                                    {formatCurrency(results.cashFlowProjections.reduce((sum, proj) => sum + proj.netCashFlow, 0))}
+                                </td>
+                                {results.cashFlowProjections.slice(1).map((cf, index) => (
+                                    <td key={index} className="px-4 py-3 text-center font-semibold" data-testid={`cf-free-cashflow-year-${index + 1}`}>
+                                        <span className={cf.netCashFlow < 0 ? "text-red" : "text-green"}>
+                                            {formatCurrency(cf.netCashFlow)}
+                                        </span>
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="px-4 py-3 font-semibold">WACC Discount Rate</td>
+                                <td className="px-4 py-3 text-center" data-testid="cf-wacc-rate">
+                                    15%
+                                </td>
+                                {results.cashFlowProjections.slice(1).map((_, index) => (
+                                    <td key={index} className="px-4 py-3 text-center" data-testid={`cf-wacc-rate-year-${index + 1}`}>
+                                        15%
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="px-4 py-3 font-semibold">PV (Present Value) of FCF</td>
+                                <td className="px-4 py-3 text-center font-semibold" data-testid="cf-pv-fcf-total">
+                                    {formatCurrency(pvOfFCFTotal)}
+                                </td>
+                                {results.cashFlowProjections.slice(1).map((cf, index) => {
+                                    const pvValue = calculatePVOfFCF(cf.netCashFlow, cf.year);
+                                    return (
+                                        <td key={index} className="px-4 py-3 text-center" data-testid={`cf-pv-fcf-year-${index + 1}`}>
+                                            <span className={pvValue < 0 ? "text-red" : "text-green"}>
+                                                {formatCurrency(pvValue)}
+                                            </span>
+                                        </td>
+                                    );
+                                })}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            );
+        }
+
+        // Komponen Tabel Analisis NPV
+        function NPVAnalysisTable({ results }) {
+            return (
+                <div className="overflow-x-auto">
+                    <table className="table table-striped">
+                        <thead>
+                            <tr className="bg-muted">
+                                <th className="px-4 py-3 text-left font-medium text-foreground w-1/3">Analisis Kelayakan</th>
+                                <th className="px-4 py-3 text-center font-medium text-foreground">Nilai</th>
+                                {results.cashFlowProjections.slice(1).map((_, index) => (
+                                    <th key={index} className="px-4 py-3 text-center font-medium text-foreground">
+                                        Tahun {index + 1}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr className="border-t-2 border-primary">
+                                <td className="px-4 py-3 font-bold">NPV</td>
+                                <td className={`px-4 py-3 text-center font-bold ${results.npv > 0 ? 'text-green' : 'text-red'}`} data-testid="npv-analysis-value">
+                                    {formatCurrency(results.npv)}
+                                </td>
+                                {results.cashFlowProjections.slice(1).map((_, index) => (
+                                    <td key={index} className="px-4 py-3 text-center" data-testid={`npv-analysis-year-${index + 1}`}>
+                                        -
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="px-4 py-3 font-bold">IRR</td>
+                                <td className={`px-4 py-3 text-center font-bold ${results.irr >= 15 ? 'text-green' : 'text-red'}`} data-testid="irr-analysis-value">
+                                    {formatPercentage(results.irr)}
+                                </td>
+                                {results.cashFlowProjections.slice(1).map((_, index) => (
+                                    <td key={index} className="px-4 py-3 text-center" data-testid={`irr-analysis-year-${index + 1}`}>
+                                        -
+                                    </td>
+                                ))}
+                            </tr>
+                            <tr>
+                                <td className="px-4 py-3 font-bold">Payback Period</td>
+                                <td className="px-4 py-3 text-center font-bold" data-testid="payback-analysis-value">
+                                    {results.paybackPeriod.years} tahun {results.paybackPeriod.months} bulan
+                                </td>
+                                {results.cashFlowProjections.slice(1).map((_, index) => (
+                                    <td key={index} className="px-4 py-3 text-center" data-testid={`payback-analysis-year-${index + 1}`}>
+                                        -
+                                    </td>
+                                ))}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            );
+        }
+
+        // Komponen Tabel Analisis Kelayakan
+        function FeasibilityAnalysisTable({ results }) {
+            const npvStatus = results.npv > 0 ? 'Layak' : 'Tidak Layak';
+            const irrStatus = results.irr >= 15 ? 'Layak' : 'Tidak Layak';
+            
+            return (
+                <div className="overflow-x-auto">
+                    <table className="table table-striped">
+                        <thead>
+                            <tr className="bg-muted">
+                                <th className="px-4 py-3 text-left font-medium text-foreground w-1/4">Metrics</th>
+                                <th className="px-4 py-3 text-right font-medium text-foreground w-1/2">Value</th>
+                                <th className="px-4 py-3 text-center font-medium text-foreground w-1/4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="px-4 py-3 font-medium">NPV</td>
+                                <td className="px-4 py-3 text-right font-medium" data-testid="feasibility-npv-value">
+                                    {formatCurrency(results.npv)}
+                                </td>
+                                <td className="px-4 py-3 text-center" data-testid="feasibility-npv-status">
+                                    <span className={`status-badge ${results.npv > 0 ? 'success' : 'danger'}`}>
+                                        {npvStatus}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="px-4 py-3 font-medium">IRR</td>
+                                <td className="px-4 py-3 text-right font-medium" data-testid="feasibility-irr-value">
+                                    {formatPercentage(results.irr)}
+                                </td>
+                                <td className="px-4 py-3 text-center" data-testid="feasibility-irr-status">
+                                    <span className={`status-badge ${results.irr >= 15 ? 'success' : 'danger'}`}>
+                                        {irrStatus}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            );
+        }
+
+        // Render aplikasi
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<FinancialAnalysis />);
+    </script>
+</body>
+</html>
