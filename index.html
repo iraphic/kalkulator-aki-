@@ -1816,6 +1816,32 @@
                                                 </div>
                                             </div>
 
+                                            <!-- Payback Period - Tahun -->
+  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+    <Label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
+      Payback Period
+    </Label>
+    <div className="text-center">
+      <div className="text-2xl font-bold text-purple-600 mb-1" data-testid="output-payback-years">
+        {results.paybackPeriod.years}
+      </div>
+      <div className="text-sm text-gray-500 font-medium">Tahun</div>
+    </div>
+  </div>
+
+  <!-- Payback Period - Bulan -->
+  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+    <Label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
+      &nbsp;
+    </Label>
+    <div className="text-center">
+      <div className="text-2xl font-bold text-purple-600 mb-1" data-testid="output-payback-months">
+        {results.paybackPeriod.months}
+      </div>
+      <div className="text-sm text-gray-500 font-medium">Bulan</div>
+    </div>
+  </div>
+
                                             {/* Status Summary */}
                                             <div className="mt-8 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-lg border">
                                                 <h3 className="font-semibold text-foreground mb-3">Status Kelayakan</h3>
