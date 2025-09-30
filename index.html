@@ -1761,7 +1761,7 @@
                                             </div>
 
                                             {/* Jangka Waktu, IRR, and Payback Period - three fields in one row */}
-                                            <div className="grid grid-cols-1 md-grid-cols-4 gap-4">
+                                            <div className="grid grid-cols-1 md-grid-cols-3 gap-4">
                                                 <div className="form-group">
                                                     <label className="block text-sm font-medium text-foreground mb-2">
                                                         Jangka Waktu (bulan)
@@ -1804,15 +1804,7 @@
                                                             className="form-control"
                                                             data-testid="output-payback-period"
                                                         /> tahun 
-                                                        <span></span>
-                                                    </div>
-                                                </div>
-                                                <div className="form-group">
-                                                    <label className="block text-sm font-medium text-foreground mb-2">
-                                                        
-                                                    </label>
-                                                    <div className=" block currency-input">
-                                                        <input
+                                                        <br><input
                                                             type="text"
                                                             value={`${results.paybackPeriod.months}`}
                                                             readOnly
@@ -1822,6 +1814,7 @@
                                                         bulan <span></span>
                                                     </div>
                                                 </div>
+
                                             </div>
 
                                             {/* Status Summary */}
