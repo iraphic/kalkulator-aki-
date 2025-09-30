@@ -1761,53 +1761,49 @@
                                             </div>
 
                                             {/* Jangka Waktu, IRR, and Payback Period - three fields in one row */}
-                                            <div className="grid grid-cols-1 md-grid-cols-3 gap-4">
-                                                <div className="form-group">
-                                                    <label className="block text-sm font-medium text-foreground mb-2">
-                                                        Jangka Waktu
-                                                    </label>
-                                                    <div className="currency-input">
-                                                        <input
-                                                            type="text"
-                                                            value={inputs.contractPeriod.toString()}
-                                                            readOnly
-                                                            className="form-control"
-                                                            data-testid="output-period"
-                                                        />
-                                                        <span>Month</span>
-                                                    </div>
-                                                </div>
-                                                <div className="form-group">
-                                                    <label className="block text-sm font-medium text-foreground mb-2">
-                                                        IRR
-                                                    </label>
-                                                    <div className="currency-input">
-                                                        <input
-                                                            type="text"
-                                                            value={formatPercentage(results.irr).replace('%', '')}
-                                                            readOnly
-                                                            className={`form-control ${results.irr >= 0.15 ? 'text-green' : 'text-red'}`}
-                                                            data-testid="output-irr"
-                                                        />
-                                                        <span>%</span>
-                                                    </div>
-                                                </div>
-                                                <div className="form-group">
-                                                    <label className="block text-sm font-medium text-foreground mb-2">
-                                                        Payback Period
-                                                    </label>
-                                                    <div className="currency-input">
-                                                        <input
-                                                            type="text"
-                                                            value={`${results.paybackPeriod.years}.${results.paybackPeriod.months}`}
-                                                            readOnly
-                                                            className="form-control"
-                                                            data-testid="output-payback-period"
-                                                        />
-                                                        <span>Month</span>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <div style={{display: 'grid', gridTemplateColumns: '1fr', gap: '1rem', marginTop: '1.5rem'}} className="md:grid-cols-3">
+  <!-- Jangka Waktu -->
+  <div style={{background: 'white', borderRadius: '8px', border: '1px solid #e5e7eb', padding: '1rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
+    <label style={{display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.75rem', textAlign: 'center'}}>
+      Jangka Waktu
+    </label>
+    <div style={{textAlign: 'center'}}>
+      <div style={{fontSize: '1.5rem', fontWeight: '700', color: '#2563eb', marginBottom: '0.25rem'}} data-testid="output-period">
+        {inputs.contractPeriod}
+      </div>
+      <div style={{fontSize: '0.875rem', color: '#6b7280', fontWeight: '500'}}>Bulan</div>
+    </div>
+  </div>
+
+  <!-- IRR -->
+  <div style={{background: 'white', borderRadius: '8px', border: '1px solid #e5e7eb', padding: '1rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
+    <label style={{display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.75rem', textAlign: 'center'}}>
+      IRR
+    </label>
+    <div style={{textAlign: 'center'}}>
+      <div 
+        style={{fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem', color: results.irr >= 15 ? '#059669' : '#dc2626'}}
+        data-testid="output-irr"
+      >
+        {formatPercentage(results.irr).replace('%', '')}%
+      </div>
+      <div style={{fontSize: '0.875rem', color: '#6b7280', fontWeight: '500'}}>Tingkat Pengembalian</div>
+    </div>
+  </div>
+
+  <!-- Payback Period -->
+  <div style={{background: 'white', borderRadius: '8px', border: '1px solid #e5e7eb', padding: '1rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
+    <label style={{display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.75rem', textAlign: 'center'}}>
+      Payback Period
+    </label>
+    <div style={{textAlign: 'center'}}>
+      <div style={{fontSize: '1.5rem', fontWeight: '700', color: '#7c3aed', marginBottom: '0.25rem'}} data-testid="output-payback-period">
+        {results.paybackPeriod.years}<span style={{fontSize: '1.125rem'}}>th</span> {results.paybackPeriod.months}<span style={{fontSize: '1.125rem'}}>bln</span>
+      </div>
+      <div style={{fontSize: '0.875rem', color: '#6b7280', fontWeight: '500'}}>Periode Pengembalian</div>
+    </div>
+  </div>
+</div>
 
                                             {/* Status Summary */}
                                             <div className="mt-8 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-lg border">
