@@ -1774,7 +1774,7 @@
                                                             className="form-control"
                                                             data-testid="output-period"
                                                         />
-                                                        <span>Month</span>
+                                                        <span></span> bulan
                                                     </div>
                                                 </div>
                                                 <div className="form-group">
@@ -1799,12 +1799,19 @@
                                                     <div className="currency-input">
                                                         <input
                                                             type="text"
-                                                            value={`${results.paybackPeriod.years}.${results.paybackPeriod.months}`}
+                                                            value={`${results.paybackPeriod.years}`}
                                                             readOnly
                                                             className="form-control"
                                                             data-testid="output-payback-period"
-                                                        />
-                                                        <span>Month</span>
+                                                        /> tahun
+                                                        <input
+                                                            type="text"
+                                                            value={`${results.paybackPeriod.months}`}
+                                                            readOnly
+                                                            className="form-control"
+                                                            data-testid="output-payback-period"
+                                                        /> bulan
+                                                        <span></span>
                                                     </div>
                                                 </div>
                                             </div>
