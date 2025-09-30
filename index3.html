@@ -1792,27 +1792,35 @@
                                                         <span>%</span>
                                                     </div>
                                                 </div>
+
                                                 <div className="form-group">
-                                                    <label className="block text-sm font-medium text-foreground mb-2">
-                                                        Payback Period
-                                                    </label>
-                                                    <div className="currency-input">
-                                                        <input
-                                                            type="text"
-                                                            value={`${results.paybackPeriod.years}`}
-                                                            readOnly
-                                                            className="form-control"
-                                                            data-testid="output-payback-period"
-                                                        /> tahun
-                                                        <input
-                                                            type="text"
-                                                            value={`${results.paybackPeriod.months}`}
-                                                            readOnly
-                                                            className="form-control"
-                                                            data-testid="output-payback-period"
-                                                        /> bulan <span></span>
-                                                    </div>
-                                                </div>
+  <label className="block text-sm font-medium text-foreground mb-2">
+    Payback Period
+  </label>
+  <div className="flex items-center gap-2">
+    <div className="flex-1">
+      <input
+        type="text"
+        value={`${results.paybackPeriod.years}`}
+        readOnly
+        className="form-control text-center"
+        data-testid="output-payback-years"
+      />
+    </div>
+    <span className="text-sm text-muted-foreground">tahun</span>
+    <div className="flex-1">
+      <input
+        type="text"
+        value={`${results.paybackPeriod.months}`}
+        readOnly
+        className="form-control text-center"
+        data-testid="output-payback-months"
+      />
+    </div>
+    <span className="text-sm text-muted-foreground">bulan</span>
+  </div>
+</div>
+                                                
                                             </div>
 
                                             {/* Status Summary */}
