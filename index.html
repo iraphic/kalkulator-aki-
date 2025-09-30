@@ -412,6 +412,16 @@
             color: #6b7280;
             font-size: 0.75rem;
         }
+         .text-green-600 { color: #059669; }
+  .text-red-600 { color: #dc2626; }
+  .text-blue-600 { color: #2563eb; }
+  .text-purple-600 { color: #7c3aed; }
+  .text-gray-500 { color: #6b7280; }
+  .text-gray-700 { color: #374151; }
+  .bg-white { background: white; }
+  .border-gray-200 { border-color: #e5e7eb; }
+  .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+  .rounded-lg { border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -1763,44 +1773,43 @@
                                             {/* Jangka Waktu, IRR, and Payback Period - three fields in one row */}
                                             <div style={{display: 'grid', gridTemplateColumns: '1fr', gap: '1rem', marginTop: '1.5rem'}} className="md:grid-cols-3">
   <!-- Jangka Waktu -->
-  <div style={{background: 'white', borderRadius: '8px', border: '1px solid #e5e7eb', padding: '1rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
-    <label style={{display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.75rem', textAlign: 'center'}}>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+    <Label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
       Jangka Waktu
-    </label>
-    <div style={{textAlign: 'center'}}>
-      <div style={{fontSize: '1.5rem', fontWeight: '700', color: '#2563eb', marginBottom: '0.25rem'}} data-testid="output-period">
+    </Label>
+    <div className="text-center">
+      <div className="text-2xl font-bold text-blue-600 mb-1" data-testid="output-period">
         {inputs.contractPeriod}
       </div>
-      <div style={{fontSize: '0.875rem', color: '#6b7280', fontWeight: '500'}}>Bulan</div>
+      <div className="text-sm text-gray-500 font-medium">Bulan</div>
     </div>
   </div>
 
-  <!-- IRR -->
-  <div style={{background: 'white', borderRadius: '8px', border: '1px solid #e5e7eb', padding: '1rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
-    <label style={{display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.75rem', textAlign: 'center'}}>
+  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+    <Label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
       IRR
-    </label>
-    <div style={{textAlign: 'center'}}>
+    </Label>
+    <div className="text-center">
       <div 
-        style={{fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem', color: results.irr >= 15 ? '#059669' : '#dc2626'}}
+        className={`text-2xl font-bold mb-1 ${results.irr >= 15 ? 'text-green-600' : 'text-red-600'}`}
         data-testid="output-irr"
       >
         {formatPercentage(results.irr).replace('%', '')}%
       </div>
-      <div style={{fontSize: '0.875rem', color: '#6b7280', fontWeight: '500'}}>Tingkat Pengembalian</div>
+      <div className="text-sm text-gray-500 font-medium">Tingkat Pengembalian</div>
     </div>
   </div>
 
-  <!-- Payback Period -->
-  <div style={{background: 'white', borderRadius: '8px', border: '1px solid #e5e7eb', padding: '1rem', boxShadow: '0 1px 2px rgba(0,0,0,0.05)'}}>
-    <label style={{display: 'block', fontSize: '0.875rem', fontWeight: '600', color: '#374151', marginBottom: '0.75rem', textAlign: 'center'}}>
+  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+    <Label className="block text-sm font-semibold text-gray-700 mb-3 text-center">
       Payback Period
-    </label>
-    <div style={{textAlign: 'center'}}>
-      <div style={{fontSize: '1.5rem', fontWeight: '700', color: '#7c3aed', marginBottom: '0.25rem'}} data-testid="output-payback-period">
-        {results.paybackPeriod.years}<span style={{fontSize: '1.125rem'}}>th</span> {results.paybackPeriod.months}<span style={{fontSize: '1.125rem'}}>bln</span>
+    </Label>
+    <div className="text-center">
+      <div className="text-2xl font-bold text-purple-600 mb-1" data-testid="output-payback-period">
+        {results.paybackPeriod.years}<span className="text-lg">th</span> {results.paybackPeriod.months}<span className="text-lg">bln</span>
       </div>
-      <div style={{fontSize: '0.875rem', color: '#6b7280', fontWeight: '500'}}>Periode Pengembalian</div>
+      <div className="text-sm text-gray-500 font-medium">Periode Pengembalian</div>
     </div>
   </div>
 </div>
