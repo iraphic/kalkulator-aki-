@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
     <title>Analisis Kelayakan Investasi</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -416,6 +419,45 @@
 </head>
 <body>
     <div id="root"></div>
+    
+    <!-- Refresh Button -->
+    <button class="refresh-btn" onclick="hardRefresh()">🔄 Clear Cache</button>
+
+    <script>
+        // Fungsi untuk hard refresh dengan clear cache
+        function hardRefresh() {
+            console.log('Clearing cache and refreshing...');
+            
+            // Clear semua cache
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    names.forEach(function(name) {
+                        caches.delete(name);
+                    });
+                    console.log('All caches cleared');
+                });
+            }
+            
+            // Clear localStorage jika perlu
+            // localStorage.clear();
+            // sessionStorage.clear();
+            
+            // Force reload dari server
+            window.location.reload(true);
+        }
+        
+        // Auto clear cache saat halaman dimuat (opsional)
+        window.addEventListener('load', function() {
+            console.log('Page loaded - cache management active');
+            
+            // Clear cache setiap 30 menit (opsional)
+            // setInterval(hardRefresh, 1800000);
+        });
+        
+        // Tambahkan timestamp ke resource untuk cache busting
+        const timestamp = new Date().getTime();
+        console.log(`App version: ${timestamp}`);
+    </script>
 
     <script type="text/babel">
         // Konstanta untuk perhitungan finansial
@@ -1820,7 +1862,7 @@
     <span className="text-sm text-muted-foreground">bulan</span>
   </div>
 </div>
-                                                
+
                                             </div>
 
                                             {/* Status Summary */}
