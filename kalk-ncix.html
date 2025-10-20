@@ -16,6 +16,7 @@
     .row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
     .row label { display: flex; align-items: center; gap: 8px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .grid-two { grid-template-columns: repeat(2, minmax(260px, 1fr)); }
     label { display: block; font-size: 14px; margin: 8px 0; }
     input[type="number"], select { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; }
     .actions { display: flex; gap: 12px; margin-top: 8px; }
@@ -118,7 +119,7 @@
           <label>Jumlah Full Rack dibooking
             <input type="number" id="it_booking_fullrack" min="0" value="0">
           </label>
-          <label>Jumlah Subrack dibooking
+          <label>Jumlah Sub rack dibooking
             <input type="number" id="it_booking_subrack" min="0" value="0">
           </label>
         </div>
@@ -128,7 +129,7 @@
           <label>Jumlah Full Rack
             <input type="number" id="it_fullrack_qty" min="0" value="0">
           </label>
-          <label>Densitas Full Rack
+          <label>Densitas Full Rack (kW)
             <select id="it_fullrack_density">
               <option value="low">Low (0–4.4 kW)</option>
               <option value="medium">Medium (>4.4–8.8 kW)</option>
@@ -152,12 +153,12 @@
           <label>Luas per Suite (m²)
             <input type="number" id="it_ps_area" min="0" value="0">
           </label>
-          <p class="muted">Bulanan dihitung per m². OTC adalah biaya setup per suite.</p>
+          <p class="muted">*Bulanan dihitung per m². OTC adalah biaya setup per suite.</p>
         </div>
 
         <div>
           <h3>Power Supply</h3>
-          <label>Redundansi Power
+          <label>Jenis Redundansi Power
             <select id="it_power_mode">
               <option value="none">Tidak ada</option>
               <option value="single">Single Source</option>
@@ -167,21 +168,21 @@
           <label>Ampere untuk Full Rack (total)
             <input type="number" id="it_power_fullrack_a" min="0" value="0">
           </label>
-          <label>Ampere untuk Subrack (total)
+          <label>Ampere untuk Sub rack (total)
             <input type="number" id="it_power_subrack_a" min="0" value="0">
           </label>
           <label>Ampere untuk Private Suite (total)
             <input type="number" id="it_power_ps_a" min="0" value="0">
           </label>
-          <p class="muted">Untuk DC 1-U, harga sudah termasuk power 2A (tidak ada tarif tambahan).</p>
+          <p class="muted">**Untuk DC 1-U, harga sudah termasuk power 2A (tidak ada tarif tambahan).</p>
         </div>
 
         <div>
-          <h3>Additional Service</h3>
-          <label>Pre-cabling UTP (kabel)
+          <h3>Additional Service IT Hall</h3>
+          <label>Pre-cabling UTP (per kabel) [OTC]
             <input type="number" id="it_precable_utp" min="0" value="0">
           </label>
-          <label>Pre-cabling Fiber (core)
+          <label>Pre-cabling Fiber (per core) [OTC]
             <input type="number" id="it_precable_fiber" min="0" value="0">
           </label>
           <label>Cross Connect UTP (bulanan)
@@ -193,9 +194,6 @@
         </div>
       </div>
 
-      <div class="actions">
-        <button type="button" id="calc_it">Hitung IT Hall</button>
-      </div>
     </form>
 
     <!-- NER form -->
@@ -227,11 +225,11 @@
         </div>
 
         <div>
-          <h3>Additional Service</h3>
-          <label>Pre-cabling UTP (kabel) [OTC]
+          <h3>Additional Service NER</h3>
+          <label>Pre-cabling UTP (per kabel) [OTC]
             <input type="number" id="ner_precable_utp" min="0" value="0">
           </label>
-          <label>Pre-cabling Fiber (core) [OTC]
+          <label>Pre-cabling Fiber (per core) [OTC]
             <input type="number" id="ner_precable_fiber" min="0" value="0">
           </label>
           <label>Cross Connect UTP (bulanan)
@@ -249,15 +247,14 @@
         </div>
       </div>
 
-      <div class="actions">
-        <button type="button" id="calc_ner">Hitung NER</button>
-      </div>
     </form>
 
-    <!-- Membership & Connectivity section -->
-    <form id="form-membership" class="card">
-      <h2>Membership NeuCentrIX & Konektivitas (MLPA/BLPA)</h2>
-      <div class="grid">
+
+
+    <!-- Membership & Connectivity -->
+    <section class="card" id="membership_connectivity_section">
+      <h2>Membership NCIX (Pusat) dan Lain-lain</h2>
+      <div class="grid grid-two">
         <div>
           <h3>Membership NCIX (Pusat)</h3>
           <label>Kelas Membership
@@ -316,10 +313,7 @@
           </label>
         </div>
       </div>
-      <div class="actions">
-        <button type="button" id="calc_member">Hitung Membership & Port</button>
-      </div>
-    </form>
+    </section>
 
     <!-- Results -->
     <section id="results" class="card">
@@ -328,8 +322,6 @@
         <li><strong>neuCentrIX site:</strong> <span id="summary_site">—</span></li>
         <li><strong>Tier:</strong> <span id="summary_tier">—</span></li>
         <li><strong>Alamat site:</strong> <span id="summary_address">—</span></li>
-        <li class="hidden"><strong>Sewa Rak:</strong> <span id="summary_sewa_rak">—</span></li>
-        <li class="hidden"><strong>Power Supply:</strong> <span id="summary_power">—</span></li>
       </ul>
       <table class="table" id="breakdown_table">
         <thead>
@@ -340,7 +332,7 @@
           <tr><td><strong>Total</strong></td><td id="total_otc">Rp 0</td><td id="total_monthly">Rp 0</td></tr>
         </tfoot>
       </table>
-      <div class="actions"><button type="button" id="download_excel">Download Excel</button></div>
+      <div class="actions"><button type="button" id="calc_total">Hitung Total</button> <button type="button" id="download_excel">Download Excel</button></div>
     </section>
 
     <section class="card">
@@ -447,11 +439,11 @@
     };
 
     const siteAddresses = {
-      'neuCentrIX Aceh': 'Jl. Sultan Mahmudsiah No.10, Kp. Baru, Kec. Baiturrahman, Kota Banda Aceh, Aceh 23127',
+      'neuCentrIX Aceh': 'Jl. Sultan Mahmudsiah No.10, Kampung Baru, Kec. Baiturrahman, Kota Banda Aceh, Aceh 23127',
       'neuCentrIX Bandung Lembong': 'Jl. Lembong No.11, Bandung',
       'neucentrIX Batam Center': 'Jl. Laksamana Bintan, Batam Center, Batam',
       'neuCentrIX Batu Ampar Balikpapan': 'Jl. Pattimura No.96, Batu Ampar, Kec. Balikpapan Utara, Kota Balikpapan, Kalimantan Timur 76136',
-      'neuCentrIX Candi - Semarang': 'Jl. Sultan Agung No.150, Semarang, Kab. Semarang',
+      'neuCentrIX Candi - Semarang': 'Jl. Sultan Agung No.150, Candi, Semarang',
       'neuCentrIX Cirebon': 'Jl. Pagongan No.11, Pekalangan, Kec. Pekalipan, Kota Cirebon, Jawa Barat 45118',
       'neuCentrIX Denpasar Kaliasem': 'Jl. Kaliasem No.2, Dangin Puri Kauh, Kec. Denpasar Utara, Kota Denpasar, Bali',
       'neuCentrIX Jakarta Jatinegara': 'Jl. D.I. Panjaitan Kav.42, Jakarta Timur',
@@ -461,16 +453,16 @@
       'neuCentrIX Mattoangin - Makassar': 'Jl. Pajonga Dg. Ngalle No.4, Kel. Mario, Kec. Mariso, Kota Makassar, Sulawesi Selatan 90122',
       'neuCentrIX Medan': 'Jl. Balai Kota, Kesawan, Kec. Medan Barat, Kota Medan, Sumatera Utara',
       'Neucentrix Meruya': 'Jl. Joglo Raya No.24, RT.4/RW.3, Joglo, Kec. Kembangan, Kota Jakarta Barat, Daerah Khusus Ibukota Jakarta 11640',
-      'neuCentrIX Pekanbaru': 'Jl. Jend. Sudirman No.199, Sumahilang, Kec. Pekanbaru Kota, Kota Pekanbaru, Riau',
+      'neuCentrIX Pekanbaru': 'Jl. Jenderal Sudirman No.199, Sumahilang, Kec. Pekanbaru Kota, Kota Pekanbaru, Riau',
       'neuCentrIX Pontianak': 'Jl. Teuku Umar No.2, Darat Sekip, Kec. Pontianak Kota, Kota Pontianak, Kalimantan Barat',
       'neuCentrIX Sepaku': 'Tengin Baru, Sepaku, Penajam Paser, Kalimantan Timur',
       'neuCentrIX Surabaya Gubeng': 'Jl. Sumatra No.131, Surabaya',
       'neuCentrIX Surabaya Kebalen': 'Jl. Kebalen Timur No.2, Krembangan Selatan, Kec. Krembangan, Kota Surabaya, Jawa Timur 60175',
-      'neuCentrIX Talang Kelapa': 'Jl. MP. Mangkunegara No.076, Suka Maju, Kec. Ilir Tim. II, Kota Palembang, Sumatera Selatan 30114',
-      'neuCentrIX Tanjung Karang Lampung': 'neuCentrIX Tanjung Karang Lampung',
-      'neuCentrIX Ulin Banjarmasin': 'Jln A Yani Pal 3.5 No.62, Banjarmasin, Kalimantan Selatan',
+      'neuCentrIX Talang Kelapa': 'Jl. MP. Mangkunegara No.076, Suka Maju, Kec. Ilir Timur II, Kota Palembang, Sumatera Selatan 30114',
+      'neuCentrIX Tanjung Karang Lampung': 'Jl. Kartini No.11, Kelapa Tiga, Kec. Tanjung Karang Pusat, Kota Bandar Lampung, Lampung 35127',
+      'neuCentrIX Ulin Banjarmasin': 'Jl. A Yani Pal 3.5 No.62, Banjarmasin, Kalimantan Selatan',
       'neuCentrIX Yogyakarta Kotabaru': 'Jl. Yos Sudarso No.9, Kotabaru, Kec. Gondokusuman, Kota Yogyakarta, DIY 55224',
-      'neuCentrIX Yogyakarta Pugeran': 'Telkom Pugeran, Suryodiningratan, Kec. Mantrijeron, Kota Yogyakarta, DIY 55141'
+      'neuCentrIX Yogyakarta Pugeran': 'Telkom Pugeran, Jl. Suryodiningratan, Kec. Mantrijeron, Kota Yogyakarta, DIY 55141'
     };
 
     function getSiteAddressByDropdownValue(val) {
@@ -646,13 +638,13 @@
         sewaMonthly += srQty * (t.sewa.monthly.subrack || 0) + uQty * (t.sewa.monthly.oneU || 0);
         sewaOtc += uQty * (t.sewa.otc.oneUSetup || 0);
       }
-      if (sewaOtc > 0 || sewaMonthly > 0) addBreakdown('Sewa Rak', sewaOtc, sewaMonthly);
       const densLabelMap = { low: 'Low', medium: 'Medium', high: 'High', very_high: 'Very High' };
       const sewaDetailParts = [];
       if (frQty > 0) sewaDetailParts.push(`Full Rack × ${frQty} (densitas ${densLabelMap[density] || density})`);
       if (srQty > 0) sewaDetailParts.push(`Subrack × ${srQty}`);
       if (tier !== 'tier3' && uQty > 0) sewaDetailParts.push(`1-U × ${uQty}`);
-      if (sewaDetailParts.length > 0) addSubRow(sewaDetailParts.join(', '), null, null);
+      const sewaLabel = sewaDetailParts.length > 0 ? `Sewa Rak — ${sewaDetailParts.join(', ')}` : 'Sewa Rak';
+      if (sewaOtc > 0 || sewaMonthly > 0) addBreakdown(sewaLabel, sewaOtc, sewaMonthly);
 
       const psQty = num(document.getElementById('it_ps_qty').value);
       const psArea = num(document.getElementById('it_ps_area').value);
@@ -670,9 +662,9 @@
         const m = mode === 'dual' ? 2 : 1;
         powerOtc = amps * t.power[mode].otcPerAmp * m;
         powerMonthly = amps * t.power[mode].monthlyPerAmp * m;
-        if (powerOtc > 0 || powerMonthly > 0) addBreakdown('Power Supply', powerOtc, powerMonthly);
         const modeLabel = mode === 'single' ? 'Single Source' : 'Dual Source aktif-aktif';
-        addSubRow(`${modeLabel} — ${amps} A`, null, null);
+        const powerLabel = `Power Supply — ${modeLabel} — ${amps} A`;
+        if (powerOtc > 0 || powerMonthly > 0) addBreakdown(powerLabel, powerOtc, powerMonthly);
       }
 
       const utpCables = num(document.getElementById('it_precable_utp').value);
@@ -703,11 +695,11 @@
       const uQty = num(document.getElementById('ner_1u_qty').value);
       const sewaOtc = frQty * t.sewa.otc.fullRack + uQty * t.sewa.otc.oneU;
       const sewaMonthly = frQty * t.sewa.monthly.fullRack + uQty * t.sewa.monthly.oneU;
-      if (sewaOtc > 0 || sewaMonthly > 0) addBreakdown('Sewa Rak', sewaOtc, sewaMonthly);
       const sewaDetailPartsNer = [];
       if (frQty > 0) sewaDetailPartsNer.push(`Full Rack × ${frQty}`);
       if (uQty > 0) sewaDetailPartsNer.push(`1-U × ${uQty}`);
-      if (sewaDetailPartsNer.length > 0) addSubRow(sewaDetailPartsNer.join(', '), null, null);
+      const sewaLabelNer = sewaDetailPartsNer.length > 0 ? `Sewa Rak — ${sewaDetailPartsNer.join(', ')}` : 'Sewa Rak';
+      if (sewaOtc > 0 || sewaMonthly > 0) addBreakdown(sewaLabelNer, sewaOtc, sewaMonthly);
 
       const mode = document.getElementById('ner_power_mode').value;
       const amps = num(document.getElementById('ner_power_a').value);
@@ -716,9 +708,9 @@
         const m = mode === 'dual' ? 2 : 1;
         powerOtc = amps * t.power[mode].otcPerAmp * m;
         powerMonthly = amps * t.power[mode].monthlyPerAmp * m;
-        if (powerOtc > 0 || powerMonthly > 0) addBreakdown('Power Supply', powerOtc, powerMonthly);
         const modeLabel = mode === 'single' ? 'Single Source' : 'Dual Source aktif-aktif';
-        addSubRow(`${modeLabel} — ${amps} A`, null, null);
+        const powerLabelNer = `Power Supply — ${modeLabel} — ${amps} A`;
+        if (powerOtc > 0 || powerMonthly > 0) addBreakdown(powerLabelNer, powerOtc, powerMonthly);
       }
 
       const utpCables = num(document.getElementById('ner_precable_utp').value);
@@ -794,9 +786,14 @@
       updateSummary();
     }
 
-    document.getElementById('calc_it').addEventListener('click', () => { clearResults(); calcItHall(); });
-    document.getElementById('calc_ner').addEventListener('click', () => { clearResults(); calcNer(); });
-    document.getElementById('calc_member').addEventListener('click', calcMembershipSection);
+    const btnCalcTotal = document.getElementById('calc_total');
+    if (btnCalcTotal) {
+      btnCalcTotal.addEventListener('click', () => {
+        clearResults();
+        const loc = getLoc();
+        if (loc === 'ithall') { calcItHall(); } else { calcNer(); }
+      });
+    }
     const btnDownload = document.getElementById('download_excel');
     if (btnDownload) btnDownload.addEventListener('click', downloadExcel);
 
@@ -813,8 +810,6 @@
         ['neuCentrIX site', site],
         ['Tier', tierText],
         ['Alamat site', addr],
-        ['Sewa Rak', document.getElementById('summary_sewa_rak')?.textContent || '—'],
-        ['Power Supply', document.getElementById('summary_power')?.textContent || '—'],
       ];
 
       const breakdownData = [['Komponen', 'OTC', 'Bulanan']];
@@ -842,7 +837,7 @@
       const wsRingkasan = XLSX.utils.aoa_to_sheet(combinedData);
       XLSX.utils.book_append_sheet(wb, wsRingkasan, 'Ringkasan');
 
-      XLSX.writeFile(wb, 'ringkasan-biaya.xlsx');
+      XLSX.writeFile(wb, 'summary-perhitungan-neucentrix.xlsx');
     }
 
     function init() { autoSelectTierBySite(); toggleForms(); toggleTierOptions(); updateSummary(); renderSiteAddresses(); }
