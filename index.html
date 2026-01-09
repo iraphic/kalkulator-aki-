@@ -11,6 +11,7 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
@@ -416,6 +417,22 @@
             color: #6b7280;
             font-size: 0.75rem;
         }
+
+        .btn-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .ba-field {
+            margin-bottom: 0.75rem;
+        }
+
+        .ba-small {
+            font-size: 0.8125rem;
+            color: #6b7280;
+        }
     </style>
 </head>
 <body>
@@ -818,6 +835,196 @@
             const [periodType, setPeriodType] = React.useState("");
             const [customPeriod, setCustomPeriod] = React.useState("");
             const [showFixedParams, setShowFixedParams] = React.useState(false);
+            const [showBeritaAcara, setShowBeritaAcara] = React.useState(false);
+            const [beritaAcaraForm, setBeritaAcaraForm] = React.useState({
+                customerName: "",
+                picName: "",
+                picTitle: "",
+                picContact: "",
+            });
+
+            const escapeHtml = (value) => {
+                return String(value ?? '').replace(/[&<>"']/g, (ch) => {
+                    switch (ch) {
+                        case '&':
+                            return '&amp;';
+                        case '<':
+                            return '&lt;';
+                        case '>':
+                            return '&gt;';
+                        case '"':
+                            return '&quot;';
+                        case "'":
+                            return '&#39;';
+                        default:
+                            return ch;
+                    }
+                });
+            };
+
+            const openBeritaAcaraSheet = () => {
+                setBeritaAcaraForm((prev) => ({
+                    ...prev,
+                    customerName: (prev.customerName || inputs.customerName || "").toString(),
+                }));
+                setShowBeritaAcara(true);
+            };
+
+            const closeBeritaAcaraSheet = () => {
+                setShowBeritaAcara(false);
+            };
+
+            const generateBeritaAcaraDocx = () => {
+                const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, BorderStyle } = docx;
+
+                const customerName = (beritaAcaraForm.customerName || inputs.customerName || "").trim();
+                const picName = (beritaAcaraForm.picName || "").trim();
+                const picTitle = (beritaAcaraForm.picTitle || "").trim();
+                const picContact = (beritaAcaraForm.picContact || "").trim();
+                const contractPeriod = Number(inputs.contractPeriod || 0);
+                
+                const dateText = new Date().toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                });
+
+                const doc = new Document({
+                    sections: [{
+                        properties: {},
+                        children: [
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: "BERITA ACARA KESEDIAAN BERLANGGANAN",
+                                        bold: true,
+                                        size: 32, // 16pt
+                                    }),
+                                ],
+                                alignment: AlignmentType.CENTER,
+                                spacing: { after: 400 },
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: `Tanggal: ${dateText}`,
+                                        size: 20, // 10pt
+                                    }),
+                                ],
+                                alignment: AlignmentType.CENTER,
+                                spacing: { after: 400 },
+                            }),
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: `Saya selaku calon pelanggan Telkom bersedia untuk berlangganan layanan ${inputs.services.map(s => s.serviceDetails).filter(Boolean).join(", ")} selama ${contractPeriod} bulan untuk memenuhi perhitungan kelayakan investasi yang berlaku di lingkungan Telkom.`,
+                                        size: 22, // 11pt
+                                    }),
+                                ],
+                                spacing: { after: 400 },
+                            }),
+                            new Table({
+                                width: {
+                                    size: 100,
+                                    type: WidthType.PERCENTAGE,
+                                },
+                                rows: [
+                                    new TableRow({
+                                        children: [
+                                            new TableCell({
+                                                children: [new Paragraph({ text: "Nama Pelanggan", bold: true })],
+                                                width: { size: 35, type: WidthType.PERCENTAGE },
+                                            }),
+                                            new TableCell({
+                                                children: [new Paragraph({ text: customerName })],
+                                            }),
+                                        ],
+                                    }),
+                                    new TableRow({
+                                        children: [
+                                            new TableCell({
+                                                children: [new Paragraph({ text: "Nama PIC Pelanggan", bold: true })],
+                                            }),
+                                            new TableCell({
+                                                children: [new Paragraph({ text: picName })],
+                                            }),
+                                        ],
+                                    }),
+                                    new TableRow({
+                                        children: [
+                                            new TableCell({
+                                                children: [new Paragraph({ text: "Jabatan", bold: true })],
+                                            }),
+                                            new TableCell({
+                                                children: [new Paragraph({ text: picTitle })],
+                                            }),
+                                        ],
+                                    }),
+                                    new TableRow({
+                                        children: [
+                                            new TableCell({
+                                                children: [new Paragraph({ text: "Kontak", bold: true })],
+                                            }),
+                                            new TableCell({
+                                                children: [new Paragraph({ text: picContact })],
+                                            }),
+                                        ],
+                                    }),
+                                ],
+                            }),
+                            new Paragraph({ text: "", spacing: { after: 800 } }),
+                            new Table({
+                                width: {
+                                    size: 100,
+                                    type: WidthType.PERCENTAGE,
+                                },
+                                borders: {
+                                    top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                                    bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                                    left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                                    right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                                    insideHorizontal: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                                    insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                                },
+                                rows: [
+                                    new TableRow({
+                                        children: [
+                                            new TableCell({
+                                                children: [
+                                                    new Paragraph({ text: "Pelanggan,", alignment: AlignmentType.CENTER }),
+                                                    new Paragraph({ text: "", spacing: { after: 1500 } }), // Space for signature
+                                                    new Paragraph({ 
+                                                        children: [new TextRun({ text: picName, bold: true, underline: {} })],
+                                                        alignment: AlignmentType.CENTER 
+                                                    }),
+                                                    new Paragraph({ text: picTitle, alignment: AlignmentType.CENTER }),
+                                                ],
+                                                width: { size: 50, type: WidthType.PERCENTAGE },
+                                            }),
+                                            new TableCell({
+                                                children: [
+                                                    new Paragraph({ text: "Telkom,", alignment: AlignmentType.CENTER }),
+                                                    new Paragraph({ text: "", spacing: { after: 1500 } }), // Space for signature
+                                                    new Paragraph({ 
+                                                        children: [new TextRun({ text: "(........................................)", bold: true })],
+                                                        alignment: AlignmentType.CENTER 
+                                                    }),
+                                                    new Paragraph({ text: "(........................................)", alignment: AlignmentType.CENTER }),
+                                                ],
+                                                width: { size: 50, type: WidthType.PERCENTAGE },
+                                            }),
+                                        ],
+                                    }),
+                                ],
+                            }),
+                        ],
+                    }],
+                });
+
+                Packer.toBlob(doc).then((blob) => {
+                    saveAs(blob, `Berita_Acara_${customerName.replace(/[^a-zA-Z0-9]/g, "_")}.docx`);
+                });
+            };
 
             const handleInputChange = (field, value) => {
                 if (field === 'customerName') {
@@ -1550,13 +1757,20 @@
                                 {/* Excel Download Button */}
                                 {results && (
                                     <div className="mt-6 pt-6 border-t border-border">
-                                        <div className="flex justify-center">
+                                        <div className="btn-row">
                                             <button 
                                                 onClick={() => exportToExcel(results, inputs)}
                                                 className="btn btn-success"
                                                 data-testid="button-export-excel"
                                             >
                                                 📊 Download Excel
+                                            </button>
+                                            <button
+                                                onClick={openBeritaAcaraSheet}
+                                                className="btn btn-primary"
+                                                data-testid="button-open-berita-acara"
+                                            >
+                                                📝 Berita Acara
                                             </button>
                                         </div>
                                     </div>
@@ -2088,6 +2302,95 @@
                                             <label className="block text-sm text-muted mb-2">Operational Cost Rate</label>
                                             <div className="p-3 bg-muted rounded-md text-sm font-medium" data-testid="operational-cost-value">
                                                 20%
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    {showBeritaAcara && (
+                        <>
+                            <div className="sheet-backdrop" onClick={closeBeritaAcaraSheet}></div>
+                            <div className={`sheet ${showBeritaAcara ? 'open' : ''}`}>
+                                <div className="sheet-header">
+                                    <h2>Berita Acara</h2>
+                                    <p>Form data pelanggan & tanda tangan PIC</p>
+                                </div>
+                                <div className="sheet-content">
+                                    <div>
+                                        <div className="ba-field">
+                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                Nama Pelanggan
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={beritaAcaraForm.customerName}
+                                                onChange={(e) => setBeritaAcaraForm((prev) => ({ ...prev, customerName: e.target.value }))}
+                                                className="form-control"
+                                            />
+                                        </div>
+
+                                        <div className="ba-field">
+                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                Nama PIC Pelanggan
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={beritaAcaraForm.picName}
+                                                onChange={(e) => setBeritaAcaraForm((prev) => ({ ...prev, picName: e.target.value }))}
+                                                className="form-control"
+                                            />
+                                        </div>
+
+                                        <div className="ba-field">
+                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                Jabatan
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={beritaAcaraForm.picTitle}
+                                                onChange={(e) => setBeritaAcaraForm((prev) => ({ ...prev, picTitle: e.target.value }))}
+                                                className="form-control"
+                                            />
+                                        </div>
+
+                                        <div className="ba-field">
+                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                Kontak
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={beritaAcaraForm.picContact}
+                                                onChange={(e) => setBeritaAcaraForm((prev) => ({ ...prev, picContact: e.target.value }))}
+                                                className="form-control"
+                                                placeholder="No HP / Email"
+                                            />
+                                        </div>
+
+                                        <div className="mt-8">
+                                            <button
+                                                type="button"
+                                                className="btn btn-primary"
+                                                onClick={generateBeritaAcaraDocx}
+                                                disabled={
+                                                    !beritaAcaraForm.customerName.trim() ||
+                                                    !beritaAcaraForm.picName.trim() ||
+                                                    !beritaAcaraForm.picTitle.trim() ||
+                                                    !beritaAcaraForm.picContact.trim() ||
+                                                    !inputs.contractPeriod
+                                                }
+                                            >
+                                                📄 Generate Berita Acara (.docx)
+                                            </button>
+                                            <div className="ba-small mt-4">
+                                                Periode berlangganan otomatis: {inputs.contractPeriod || 0} bulan.
+                                            </div>
+                                            <div className="mt-4">
+                                                <button type="button" className="btn btn-outline" onClick={closeBeritaAcaraSheet}>
+                                                    Tutup
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
