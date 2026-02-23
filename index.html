@@ -14,7 +14,9 @@
     <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <style>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+   <style>
         * {
             margin: 0;
             padding: 0;
@@ -1468,6 +1470,286 @@
                 saveAs(blob, filename);
             };
 
+            const exportToPDF = (results, inputs) => {
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+        alert('Fitur PDF belum siap. Silakan refresh halaman.');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+
+    const totalMonthlyRevenue = inputs.services.reduce(
+        (sum, service) => sum + service.monthlyRevenue,
+        0
+    );
+    const totalOtcCost = inputs.services.reduce(
+        (sum, service) => sum + service.otcCost,
+        0
+    );
+    const totalMonthlyRevenueWithQty = inputs.services.reduce(
+        (sum, service) => sum + (service.monthlyRevenue * getSafeQuantity(service.quantity)),
+        0
+    );
+    const totalOtcCostWithQty = inputs.services.reduce(
+        (sum, service) => sum + (service.otcCost * getSafeQuantity(service.quantity)),
+        0
+    );
+
+    const customerNameForFile = inputs.customerName
+        ? inputs.customerName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_')
+        : 'Nama_Customer';
+    const reportTitle = `AKI Report - ${inputs.customerName || 'Nama Customer'}`;
+
+    const coverIrrStatus = results.irr >= 15 ? 'Feasible' : 'Not Feasible';
+    const coverNpvStatus = results.npv > 0 ? 'Feasible' : 'Not Feasible';
+    const recommendation = results.isViable
+        ? 'Layak untuk diimplementasikan'
+        : 'Tidak layak untuk diimplementasikan';
+
+    let y = 12;
+
+    doc.setFontSize(14);
+    doc.text(reportTitle, 105, y, { align: 'center' });
+    y += 8;
+
+    // ================== SEGMENT 1: REVENUE PLAN ==================
+    doc.setFontSize(11);
+    doc.text('Revenue Plan', 14, y);
+    y += 4;
+
+    // Resume: mengikuti sheet BUSINESS PLAN (coverSheetData)
+    const resumeBody = [
+        ['Total Investasi', formatCurrency(inputs.investmentCost)],
+        ['Pendapatan PSB', formatCurrency(results.otcRevenue)],
+        ['Pendapatan Abonemen IBL', `${formatCurrency(totalMonthlyRevenueWithQty)} /bulan`],
+        ['IRR', `${formatPercentage(results.irr)} ${coverIrrStatus}`],
+        ['NPV', `${formatCurrency(results.npv)} ${coverNpvStatus}`],
+        ['PAYBACK PERIODE', `${results.paybackPeriod.years} years ${results.paybackPeriod.months} months`],
+        ['Rekomendasi', recommendation]
+    ];
+
+    doc.autoTable({
+        startY: y,
+        head: [['Resume', 'Nilai']],
+        body: resumeBody,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
+        theme: 'grid',
+        columnStyles: {
+            0: { cellWidth: 75 },
+            1: { cellWidth: 100 }
+        }
+    });
+
+    y = doc.lastAutoTable.finalY + 6;
+
+    // Detail Layanan: mengikuti bagian DETAIL BREAKDOWN LAYANAN
+    doc.setFontSize(11);
+    doc.text('Detail Layanan', 14, y);
+    y += 4;
+
+    const servicesTableBody = inputs.services.length > 0
+        ? inputs.services.map((service, index) => [
+            String(index + 1),
+            service.serviceDetails || `Layanan ${index + 1}`,
+            service.bandwidth || '-',
+            service.quantity != null && service.quantity !== '' ? String(service.quantity) : '-',
+            service.unit || '-',
+            formatCurrency(service.otcCost),
+            formatCurrency(service.monthlyRevenue),
+            formatCurrency(service.otcCost * getSafeQuantity(service.quantity)),
+            formatCurrency(service.monthlyRevenue * getSafeQuantity(service.quantity)),
+            formatCurrency(
+                service.monthlyRevenue * getSafeQuantity(service.quantity) * inputs.contractPeriod
+            )
+        ])
+        : [['-', '-', '-', '-', '-', '-', '-', '-', '-', '-']];
+
+    doc.autoTable({
+        startY: y,
+        head: [[
+            'No.',
+            'Layanan',
+            'BW (Mbps)',
+            'Qty',
+            'Satuan',
+            'OTC',
+            'MRC',
+            'Total OTC',
+            'Total MRC',
+            `Total MRC ${inputs.contractPeriod} Bulan`
+        ]],
+        body: servicesTableBody,
+        styles: { fontSize: 7 },
+        headStyles: { fillColor: [226, 232, 240] },
+        theme: 'grid'
+    });
+
+    const afterServicesY = doc.lastAutoTable.finalY + 4;
+    if (afterServicesY > 260) {
+        doc.addPage();
+        y = 14;
+    } else {
+        y = afterServicesY;
+    }
+
+    const totalRow = [
+        '',
+        'Total (exc. PPN)',
+        '-',
+        inputs.services
+            .reduce((sum, service) => sum + getSafeQuantity(service.quantity), 0)
+            .toString(),
+        inputs.services.length > 0 ? (inputs.services[0].unit || '-') : '-',
+        formatCurrency(totalOtcCost),
+        formatCurrency(totalMonthlyRevenue),
+        formatCurrency(totalOtcCostWithQty),
+        formatCurrency(totalMonthlyRevenueWithQty),
+        formatCurrency(totalMonthlyRevenueWithQty * inputs.contractPeriod)
+    ];
+
+    doc.autoTable({
+        startY: y,
+        body: [totalRow],
+        styles: { fontSize: 7 },
+        theme: 'plain'
+    });
+
+    // ================== SEGMENT 2: ANALISA KELAYAKAN INVESTASI ==================
+    doc.addPage();
+    y = 12;
+
+    doc.setFontSize(11);
+    doc.text('Analisa Kelayakan Investasi', 14, y);
+    y += 6;
+
+    const npvStatus = results.npv > 0 ? 'Layak' : 'Tidak Layak';
+    const irrStatus = results.irr >= 0.15 ? 'Layak' : 'Tidak Layak';
+
+    // Ringkasan utama: mengikuti bagian "RINGKASAN UTAMA HASIL PERHITUNGAN"
+    const ringkasanBody = [
+        ['Total Revenue (Lifetime)', formatCurrency(results.totalRevenue)],
+        ['OTC Revenue', formatCurrency(results.otcRevenue)],
+        ['Monthly Revenue Total', formatCurrency(results.monthlyTotal)],
+        ['Total COGS', formatCurrency(results.cogsProjections
+            .reduce((sum, p) => sum + p.totalCogs, 0))],
+        ['Total OPEX', formatCurrency(results.totalOpex)],
+        ['NPV', formatCurrency(results.npv)],
+        ['IRR', formatPercentage(results.irr)],
+        ['Payback Period', `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`],
+        ['Status Kelayakan', results.isViable ? 'LAYAK' : 'TIDAK LAYAK']
+    ];
+
+    doc.autoTable({
+        startY: y,
+        head: [['Metric', 'Nilai']],
+        body: ringkasanBody,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
+        theme: 'grid',
+        columnStyles: {
+            0: { cellWidth: 80 },
+            1: { cellWidth: 90 }
+        }
+    });
+
+    y = doc.lastAutoTable.finalY + 6;
+
+    // Tabel ANALISIS KELAYAKAN INVESTASI (NPV, IRR, Payback + keterangan)
+    const feasibilityBody = [
+        [
+            'NPV',
+            formatCurrency(results.npv),
+            '> Rp 0',
+            npvStatus,
+            npvStatus === 'Layak'
+                ? 'Investasi menghasilkan nilai positif'
+                : 'Investasi tidak menghasilkan nilai positif'
+        ],
+        [
+            'IRR',
+            formatPercentage(results.irr),
+            '≥ 15%',
+            irrStatus,
+            irrStatus === 'Layak'
+                ? 'Return melebihi cost of capital'
+                : 'Return di bawah cost of capital'
+        ],
+        [
+            'Payback Period',
+            `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`,
+            'Reasonable Period',
+            '-',
+            'Waktu pengembalian modal investasi'
+        ]
+    ];
+
+    doc.autoTable({
+        startY: y,
+        head: [['Metrics', 'Value', 'Threshold', 'Status', 'Keterangan']],
+        body: feasibilityBody,
+        styles: { fontSize: 7 },
+        headStyles: { fillColor: [226, 232, 240] },
+        theme: 'grid'
+    });
+
+    y = doc.lastAutoTable.finalY + 6;
+
+    // Tabel REKOMENDASI INVESTASI
+    const rekomendasiBody = [
+        [
+            'Profitabilitas (NPV)',
+            results.npv > 0 ? 'POSITIF' : 'NEGATIF',
+            results.npv > 0 ? 'Investasi menguntungkan' : 'Investasi merugikan'
+        ],
+        [
+            'Efisiensi Return (IRR)',
+            results.irr >= 0.15 ? 'MEMADAI' : 'TIDAK MEMADAI',
+            results.irr >= 0.15 ? 'Return sesuai ekspektasi' : 'Return di bawah ekspektasi'
+        ],
+        [
+            'Risiko Waktu (Payback)',
+            `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`,
+            'Waktu pengembalian investasi'
+        ],
+        [
+            'Status Kelayakan',
+            results.isViable ? 'LAYAK' : 'TIDAK LAYAK',
+            results.isViable
+                ? 'Investasi direkomendasikan untuk dilaksanakan'
+                : 'Investasi tidak direkomendasikan'
+        ],
+        [
+            'Tingkat Kepercayaan',
+            results.npv > 0 && results.irr >= 0.15
+                ? 'TINGGI'
+                : results.npv > 0 || results.irr >= 0.15
+                    ? 'SEDANG'
+                    : 'RENDAH',
+            'Berdasarkan konsistensi indikator kelayakan'
+        ],
+        [
+            'Rekomendasi Tindakan',
+            results.isViable ? 'PROCEED' : 'REVIEW/REJECT',
+            results.isViable
+                ? 'Lanjutkan ke tahap implementasi'
+                : 'Tinjau ulang parameter atau tolak investasi'
+        ]
+    ];
+
+    doc.autoTable({
+        startY: y,
+        head: [['Aspek Penilaian', 'Hasil', 'Interpretasi']],
+        body: rekomendasiBody,
+        styles: { fontSize: 7 },
+        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
+        theme: 'grid'
+    });
+
+    doc.save(`AKI_PT_${customerNameForFile}_AS_PDF.pdf`);
+};
+
             React.useEffect(() => {
                 const hasValidServices = inputs.services.length > 0 && inputs.services.some(service => 
                     service.serviceDetails.trim() !== "" && (service.monthlyRevenue > 0 || service.otcCost > 0)
@@ -1765,6 +2047,13 @@
                                             >
                                                 📊 Download Excel
                                             </button>
+                                            <button
+        onClick={() => exportToPDF(results, inputs)}
+        className="btn btn-primary"
+        data-testid="button-export-pdf"
+    >
+        📄 Download AKI as PDF
+    </button>
                                             <button
                                                 onClick={openBeritaAcaraSheet}
                                                 className="btn btn-primary"
