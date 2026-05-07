@@ -1916,9 +1916,9 @@
     doc.addPage();
     y = 12;
 
-    doc.setFontSize(14);
+    doc.setFontSize(12);
     doc.text('Lembar Approval & Tanda Tangan Digital', 105, y, { align: 'center' });
-    y += 10;
+    y += 8;
 
     const currentDateTime = new Date().toLocaleString('id-ID', {
         day: '2-digit',
@@ -1978,6 +1978,15 @@
                 const height = data.cell.height - 2;
                 doc.setDrawColor(0);
                 doc.rect(x, yCell, width, height);
+            }
+
+            if (data.section === 'body' && data.row.index === 0 && data.column.index === 1) {
+                const separatorY = data.cell.y + data.cell.height / 2 + 1;
+                const x1 = data.cell.x + 3;
+                const x2 = data.cell.x + data.cell.width - 3;
+                doc.setDrawColor(156);
+                doc.setLineWidth(0.2);
+                doc.line(x1, separatorY, x2, separatorY);
             }
         }
     });
@@ -2817,7 +2826,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.5.2 - May 8, 2026 - 02.28</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.5.3 - May 8, 2026 - 02.34</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> | 
     <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
