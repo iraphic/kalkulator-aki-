@@ -1850,58 +1850,30 @@
     doc.text('Lembar Approval & Tanda Tangan Digital', 105, y, { align: 'center' });
     y += 10;
 
-    const approvalMetaBody = [
-        ['Tanggal', new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })],
-        ['Nama Pelanggan', inputs.customerName || '-']
-    ];
-
-    doc.autoTable({
-        startY: y,
-        head: [['Keterangan', 'Detail']],
-        body: approvalMetaBody,
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
-        theme: 'grid',
-        columnStyles: {
-            0: { cellWidth: 50 },
-            1: { cellWidth: 140 }
-        }
-    });
-
-    y = doc.lastAutoTable.finalY + 10;
-
     const approvalTableBody = [
         [
-            'Dibuat oleh 1',
-            approvalData.dibuat[0].nik || '...........................',
-            approvalData.dibuat[0].nama || '...........................',
-            approvalData.dibuat[0].jabatan || '...........................',
+            'Dibuat Oleh',
+            `${approvalData.dibuat[0].nama || '...........................'}\nNIK. ${approvalData.dibuat[0].nik || '...........................'}\n${approvalData.dibuat[0].jabatan || '...........................'}`,
             '...........................',
-            '...........................'
+            ''
         ],
         [
-            'Dibuat oleh 2',
-            approvalData.dibuat[1].nik || '...........................',
-            approvalData.dibuat[1].nama || '...........................',
-            approvalData.dibuat[1].jabatan || '...........................',
+            'Dibuat Oleh',
+            `${approvalData.dibuat[1].nama || '...........................'}\nNIK. ${approvalData.dibuat[1].nik || '...........................'}\n${approvalData.dibuat[1].jabatan || '...........................'}`,
             '...........................',
-            '...........................'
+            ''
         ],
         [
-            'Diperiksa oleh',
-            approvalData.diperiksa.nik || '...........................',
-            approvalData.diperiksa.nama || '...........................',
-            approvalData.diperiksa.jabatan || '...........................',
+            'Diperiksa Oleh',
+            `${approvalData.diperiksa.nama || '...........................'}\nNIK. ${approvalData.diperiksa.nik || '...........................'}\n${approvalData.diperiksa.jabatan || '...........................'}`,
             '...........................',
-            '...........................'
+            ''
         ],
         [
-            'Disetujui oleh',
-            approvalData.disetujui.nik || '...........................',
-            approvalData.disetujui.nama || '...........................',
-            approvalData.disetujui.jabatan || '...........................',
+            'Disetujui Oleh',
+            `${approvalData.disetujui.nama || '...........................'}\nNIK. ${approvalData.disetujui.nik || '...........................'}\n${approvalData.disetujui.jabatan || '...........................'}`,
             '...........................',
-            '...........................'
+            ''
         ]
     ];
 
@@ -1909,23 +1881,29 @@
         startY: y,
         head: [[
             'Peran',
-            'NIK',
-            'Nama',
-            'Jabatan',
-            'Tanda Tangan',
-            'Tanggal'
+            'Nama / NIK / Jabatan',
+            'Tanggal',
+            'Tanda Tangan'
         ]],
         body: approvalTableBody,
-        styles: { fontSize: 8 },
+        styles: { fontSize: 8, minCellHeight: 28, cellPadding: 4 },
         headStyles: { fillColor: [30, 64, 175], textColor: 255 },
         theme: 'grid',
         columnStyles: {
             0: { cellWidth: 35 },
-            1: { cellWidth: 30 },
-            2: { cellWidth: 45 },
-            3: { cellWidth: 35 },
-            4: { cellWidth: 30 },
-            5: { cellWidth: 30 }
+            1: { cellWidth: 85 },
+            2: { cellWidth: 35 },
+            3: { cellWidth: 45 }
+        },
+        didDrawCell: (data) => {
+            if (data.section === 'body' && data.column.index === 3) {
+                const x = data.cell.x + 1;
+                const yCell = data.cell.y + 1;
+                const width = data.cell.width - 2;
+                const height = data.cell.height - 2;
+                doc.setDrawColor(0);
+                doc.rect(x, yCell, width, height);
+            }
         }
     });
 
