@@ -179,6 +179,23 @@
             background: #f9fafb;
         }
 
+        .dummy-fill-btn {
+            position: fixed;
+            right: 1rem;
+            bottom: 1rem;
+            z-index: 999;
+            padding: 0.5rem 0.75rem;
+            border-radius: 9999px;
+            background: #1e40af;
+            color: white;
+            font-size: 0.85rem;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+        }
+
+        .dummy-fill-btn:hover {
+            background: #1e3a8a;
+        }
+
         .service-card {
             border: 1px solid #e5e7eb;
             border-radius: 8px;
@@ -894,6 +911,59 @@
 
             const closeApprovalSheet = () => {
                 setShowApprovalForm(false);
+            };
+
+            const fillDummyData = () => {
+                const dummyInputs = {
+                    customerName: "PT Telkom Indonesia",
+                    investmentCost: 240000000,
+                    contractPeriod: 36,
+                    services: [{
+                        id: "1",
+                        serviceType: "Astinet",
+                        serviceDetails: "Astinet 200 Mbps",
+                        monthlyRevenue: 42000000,
+                        otcCost: 7200000,
+                        bandwidth: "200 Mbps",
+                        quantity: 1,
+                        unit: "titik",
+                    }],
+                };
+
+                const dummyInputValues = {
+                    customerName: "PT Telkom Indonesia",
+                    investmentCost: formatInputCurrency("240000000"),
+                    contractPeriod: "36",
+                    services: [{
+                        id: "1",
+                        serviceType: "Astinet",
+                        serviceDetails: "Astinet 200 Mbps",
+                        monthlyRevenue: formatInputCurrency("42000000"),
+                        otcCost: formatInputCurrency("7200000"),
+                        bandwidth: "200 Mbps",
+                        quantity: "1",
+                        unit: "titik",
+                    }],
+                };
+
+                setInputs(dummyInputs);
+                setInputValues(dummyInputValues);
+                setPeriodType("36");
+                setCustomPeriod("");
+                setApprovalForm({
+                    dibuat: [
+                        { nik: "720575", nama: "Mungkas Setyabadi", jabatan: "HEAD OF TELKOM DAERAH CIBINONG" },
+                        { nik: "980275", nama: "Vega Savera Yuana", jabatan: "OFF 3 SALES ENGINEER" }
+                    ],
+                    diperiksa: { nik: "870028", nama: "Noviana Putri Kusumasari", jabatan: "MANAGER WITEL BUSINESS SERVICE" },
+                    disetujui: { nik: "720470", nama: "Dodi Suparman", jabatan: "GENERAL MANAGER WITEL PRIANGAN BARAT" }
+                });
+                setBeritaAcaraForm({
+                    customerName: "PT Telkom Indonesia",
+                    picName: "Mungkas Setyabadi",
+                    picTitle: "Head of Telkom Daerah Cibinong",
+                    picContact: "0812-3456-7890",
+                });
             };
 
             const generateBeritaAcaraDocx = () => {
@@ -1850,29 +1920,33 @@
     doc.text('Lembar Approval & Tanda Tangan Digital', 105, y, { align: 'center' });
     y += 10;
 
+    const currentDateTime = new Date().toLocaleString('id-ID', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    const createdByCombined = `${approvalData.dibuat[0].nama || '...........................'}\nNIK. ${approvalData.dibuat[0].nik || '...........................'}\n${approvalData.dibuat[0].jabatan || '...........................'}\n\n${approvalData.dibuat[1].nama || '...........................'}\nNIK. ${approvalData.dibuat[1].nik || '...........................'}\n${approvalData.dibuat[1].jabatan || '...........................'}`;
+
     const approvalTableBody = [
         [
             'Dibuat Oleh',
-            `${approvalData.dibuat[0].nama || '...........................'}\nNIK. ${approvalData.dibuat[0].nik || '...........................'}\n${approvalData.dibuat[0].jabatan || '...........................'}`,
-            '...........................',
-            ''
-        ],
-        [
-            'Dibuat Oleh',
-            `${approvalData.dibuat[1].nama || '...........................'}\nNIK. ${approvalData.dibuat[1].nik || '...........................'}\n${approvalData.dibuat[1].jabatan || '...........................'}`,
-            '...........................',
+            createdByCombined,
+            currentDateTime,
             ''
         ],
         [
             'Diperiksa Oleh',
             `${approvalData.diperiksa.nama || '...........................'}\nNIK. ${approvalData.diperiksa.nik || '...........................'}\n${approvalData.diperiksa.jabatan || '...........................'}`,
-            '...........................',
+            currentDateTime,
             ''
         ],
         [
             'Disetujui Oleh',
             `${approvalData.disetujui.nama || '...........................'}\nNIK. ${approvalData.disetujui.nik || '...........................'}\n${approvalData.disetujui.jabatan || '...........................'}`,
-            '...........................',
+            currentDateTime,
             ''
         ]
     ];
@@ -1886,14 +1960,15 @@
             'Tanda Tangan'
         ]],
         body: approvalTableBody,
-        styles: { fontSize: 8, minCellHeight: 28, cellPadding: 4 },
+        styles: { fontSize: 8, minCellHeight: 34, cellPadding: 4 },
         headStyles: { fillColor: [30, 64, 175], textColor: 255 },
         theme: 'grid',
+        tableWidth: 'auto',
         columnStyles: {
-            0: { cellWidth: 35 },
-            1: { cellWidth: 85 },
-            2: { cellWidth: 35 },
-            3: { cellWidth: 45 }
+            0: { cellWidth: 30 },
+            1: { cellWidth: 90 },
+            2: { cellWidth: 30 },
+            3: { cellWidth: 40 }
         },
         didDrawCell: (data) => {
             if (data.section === 'body' && data.column.index === 3) {
@@ -1907,7 +1982,7 @@
         }
     });
 
-    doc.save(`AKI_PT_${customerNameForFile}_AS_PDF.pdf`);
+    doc.save(`AKI_PT_${customerNameForFile}_unsigned.pdf`);
 };
 
             React.useEffect(() => {
@@ -1923,6 +1998,14 @@
             return (
                 <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8">
                     <div className="container">
+                        <button
+                            type="button"
+                            className="btn btn-primary dummy-fill-btn"
+                            onClick={fillDummyData}
+                            data-testid="button-fill-dummy"
+                        >
+                            ⚡ Isi Dummy
+                        </button>
                         {/* Header */}
                         <div className="header">
                             <h1 data-testid="page-title">
@@ -2231,6 +2314,7 @@
                                 {results && (
                                     <div className="mt-6 pt-6 border-t border-border">
                                         <div className="btn-row">
+                                            {/*
                                             <button 
                                                 onClick={() => exportToExcel(results, inputs, approvalForm)}
                                                 className="btn btn-success"
@@ -2238,12 +2322,13 @@
                                             >
                                                 📊 Download Excel
                                             </button>
+                                            */}
                                             <button
         onClick={() => exportToPDF(results, inputs, approvalForm)}
-        className="btn btn-primary"
+        className="btn btn-success"
         data-testid="button-export-pdf"
     >
-        📄 Download AKI as PDF
+        📊 Download AKI as PDF
     </button>
                                             <button
                                                 onClick={openBeritaAcaraSheet}
@@ -2254,10 +2339,10 @@
                                             </button>
                                             <button
                                                 onClick={openApprovalSheet}
-                                                className="btn btn-primary"
+                                                className="btn btn-success"
                                                 data-testid="button-open-approval"
                                             >
-                                                ✍️ Form Approval
+                                                ✍️ Form Penandatangan
                                             </button>
                                         </div>
                                     </div>
@@ -2732,7 +2817,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.5 - May 8, 2026 - 02.11</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.5.2 - May 8, 2026 - 02.28</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> | 
     <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
