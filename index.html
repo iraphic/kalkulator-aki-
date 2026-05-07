@@ -1848,133 +1848,84 @@
 
     doc.setFontSize(14);
     doc.text('Lembar Approval & Tanda Tangan Digital', 105, y, { align: 'center' });
-    y += 8;
+    y += 10;
 
-    doc.setFontSize(9);
-    doc.text(`Tanggal: ${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })}`, 14, y);
-    y += 6;
-    doc.text(`Nama Pelanggan: ${inputs.customerName}`, 14, y);
-    y += 8;
-
-    // DIBUAT pertama OLEH Section
-    doc.setFontSize(11);
-    doc.text('DIBUAT OLEH', 14, y);
-    y += 2;
-    doc.setDrawColor(30, 64, 175);
-    doc.line(14, y, 200, y);
-    y += 6;
-
-    const dibuatBody = [
-        ['NIK', approvalData.dibuat[0].nik || '...........................'],
-        ['Nama', approvalData.dibuat[0].nama || '...........................'],
-        ['Jabatan', approvalData.dibuat[0].jabatan || '...........................'],
-        ['Tanda Tangan', ''],
-        ['']
+    const approvalMetaBody = [
+        ['Tanggal', new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })],
+        ['Nama Pelanggan', inputs.customerName || '-']
     ];
 
     doc.autoTable({
         startY: y,
         head: [['Keterangan', 'Detail']],
-        body: dibuatBody,
+        body: approvalMetaBody,
         styles: { fontSize: 8 },
         headStyles: { fillColor: [30, 64, 175], textColor: 255 },
         theme: 'grid',
         columnStyles: {
             0: { cellWidth: 50 },
-            1: { cellWidth: 130 }
+            1: { cellWidth: 140 }
         }
     });
 
-    y = doc.lastAutoTable.finalY + 8;
+    y = doc.lastAutoTable.finalY + 10;
 
-// DIBUAT kedua OLEH Section
-    doc.setFontSize(11);
-    doc.text('DIBUAT OLEH', 14, y);
-    y += 2;
-    doc.setDrawColor(30, 64, 175);
-    doc.line(14, y, 200, y);
-    y += 6;
-
-    const dibuatBody1 = [
-        ['NIK', approvalData.dibuat[1].nik || '...........................'],
-        ['Nama', approvalData.dibuat[1].nama || '...........................'],
-        ['Jabatan', approvalData.dibuat[1].jabatan || '...........................'],
-        ['Tanda Tangan', ''],
-        ['']
+    const approvalTableBody = [
+        [
+            'Dibuat oleh 1',
+            approvalData.dibuat[0].nik || '...........................',
+            approvalData.dibuat[0].nama || '...........................',
+            approvalData.dibuat[0].jabatan || '...........................',
+            '...........................',
+            '...........................'
+        ],
+        [
+            'Dibuat oleh 2',
+            approvalData.dibuat[1].nik || '...........................',
+            approvalData.dibuat[1].nama || '...........................',
+            approvalData.dibuat[1].jabatan || '...........................',
+            '...........................',
+            '...........................'
+        ],
+        [
+            'Diperiksa oleh',
+            approvalData.diperiksa.nik || '...........................',
+            approvalData.diperiksa.nama || '...........................',
+            approvalData.diperiksa.jabatan || '...........................',
+            '...........................',
+            '...........................'
+        ],
+        [
+            'Disetujui oleh',
+            approvalData.disetujui.nik || '...........................',
+            approvalData.disetujui.nama || '...........................',
+            approvalData.disetujui.jabatan || '...........................',
+            '...........................',
+            '...........................'
+        ]
     ];
 
     doc.autoTable({
         startY: y,
-        head: [['Keterangan', 'Detail']],
-        body: dibuatBody1,
+        head: [[
+            'Peran',
+            'NIK',
+            'Nama',
+            'Jabatan',
+            'Tanda Tangan',
+            'Tanggal'
+        ]],
+        body: approvalTableBody,
         styles: { fontSize: 8 },
         headStyles: { fillColor: [30, 64, 175], textColor: 255 },
         theme: 'grid',
         columnStyles: {
-            0: { cellWidth: 50 },
-            1: { cellWidth: 130 }
-        }
-    });
-
-    y = doc.lastAutoTable.finalY + 8;
-    // DIPERIKSA OLEH Section
-    doc.setFontSize(11);
-    doc.text('DIPERIKSA OLEH', 14, y);
-    y += 2;
-    doc.setDrawColor(30, 64, 175);
-    doc.line(14, y, 200, y);
-    y += 6;
-
-    const diperiksaBody = [
-        ['NIK', approvalData.diperiksa.nik || '...........................'],
-        ['Nama', approvalData.diperiksa.nama || '...........................'],
-        ['Jabatan', approvalData.diperiksa.jabatan || '...........................'],
-        ['Tanda Tangan', ''],
-        ['']
-        
-    ];
-
-    doc.autoTable({
-        startY: y,
-        head: [['Keterangan', 'Detail']],
-        body: diperiksaBody,
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
-        theme: 'grid',
-        columnStyles: {
-            0: { cellWidth: 50 },
-            1: { cellWidth: 130 }
-        }
-    });
-
-    y = doc.lastAutoTable.finalY + 8;
-
-    // DISETUJUI OLEH Section
-    doc.setFontSize(11);
-    doc.text('DISETUJUI OLEH', 14, y);
-    y += 2;
-    doc.setDrawColor(30, 64, 175);
-    doc.line(14, y, 200, y);
-    y += 6;
-
-    const disetujuiBody = [
-        ['NIK', approvalData.disetujui.nik || '...........................'],
-        ['Nama', approvalData.disetujui.nama || '...........................'],
-        ['Jabatan', approvalData.disetujui.jabatan || '...........................'],
-        ['Tanda Tangan', ''],
-        ['']
-    ];
-
-    doc.autoTable({
-        startY: y,
-        head: [['Keterangan', 'Detail']],
-        body: disetujuiBody,
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
-        theme: 'grid',
-        columnStyles: {
-            0: { cellWidth: 50 },
-            1: { cellWidth: 130 }
+            0: { cellWidth: 35 },
+            1: { cellWidth: 30 },
+            2: { cellWidth: 45 },
+            3: { cellWidth: 35 },
+            4: { cellWidth: 30 },
+            5: { cellWidth: 30 }
         }
     });
 
@@ -2803,7 +2754,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.4.6</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.5 - May 8, 2026 - 02.11</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> | 
     <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
