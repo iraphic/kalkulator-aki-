@@ -809,6 +809,7 @@
                 contractPeriod: 0,
                 services: [{
                     id: "1",
+                    serviceType: "",
                     serviceDetails: "",
                     monthlyRevenue: 0,
                     otcCost: 0,
@@ -825,6 +826,7 @@
                 contractPeriod: "",
                 services: [{
                     id: "1",
+                    serviceType: "",
                     serviceDetails: "",
                     monthlyRevenue: "",
                     otcCost: "",
@@ -1064,38 +1066,79 @@
             };
 
             const handleServiceChange = (serviceId, field, value) => {
-                // Perbarui nilai tampilan
                 setInputValues(prev => ({
                     ...prev,
-                    services: prev.services.map(service =>
-                        service.id === serviceId
-                            ? {
+                    services: prev.services.map(service => {
+                        if (service.id !== serviceId) return service;
+
+                        if (field === 'serviceType') {
+                            return {
                                 ...service,
-                                [field]: (field === 'serviceDetails' || field === 'bandwidth' || field === 'unit') 
-                                    ? value 
-                                    : field === 'quantity'
-                                        ? value // quantity ditampilkan sebagai string di input
-                                        : formatInputCurrency(value) // monthlyRevenue dan otcCost
-                            }
-                            : service
-                    )
+                                serviceType: value,
+                                serviceDetails: value === 'custom' ? '' : value
+                            };
+                        }
+
+                        if (field === 'serviceDetails' || field === 'bandwidth' || field === 'unit') {
+                            return {
+                                ...service,
+                                [field]: value
+                            };
+                        }
+
+                        if (field === 'quantity') {
+                            return {
+                                ...service,
+                                quantity: value
+                            };
+                        }
+
+                        return {
+                            ...service,
+                            [field]: formatInputCurrency(value)
+                        };
+                    })
                 }));
 
-                // Perbarui nilai aktual
                 setInputs(prev => ({
                     ...prev,
-                    services: prev.services.map(service =>
-                        service.id === serviceId
-                            ? {
+                    services: prev.services.map(service => {
+                        if (service.id !== serviceId) return service;
+
+                        if (field === 'serviceType') {
+                            return {
                                 ...service,
-                                [field]: (field === 'serviceDetails' || field === 'bandwidth' || field === 'unit')
-                                    ? value 
-                                    : field === 'quantity'
-                                        ? parseInt(value) || 0 // quantity disimpan sebagai number
-                                        : parseCurrency(value) // monthlyRevenue dan otcCost
-                            }
-                            : service
-                    )
+                                serviceType: value,
+                                serviceDetails: value === 'custom' ? '' : value
+                            };
+                        }
+
+                        if (field === 'serviceDetails') {
+                            return {
+                                ...service,
+                                serviceDetails: value
+                            };
+                        }
+
+                        if (field === 'bandwidth' || field === 'unit') {
+                            return {
+                                ...service,
+                                [field]: value
+                            };
+                        }
+
+                        if (field === 'quantity') {
+                            return {
+                                ...service,
+                                quantity: parseInt(value) || 0
+                            };
+                        }
+
+                        return {
+                            ...service,
+                            [field]: parseCurrency(value)
+                        };
+                    })
                 }));
             };
 
@@ -1103,6 +1146,7 @@
                 const newId = Date.now().toString();
                 const newService = {
                     id: newId,
+                    serviceType: "",
                     serviceDetails: "",
                     monthlyRevenue: 0,
                     otcCost: 0,
@@ -1112,6 +1156,7 @@
                 };
                 const newServiceDisplay = {
                     id: newId,
+                    serviceType: "",
                     serviceDetails: "",
                     monthlyRevenue: "",
                     otcCost: "",
@@ -1243,7 +1288,7 @@
                     ['No.', 'Jenis & Detail Layanan', 'Biaya Bulanan', 'Biaya Aktivasi (OTC)', 'Subtotal Bulanan', 'Subtotal OTC'],
                     ...inputs.services.map((service, index) => [
                         index + 1,
-                        service.serviceDetails || `Layanan ${index + 1}`,
+                        service.serviceDetails || service.serviceType || `Layanan ${index + 1}`,
                         formatCurrency(service.monthlyRevenue),
                         formatCurrency(service.otcCost),
                         formatCurrency(service.monthlyRevenue),
@@ -1271,7 +1316,7 @@
                     [''],
                     ['Layanan', 'BW (Mbps)', 'Qty', 'Satuan', 'OTC', 'MRC', 'Total OTC', 'Total MRC', `Total MRC ${inputs.contractPeriod} Bulan`],
                     ...inputs.services.map((service) => [
-                        service.serviceDetails || 'Layanan',
+                        service.serviceDetails || service.serviceType || 'Layanan',
                         service.bandwidth || '-',
                         service.quantity ?? '-',
                         service.unit || '-',
@@ -1615,7 +1660,7 @@
     const servicesTableBody = inputs.services.length > 0
         ? inputs.services.map((service, index) => [
             String(index + 1),
-            service.serviceDetails || `Layanan ${index + 1}`,
+            service.serviceDetails || service.serviceType || `Layanan ${index + 1}`,
             service.bandwidth || '-',
             service.quantity != null && service.quantity !== '' ? String(service.quantity) : '-',
             service.unit || '-',
@@ -2097,15 +2142,46 @@
                                                             <label className="block text-sm font-medium text-foreground mb-2">
                                                                 Jenis & Detail Layanan
                                                             </label>
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Astinet / Metro E / Indibiz, dsb."
-                                                                value={inputValues.services.find(s => s.id === service.id)?.serviceDetails || ''}
-                                                                onChange={(e) => handleServiceChange(service.id, 'serviceDetails', e.target.value)}
-                                                                className="form-control"
-                                                                data-testid={`input-service-details-${service.id}`}
-                                                            />
+                                                            <div className="select">
+                                                                <select
+                                                                    value={inputValues.services.find(s => s.id === service.id)?.serviceType || ''}
+                                                                    onChange={(e) => handleServiceChange(service.id, 'serviceType', e.target.value)}
+                                                                    className="form-control"
+                                                                    data-testid={`select-service-type-${service.id}`}
+                                                                >
+                                                                    <option value="">Pilih layanan</option>
+                                                                    <option value="Astinet">Astinet</option>
+                                                                    <option value="Astinet Lite">Astinet Lite</option>
+                                                                    <option value="Astinet Fit">Astinet Fit</option>
+                                                                    <option value="Astinet Beda Bandwidth">Astinet Beda Bandwidth</option>
+                                                                    <option value="Indibiz">Indibiz</option>
+                                                                    <option value="Metro Ethernet">Metro Ethernet</option>
+                                                                    <option value="SIP Trunk">SIP Trunk</option>
+                                                                    <option value="WMS">WMS</option>
+                                                                    <option value="WMS Fit">WMS Fit</option>
+                                                                    <option value="WMS Lite">WMS Lite</option>
+                                                                    <option value="IP Transit">IP Transit</option>
+                                                                    <option value="IP Transit Beda Bandwidth">IP Transit Beda Bandwidth</option>
+                                                                    <option value="VPN IP">VPN IP</option>
+                                                                    <option value="custom">Custom</option>
+                                                                </select>
+                                                            </div>
                                                         </div>
+                                                        {inputValues.services.find(s => s.id === service.id)?.serviceType === 'custom' && (
+                                                            <div className="form-group">
+                                                                <label className="block text-sm font-medium text-foreground mb-2">
+                                                                    Isi Layanan Manual
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Masukkan detail layanan"
+                                                                    value={inputValues.services.find(s => s.id === service.id)?.serviceDetails || ''}
+                                                                    onChange={(e) => handleServiceChange(service.id, 'serviceDetails', e.target.value)}
+                                                                    className="form-control"
+                                                                    data-testid={`input-service-details-custom-${service.id}`}
+                                                                />
+                                                            </div>
+                                                        )}
                                                         
                                                         <div className="form-group">
                                                             <label className="block text-sm font-medium text-foreground mb-2">
@@ -2617,7 +2693,7 @@
                                                         <tbody>
                                                             {inputs.services.map((service, index) => (
                                                                 <tr key={service.id} className={index % 2 === 0 ? "bg-background" : "bg-muted/30"} data-testid={`service-row-${service.id}`}>
-                                                                    <td className="border-r font-medium">{service.serviceDetails || `Layanan ${index + 1}`}</td>
+                                                                    <td className="border-r font-medium">{service.serviceDetails || service.serviceType || `Layanan ${index + 1}`}</td>
                                                                     <td className="border-r text-center" data-testid={`table-bandwidth-${service.id}`}>{service.bandwidth || "-"}</td>
                                                                     <td className="border-r text-center" data-testid={`table-quantity-${service.id}`}>{service.quantity || "-"}</td>
                                                                     <td className="border-r text-center" data-testid={`table-unit-${service.id}`}>{service.unit || "-"}</td>
@@ -2740,7 +2816,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.4.4</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.4.5</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> | 
     <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
