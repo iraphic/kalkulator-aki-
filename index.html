@@ -847,7 +847,10 @@
 
             const [showApprovalForm, setShowApprovalForm] = React.useState(false);
             const [approvalForm, setApprovalForm] = React.useState({
-                dibuat: { nik: "", nama: "", jabatan: "" },
+                dibuat: [
+                    { nik: "", nama: "", jabatan: "" },
+                    { nik: "", nama: "", jabatan: "" }
+                ],
                 diperiksa: { nik: "", nama: "", jabatan: "" },
                 disetujui: { nik: "", nama: "", jabatan: "" },
             });
@@ -1482,10 +1485,17 @@
                     ['Tanggal', new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })],
                     ['Nama Pelanggan', inputs.customerName],
                     [''],
-                    ['DIBUAT OLEH', '', '', ''],
-                    ['NIK', approvalData.dibuat.nik, '', ''],
-                    ['Nama', approvalData.dibuat.nama, '', ''],
-                    ['Jabatan', approvalData.dibuat.jabatan, '', ''],
+                    ['DIBUAT OLEH - ORANG KE-1', '', '', ''],
+                    ['NIK', approvalData.dibuat[0].nik, '', ''],
+                    ['Nama', approvalData.dibuat[0].nama, '', ''],
+                    ['Jabatan', approvalData.dibuat[0].jabatan, '', ''],
+                    ['Tanda Tangan', '...........................', '', ''],
+                    ['Tanggal', '', '', ''],
+                    [''],
+                    ['DIBUAT OLEH - ORANG KE-2', '', '', ''],
+                    ['NIK', approvalData.dibuat[1].nik, '', ''],
+                    ['Nama', approvalData.dibuat[1].nama, '', ''],
+                    ['Jabatan', approvalData.dibuat[1].jabatan, '', ''],
                     ['Tanda Tangan', '...........................', '', ''],
                     ['Tanggal', '', '', ''],
                     [''],
@@ -1523,7 +1533,7 @@
                 saveAs(blob, filename);
             };
 
-            const exportToPDF = (results, inputs) => {
+            const exportToPDF = (results, inputs, approvalData = { dibuat: { nik: "", nama: "", jabatan: "" }, diperiksa: { nik: "", nama: "", jabatan: "" }, disetujui: { nik: "", nama: "", jabatan: "" } }) => {
     if (!window.jspdf || !window.jspdf.jsPDF) {
         alert('Fitur PDF belum siap. Silakan refresh halaman.');
         return;
@@ -1798,6 +1808,111 @@
         styles: { fontSize: 7 },
         headStyles: { fillColor: [30, 64, 175], textColor: 255 },
         theme: 'grid'
+    });
+
+    // ================== SEGMENT 3: APPROVAL & SIGNATURES ==================
+    doc.addPage();
+    y = 12;
+
+    doc.setFontSize(14);
+    doc.text('Lembar Approval & Tanda Tangan Digital', 105, y, { align: 'center' });
+    y += 8;
+
+    doc.setFontSize(9);
+    doc.text(`Tanggal: ${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })}`, 14, y);
+    y += 6;
+    doc.text(`Nama Pelanggan: ${inputs.customerName}`, 14, y);
+    y += 8;
+
+    // DIBUAT OLEH Section
+    doc.setFontSize(11);
+    doc.text('DIBUAT OLEH', 14, y);
+    y += 2;
+    doc.setDrawColor(30, 64, 175);
+    doc.line(14, y, 200, y);
+    y += 6;
+
+    const dibuatBody = [
+        ['NIK', approvalData.dibuat.nik || '...........................'],
+        ['Nama', approvalData.dibuat.nama || '...........................'],
+        ['Jabatan', approvalData.dibuat.jabatan || '...........................'],
+        ['Tanda Tangan', '...........................'],
+        ['Tanggal', '...........................']
+    ];
+
+    doc.autoTable({
+        startY: y,
+        head: [['Keterangan', 'Detail']],
+        body: dibuatBody,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [226, 232, 240] },
+        theme: 'grid',
+        columnStyles: {
+            0: { cellWidth: 50 },
+            1: { cellWidth: 130 }
+        }
+    });
+
+    y = doc.lastAutoTable.finalY + 8;
+
+    // DIPERIKSA OLEH Section
+    doc.setFontSize(11);
+    doc.text('DIPERIKSA OLEH', 14, y);
+    y += 2;
+    doc.setDrawColor(30, 64, 175);
+    doc.line(14, y, 200, y);
+    y += 6;
+
+    const diperiksaBody = [
+        ['NIK', approvalData.diperiksa.nik || '...........................'],
+        ['Nama', approvalData.diperiksa.nama || '...........................'],
+        ['Jabatan', approvalData.diperiksa.jabatan || '...........................'],
+        ['Tanda Tangan', '...........................'],
+        ['Tanggal', '...........................']
+    ];
+
+    doc.autoTable({
+        startY: y,
+        head: [['Keterangan', 'Detail']],
+        body: diperiksaBody,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [226, 232, 240] },
+        theme: 'grid',
+        columnStyles: {
+            0: { cellWidth: 50 },
+            1: { cellWidth: 130 }
+        }
+    });
+
+    y = doc.lastAutoTable.finalY + 8;
+
+    // DISETUJUI OLEH Section
+    doc.setFontSize(11);
+    doc.text('DISETUJUI OLEH', 14, y);
+    y += 2;
+    doc.setDrawColor(30, 64, 175);
+    doc.line(14, y, 200, y);
+    y += 6;
+
+    const disetujuiBody = [
+        ['NIK', approvalData.disetujui.nik || '...........................'],
+        ['Nama', approvalData.disetujui.nama || '...........................'],
+        ['Jabatan', approvalData.disetujui.jabatan || '...........................'],
+        ['Tanda Tangan', '...........................'],
+        ['Tanggal', '...........................']
+    ];
+
+    doc.autoTable({
+        startY: y,
+        head: [['Keterangan', 'Detail']],
+        body: disetujuiBody,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [226, 232, 240] },
+        theme: 'grid',
+        columnStyles: {
+            0: { cellWidth: 50 },
+            1: { cellWidth: 130 }
+        }
     });
 
     doc.save(`AKI_PT_${customerNameForFile}_AS_PDF.pdf`);
@@ -2101,7 +2216,7 @@
                                                 📊 Download Excel
                                             </button>
                                             <button
-        onClick={() => exportToPDF(results, inputs)}
+        onClick={() => exportToPDF(results, inputs, approvalForm)}
         className="btn btn-primary"
         data-testid="button-export-pdf"
     >
@@ -2758,13 +2873,13 @@
                                 </div>
                                 <div className="sheet-content">
                                     <div>
-                                        <h3 className="font-semibold mb-4 text-sm">Dibuat oleh</h3>
+                                        <h3 className="font-semibold mb-4 text-sm">Dibuat oleh - Orang ke-1</h3>
                                         <div className="ba-field">
                                             <label className="block text-xs font-medium text-foreground mb-1">NIK</label>
                                             <input
                                                 type="text"
-                                                value={approvalForm.dibuat.nik}
-                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, dibuat: { ...prev.dibuat, nik: e.target.value } }))}
+                                                value={approvalForm.dibuat[0].nik}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, dibuat: [{ ...prev.dibuat[0], nik: e.target.value }, prev.dibuat[1]] }))}
                                                 className="form-control"
                                                 placeholder="Nomor Identitas Karyawan"
                                             />
@@ -2773,8 +2888,8 @@
                                             <label className="block text-xs font-medium text-foreground mb-1">Nama</label>
                                             <input
                                                 type="text"
-                                                value={approvalForm.dibuat.nama}
-                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, dibuat: { ...prev.dibuat, nama: e.target.value } }))}
+                                                value={approvalForm.dibuat[0].nama}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, dibuat: [{ ...prev.dibuat[0], nama: e.target.value }, prev.dibuat[1]] }))}
                                                 className="form-control"
                                                 placeholder="Nama Lengkap"
                                             />
@@ -2783,8 +2898,40 @@
                                             <label className="block text-xs font-medium text-foreground mb-1">Jabatan</label>
                                             <input
                                                 type="text"
-                                                value={approvalForm.dibuat.jabatan}
-                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, dibuat: { ...prev.dibuat, jabatan: e.target.value } }))}
+                                                value={approvalForm.dibuat[0].jabatan}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, dibuat: [{ ...prev.dibuat[0], jabatan: e.target.value }, prev.dibuat[1]] }))}
+                                                className="form-control"
+                                                placeholder="Jabatan"
+                                            />
+                                        </div>
+
+                                        <h3 className="font-semibold mb-4 text-sm mt-6">Dibuat oleh - Orang ke-2</h3>
+                                        <div className="ba-field">
+                                            <label className="block text-xs font-medium text-foreground mb-1">NIK</label>
+                                            <input
+                                                type="text"
+                                                value={approvalForm.dibuat[1].nik}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, dibuat: [prev.dibuat[0], { ...prev.dibuat[1], nik: e.target.value }] }))}
+                                                className="form-control"
+                                                placeholder="Nomor Identitas Karyawan"
+                                            />
+                                        </div>
+                                        <div className="ba-field">
+                                            <label className="block text-xs font-medium text-foreground mb-1">Nama</label>
+                                            <input
+                                                type="text"
+                                                value={approvalForm.dibuat[1].nama}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, dibuat: [prev.dibuat[0], { ...prev.dibuat[1], nama: e.target.value }] }))}
+                                                className="form-control"
+                                                placeholder="Nama Lengkap"
+                                            />
+                                        </div>
+                                        <div className="ba-field">
+                                            <label className="block text-xs font-medium text-foreground mb-1">Jabatan</label>
+                                            <input
+                                                type="text"
+                                                value={approvalForm.dibuat[1].jabatan}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, dibuat: [prev.dibuat[0], { ...prev.dibuat[1], jabatan: e.target.value }] }))}
                                                 className="form-control"
                                                 placeholder="Jabatan"
                                             />
