@@ -1979,15 +1979,6 @@
                 doc.setDrawColor(0);
                 doc.rect(x, yCell, width, height);
             }
-
-            if (data.section === 'body' && data.row.index === 0 && data.column.index === 1) {
-                const separatorY = data.cell.y + data.cell.height / 2 + 1;
-                const x1 = data.cell.x + 3;
-                const x2 = data.cell.x + data.cell.width - 3;
-                doc.setDrawColor(156);
-                doc.setLineWidth(0.2);
-                doc.line(x1, separatorY, x2, separatorY);
-            }
         }
     });
 
