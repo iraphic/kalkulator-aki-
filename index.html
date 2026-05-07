@@ -1464,12 +1464,12 @@
                     ['=== REKOMENDASI INVESTASI ==='],
                     ['Aspek Penilaian', 'Hasil', 'Interpretasi'],
                     ['Profitabilitas (NPV)', results.npv > 0 ? 'POSITIF' : 'NEGATIF', results.npv > 0 ? 'Investasi menguntungkan' : 'Investasi merugikan'],
-                    ['Efisiensi Return (IRR)', results.irr >= 0.15 ? 'MEMADAI' : 'TIDAK MEMADAI', results.irr >= 0.15 ? 'Return sesuai ekspektasi' : 'Return di bawah ekspektasi'],
+                    ['Efisiensi Return (IRR)', results.irr > 0.15 ? 'MEMADAI' : 'TIDAK MEMADAI', results.irr > 0.15 ? 'Return sesuai ekspektasi' : 'Return di bawah ekspektasi'],
                     ['Risiko Waktu (Payback)', `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`, 'Waktu pengembalian investasi'],
                     [''],
                     ['KESIMPULAN AKHIR', '', ''],
                     ['Status Kelayakan', results.isViable ? 'LAYAK' : 'TIDAK LAYAK', results.isViable ? 'Investasi direkomendasikan untuk dilaksanakan' : 'Investasi tidak direkomendasikan'],
-                    ['Tingkat Kepercayaan', results.npv > 0 && results.irr > 0.15 ? 'TINGGI' : results.npv > 0 || results.irr >= 0.15 ? 'SEDANG' : 'RENDAH', 'Berdasarkan konsistensi indikator kelayakan'],
+                    ['Tingkat Kepercayaan', results.npv > 0 && results.irr > 0.15 ? 'TINGGI' : results.npv > 0 || results.irr > 0.15 ? 'SEDANG' : 'RENDAH', 'Berdasarkan konsistensi indikator kelayakan'],
                     ['Rekomendasi Tindakan', 
                         results.isViable ? 'PROCEED' : 'REVIEW/REJECT', 
                         results.isViable ? 'Lanjutkan ke tahap implementasi' : 'Tinjau ulang parameter atau tolak investasi']
@@ -1688,7 +1688,7 @@
     y += 6;
 
     const npvStatus = results.npv > 0 ? 'Layak' : 'Tidak Layak';
-    const irrStatus = results.irr >= 0.15 ? 'Layak' : 'Tidak Layak';
+    const irrStatus = results.irr > 0.15 ? 'Layak' : 'Tidak Layak';
 
     // Ringkasan utama: mengikuti bagian "RINGKASAN UTAMA HASIL PERHITUNGAN"
     const ringkasanBody = [
@@ -1733,7 +1733,7 @@
         [
             'IRR',
             formatPercentage(results.irr),
-            '≥ 15%',
+            '> 15%',
             irrStatus,
             irrStatus === 'Layak'
                 ? 'Return melebihi cost of capital'
@@ -1785,9 +1785,9 @@
         ],
         [
             'Tingkat Kepercayaan',
-            results.npv > 0 && results.irr >= 0.15
+            results.npv > 0 && results.irr > 0.15
                 ? 'TINGGI'
-                : results.npv > 0 || results.irr >= 0.15
+                : results.npv > 0 || results.irr > 0.15
                     ? 'SEDANG'
                     : 'RENDAH',
             'Berdasarkan konsistensi indikator kelayakan'
@@ -2740,7 +2740,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.4</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.4.4</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> | 
     <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
