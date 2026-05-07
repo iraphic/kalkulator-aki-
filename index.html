@@ -1530,14 +1530,14 @@
                     ['Tanggal', new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })],
                     ['Nama Pelanggan', inputs.customerName],
                     [''],
-                    ['DIBUAT OLEH - ORANG KE-1', '', '', ''],
+                    ['DIBUAT OLEH - ', '', '', ''],
                     ['NIK', approvalData.dibuat[0].nik, '', ''],
                     ['Nama', approvalData.dibuat[0].nama, '', ''],
                     ['Jabatan', approvalData.dibuat[0].jabatan, '', ''],
                     ['Tanda Tangan', '', '', ''],
                     
                     [''],
-                    ['DIBUAT OLEH - ORANG KE-2', '', '', ''],
+                    
                     ['NIK', approvalData.dibuat[1].nik, '', ''],
                     ['Nama', approvalData.dibuat[1].nama, '', ''],
                     ['Jabatan', approvalData.dibuat[1].jabatan, '', ''],
@@ -1674,34 +1674,6 @@
         ])
         : [['-', '-', '-', '-', '-', '-', '-', '-', '-', '-']];
 
-    doc.autoTable({
-        startY: y,
-        head: [[
-            'No.',
-            'Layanan',
-            'BW (Mbps)',
-            'Qty',
-            'Satuan',
-            'OTC',
-            'MRC',
-            'Total OTC',
-            'Total MRC',
-            `Total MRC ${inputs.contractPeriod} Bulan`
-        ]],
-        body: servicesTableBody,
-        styles: { fontSize: 7 },
-        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
-        theme: 'grid'
-    });
-
-    const afterServicesY = doc.lastAutoTable.finalY + 4;
-    if (afterServicesY > 260) {
-        doc.addPage();
-        y = 14;
-    } else {
-        y = afterServicesY;
-    }
-
     const totalRow = [
         '',
         'Total (exc. PPN)',
@@ -1717,11 +1689,26 @@
         formatCurrency(totalMonthlyRevenueWithQty * inputs.contractPeriod)
     ];
 
+    const servicesTableWithTotal = [...servicesTableBody, totalRow];
+
     doc.autoTable({
         startY: y,
-        body: [totalRow],
+        head: [[
+            'No.',
+            'Layanan',
+            'BW (Mbps)',
+            'Qty',
+            'Satuan',
+            'OTC',
+            'MRC',
+            'Total OTC',
+            'Total MRC',
+            `Total MRC ${inputs.contractPeriod} Bulan`
+        ]],
+        body: servicesTableWithTotal,
         styles: { fontSize: 7 },
-        theme: 'plain'
+        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
+        theme: 'grid'
     });
 
     // ================== SEGMENT 2: ANALISA KELAYAKAN INVESTASI ==================
@@ -1890,7 +1877,7 @@
         head: [['Keterangan', 'Detail']],
         body: dibuatBody,
         styles: { fontSize: 8 },
-        headStyles: { fillColor: [226, 232, 240] },
+        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
         theme: 'grid',
         columnStyles: {
             0: { cellWidth: 50 },
@@ -1921,7 +1908,7 @@
         head: [['Keterangan', 'Detail']],
         body: dibuatBody1,
         styles: { fontSize: 8 },
-        headStyles: { fillColor: [226, 232, 240] },
+        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
         theme: 'grid',
         columnStyles: {
             0: { cellWidth: 50 },
@@ -1952,7 +1939,7 @@
         head: [['Keterangan', 'Detail']],
         body: diperiksaBody,
         styles: { fontSize: 8 },
-        headStyles: { fillColor: [226, 232, 240] },
+        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
         theme: 'grid',
         columnStyles: {
             0: { cellWidth: 50 },
@@ -1983,7 +1970,7 @@
         head: [['Keterangan', 'Detail']],
         body: disetujuiBody,
         styles: { fontSize: 8 },
-        headStyles: { fillColor: [226, 232, 240] },
+        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
         theme: 'grid',
         columnStyles: {
             0: { cellWidth: 50 },
@@ -2816,7 +2803,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.4.5</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.4.6</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> | 
     <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
