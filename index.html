@@ -1456,7 +1456,7 @@
                     ['=== ANALISIS KELAYAKAN INVESTASI ==='],
                     ['Metrics', 'Value', 'Threshold', 'Status', 'Keterangan'],
                     ['NPV', formatCurrency(results.npv), '> Rp 0', npvStatus, npvStatus === 'Layak' ? 'Investasi menghasilkan nilai positif' : 'Investasi tidak menghasilkan nilai positif'],
-                    ['IRR', formatPercentage(results.irr), '>= 15%', irrStatus, irrStatus === 'Layak' ? 'Return melebihi cost of capital' : 'Return di bawah cost of capital'],
+                    ['IRR', formatPercentage(results.irr), '> 15 %', irrStatus, irrStatus === 'Layak' ? 'Return melebihi cost of capital' : 'Return di bawah cost of capital'],
                     ['Payback Period', `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`, 'Reasonable Period', '-', 'Waktu pengembalian modal investasi'],
                     [''],
                     
@@ -1469,7 +1469,7 @@
                     [''],
                     ['KESIMPULAN AKHIR', '', ''],
                     ['Status Kelayakan', results.isViable ? 'LAYAK' : 'TIDAK LAYAK', results.isViable ? 'Investasi direkomendasikan untuk dilaksanakan' : 'Investasi tidak direkomendasikan'],
-                    ['Tingkat Kepercayaan', results.npv > 0 && results.irr >= 0.15 ? 'TINGGI' : results.npv > 0 || results.irr >= 0.15 ? 'SEDANG' : 'RENDAH', 'Berdasarkan konsistensi indikator kelayakan'],
+                    ['Tingkat Kepercayaan', results.npv > 0 && results.irr > 0.15 ? 'TINGGI' : results.npv > 0 || results.irr >= 0.15 ? 'SEDANG' : 'RENDAH', 'Berdasarkan konsistensi indikator kelayakan'],
                     ['Rekomendasi Tindakan', 
                         results.isViable ? 'PROCEED' : 'REVIEW/REJECT', 
                         results.isViable ? 'Lanjutkan ke tahap implementasi' : 'Tinjau ulang parameter atau tolak investasi']
@@ -1645,7 +1645,7 @@
         ]],
         body: servicesTableBody,
         styles: { fontSize: 7 },
-        headStyles: { fillColor: [226, 232, 240] },
+        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
         theme: 'grid'
     });
 
@@ -1753,7 +1753,7 @@
         head: [['Metrics', 'Value', 'Threshold', 'Status', 'Keterangan']],
         body: feasibilityBody,
         styles: { fontSize: 7 },
-        headStyles: { fillColor: [226, 232, 240] },
+        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
         theme: 'grid'
     });
 
