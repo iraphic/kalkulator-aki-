@@ -1926,19 +1926,16 @@
         year: 'numeric'
     });
 
-    const createdByCombined = `${approvalData.dibuat[0].nama || '...........................'}\nNIK. ${approvalData.dibuat[0].nik || '...........................'}\n${approvalData.dibuat[0].jabatan || '...........................'}\n\n`;
-
     const approvalTableBody = [
         [
-            'Dibuat Oleh',
-            createdByCombined,
+            { content: 'Dibuat Oleh', rowSpan: 2 },
+            `${approvalData.dibuat[0].nama || '...........................'}\nNIK. ${approvalData.dibuat[0].nik || '...........................'}\n${approvalData.dibuat[0].jabatan || '...........................'}`,
             currentDateTime,
             ''
         ],
         [
             '',
             `${approvalData.dibuat[1].nama || '...........................'}\nNIK. ${approvalData.dibuat[1].nik || '...........................'}\n${approvalData.dibuat[1].jabatan || '...........................'}`,
-            createdByCombined,
             currentDateTime,
             ''
         ],
@@ -1959,19 +1956,19 @@
     doc.autoTable({
         startY: y,
         head: [[
-            'Peran',
+            '',
             'Nama / NIK / Jabatan',
             'Tanggal',
             'Tanda Tangan'
         ]],
         body: approvalTableBody,
-        styles: { fontSize: 8, minCellHeight: 34, cellPadding: 4 },
+        styles: { fontSize: 8, minCellHeight: 14, cellPadding: 4 },
         headStyles: { fillColor: [30, 64, 175], textColor: 255 },
         theme: 'grid',
         tableWidth: 'auto',
         columnStyles: {
             0: { cellWidth: 30 },
-            1: { cellWidth: 90 },
+            1: { cellWidth: 70 },
             2: { cellWidth: 30 },
             3: { cellWidth: 40 }
         },
