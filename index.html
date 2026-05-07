@@ -845,6 +845,13 @@
                 picContact: "",
             });
 
+            const [showApprovalForm, setShowApprovalForm] = React.useState(false);
+            const [approvalForm, setApprovalForm] = React.useState({
+                dibuat: { nik: "", nama: "", jabatan: "" },
+                diperiksa: { nik: "", nama: "", jabatan: "" },
+                disetujui: { nik: "", nama: "", jabatan: "" },
+            });
+
             const escapeHtml = (value) => {
                 return String(value ?? '').replace(/[&<>"']/g, (ch) => {
                     switch (ch) {
@@ -874,6 +881,14 @@
 
             const closeBeritaAcaraSheet = () => {
                 setShowBeritaAcara(false);
+            };
+
+            const openApprovalSheet = () => {
+                setShowApprovalForm(true);
+            };
+
+            const closeApprovalSheet = () => {
+                setShowApprovalForm(false);
             };
 
             const generateBeritaAcaraDocx = () => {
@@ -1160,7 +1175,7 @@
                 }
             };
 
-            const exportToExcel = (results, inputs) => {
+            const exportToExcel = (results, inputs, approvalData = { dibuat: { nik: "", nama: "", jabatan: "" }, diperiksa: { nik: "", nama: "", jabatan: "" }, disetujui: { nik: "", nama: "", jabatan: "" } }) => {
                 const wb = XLSX.utils.book_new();
                 
                 // Hitung total untuk layanan
@@ -1459,6 +1474,44 @@
                 
                 const wsNPVFeasibility = XLSX.utils.aoa_to_sheet(npvFeasibilityData);
                 XLSX.utils.book_append_sheet(wb, wsNPVFeasibility, 'NPV, IRR & Feasibility');
+                
+                // ===== SHEET 6: Approval Signatures =====
+                const approvalSheetData = [
+                    ['LEMBAR APPROVAL & TANDA TANGAN DIGITAL'],
+                    [''],
+                    ['Tanggal', new Date().toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' })],
+                    ['Nama Pelanggan', inputs.customerName],
+                    [''],
+                    ['DIBUAT OLEH', '', '', ''],
+                    ['NIK', approvalData.dibuat.nik, '', ''],
+                    ['Nama', approvalData.dibuat.nama, '', ''],
+                    ['Jabatan', approvalData.dibuat.jabatan, '', ''],
+                    ['Tanda Tangan', '...........................', '', ''],
+                    ['Tanggal', '', '', ''],
+                    [''],
+                    ['DIPERIKSA OLEH', '', '', ''],
+                    ['NIK', approvalData.diperiksa.nik, '', ''],
+                    ['Nama', approvalData.diperiksa.nama, '', ''],
+                    ['Jabatan', approvalData.diperiksa.jabatan, '', ''],
+                    ['Tanda Tangan', '...........................', '', ''],
+                    ['Tanggal', '', '', ''],
+                    [''],
+                    ['DISETUJUI OLEH', '', '', ''],
+                    ['NIK', approvalData.disetujui.nik, '', ''],
+                    ['Nama', approvalData.disetujui.nama, '', ''],
+                    ['Jabatan', approvalData.disetujui.jabatan, '', ''],
+                    ['Tanda Tangan', '...........................', '', ''],
+                    ['Tanggal', '', '', ''],
+                ];
+                
+                const wsApprovalSheet = XLSX.utils.aoa_to_sheet(approvalSheetData);
+                wsApprovalSheet['!cols'] = [
+                    { wch: 25 },
+                    { wch: 35 },
+                    { wch: 15 },
+                    { wch: 15 }
+                ];
+                XLSX.utils.book_append_sheet(wb, wsApprovalSheet, 'Approval & Signatures');
                 
                 const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
                 const blob = new Blob([wbout], { type: 'application/octet-stream' });
@@ -2041,7 +2094,7 @@
                                     <div className="mt-6 pt-6 border-t border-border">
                                         <div className="btn-row">
                                             <button 
-                                                onClick={() => exportToExcel(results, inputs)}
+                                                onClick={() => exportToExcel(results, inputs, approvalForm)}
                                                 className="btn btn-success"
                                                 data-testid="button-export-excel"
                                             >
@@ -2060,6 +2113,13 @@
                                                 data-testid="button-open-berita-acara"
                                             >
                                                 📝 Berita Acara
+                                            </button>
+                                            <button
+                                                onClick={openApprovalSheet}
+                                                className="btn btn-primary"
+                                                data-testid="button-open-approval"
+                                            >
+                                                ✍️ Form Approval
                                             </button>
                                         </div>
                                     </div>
@@ -2681,6 +2741,126 @@
                                                     Tutup
                                                 </button>
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    {showApprovalForm && (
+                        <>
+                            <div className="sheet-backdrop" onClick={closeApprovalSheet}></div>
+                            <div className={`sheet ${showApprovalForm ? 'open' : ''}`}>
+                                <div className="sheet-header">
+                                    <h2>Form Approval</h2>
+                                    <p>Tanda tangan digital - Dibuat, Diperiksa, Disetujui</p>
+                                </div>
+                                <div className="sheet-content">
+                                    <div>
+                                        <h3 className="font-semibold mb-4 text-sm">Dibuat oleh</h3>
+                                        <div className="ba-field">
+                                            <label className="block text-xs font-medium text-foreground mb-1">NIK</label>
+                                            <input
+                                                type="text"
+                                                value={approvalForm.dibuat.nik}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, dibuat: { ...prev.dibuat, nik: e.target.value } }))}
+                                                className="form-control"
+                                                placeholder="Nomor Identitas Karyawan"
+                                            />
+                                        </div>
+                                        <div className="ba-field">
+                                            <label className="block text-xs font-medium text-foreground mb-1">Nama</label>
+                                            <input
+                                                type="text"
+                                                value={approvalForm.dibuat.nama}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, dibuat: { ...prev.dibuat, nama: e.target.value } }))}
+                                                className="form-control"
+                                                placeholder="Nama Lengkap"
+                                            />
+                                        </div>
+                                        <div className="ba-field">
+                                            <label className="block text-xs font-medium text-foreground mb-1">Jabatan</label>
+                                            <input
+                                                type="text"
+                                                value={approvalForm.dibuat.jabatan}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, dibuat: { ...prev.dibuat, jabatan: e.target.value } }))}
+                                                className="form-control"
+                                                placeholder="Jabatan"
+                                            />
+                                        </div>
+
+                                        <h3 className="font-semibold mb-4 text-sm mt-6">Diperiksa oleh</h3>
+                                        <div className="ba-field">
+                                            <label className="block text-xs font-medium text-foreground mb-1">NIK</label>
+                                            <input
+                                                type="text"
+                                                value={approvalForm.diperiksa.nik}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, diperiksa: { ...prev.diperiksa, nik: e.target.value } }))}
+                                                className="form-control"
+                                                placeholder="Nomor Identitas Karyawan"
+                                            />
+                                        </div>
+                                        <div className="ba-field">
+                                            <label className="block text-xs font-medium text-foreground mb-1">Nama</label>
+                                            <input
+                                                type="text"
+                                                value={approvalForm.diperiksa.nama}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, diperiksa: { ...prev.diperiksa, nama: e.target.value } }))}
+                                                className="form-control"
+                                                placeholder="Nama Lengkap"
+                                            />
+                                        </div>
+                                        <div className="ba-field">
+                                            <label className="block text-xs font-medium text-foreground mb-1">Jabatan</label>
+                                            <input
+                                                type="text"
+                                                value={approvalForm.diperiksa.jabatan}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, diperiksa: { ...prev.diperiksa, jabatan: e.target.value } }))}
+                                                className="form-control"
+                                                placeholder="Jabatan"
+                                            />
+                                        </div>
+
+                                        <h3 className="font-semibold mb-4 text-sm mt-6">Disetujui oleh</h3>
+                                        <div className="ba-field">
+                                            <label className="block text-xs font-medium text-foreground mb-1">NIK</label>
+                                            <input
+                                                type="text"
+                                                value={approvalForm.disetujui.nik}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, disetujui: { ...prev.disetujui, nik: e.target.value } }))}
+                                                className="form-control"
+                                                placeholder="Nomor Identitas Karyawan"
+                                            />
+                                        </div>
+                                        <div className="ba-field">
+                                            <label className="block text-xs font-medium text-foreground mb-1">Nama</label>
+                                            <input
+                                                type="text"
+                                                value={approvalForm.disetujui.nama}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, disetujui: { ...prev.disetujui, nama: e.target.value } }))}
+                                                className="form-control"
+                                                placeholder="Nama Lengkap"
+                                            />
+                                        </div>
+                                        <div className="ba-field">
+                                            <label className="block text-xs font-medium text-foreground mb-1">Jabatan</label>
+                                            <input
+                                                type="text"
+                                                value={approvalForm.disetujui.jabatan}
+                                                onChange={(e) => setApprovalForm((prev) => ({ ...prev, disetujui: { ...prev.disetujui, jabatan: e.target.value } }))}
+                                                className="form-control"
+                                                placeholder="Jabatan"
+                                            />
+                                        </div>
+
+                                        <div className="mt-8">
+                                            <div className="ba-small mb-4">
+                                                Informasi approval ini akan ditampilkan dalam Excel export.
+                                            </div>
+                                            <button type="button" className="btn btn-outline" onClick={closeApprovalSheet}>
+                                                Simpan & Tutup
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
