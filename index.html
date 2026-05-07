@@ -1863,7 +1863,7 @@
     doc.line(14, y, 200, y);
     y += 6;
 
-    const dibuatBody = [
+    const dibuatBody1 = [
         ['NIK', approvalData.dibuat[1].nik || '...........................'],
         ['Nama', approvalData.dibuat[1].nama || '...........................'],
         ['Jabatan', approvalData.dibuat[1].jabatan || '...........................'],
@@ -1874,7 +1874,7 @@
     doc.autoTable({
         startY: y,
         head: [['Keterangan', 'Detail']],
-        body: dibuatBody,
+        body: dibuatBody1,
         styles: { fontSize: 8 },
         headStyles: { fillColor: [226, 232, 240] },
         theme: 'grid',
