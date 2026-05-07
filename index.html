@@ -1926,11 +1926,18 @@
         year: 'numeric'
     });
 
-    const createdByCombined = `${approvalData.dibuat[0].nama || '...........................'}\nNIK. ${approvalData.dibuat[0].nik || '...........................'}\n${approvalData.dibuat[0].jabatan || '...........................'}\n\n${approvalData.dibuat[1].nama || '...........................'}\nNIK. ${approvalData.dibuat[1].nik || '...........................'}\n${approvalData.dibuat[1].jabatan || '...........................'}`;
+    const createdByCombined = `${approvalData.dibuat[0].nama || '...........................'}\nNIK. ${approvalData.dibuat[0].nik || '...........................'}\n${approvalData.dibuat[0].jabatan || '...........................'}\n\n`;
 
     const approvalTableBody = [
         [
             'Dibuat Oleh',
+            createdByCombined,
+            currentDateTime,
+            ''
+        ],
+        [
+            '',
+            `${approvalData.dibuat[1].nama || '...........................'}\nNIK. ${approvalData.dibuat[1].nik || '...........................'}\n${approvalData.dibuat[1].jabatan || '...........................'}`,
             createdByCombined,
             currentDateTime,
             ''
