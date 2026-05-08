@@ -2632,7 +2632,7 @@
                                 <div className="grid grid-cols-1 md-grid-cols-3 gap-4">
                                     <div className="form-group">
                                         <label className="block text-sm font-medium mb-2">ID Proposal</label>
-                                        <input type="text" className="form-control" placeholder="Contoh: PP-2025-001"
+                                        <input type="text" className="form-control" placeholder="Contoh: B26-xxxxx"
                                             value={programForm.idProposal}
                                             onChange={e => setProgramForm(p => ({ ...p, idProposal: e.target.value }))} />
                                     </div>
@@ -2649,7 +2649,7 @@
                                             onChange={e => setProgramForm(p => ({ ...p, idLop: e.target.value }))} />
                                     </div>
                                     <div className="form-group">
-                                        <label className="block text-sm font-medium mb-2">Lokasi / Site Program</label>
+                                        <label className="block text-sm font-medium mb-2">Lokasi STO</label>
                                         <input type="text" className="form-control" placeholder="Contoh: STO CSN"
                                             value={programForm.lokasiProgram}
                                             onChange={e => setProgramForm(p => ({ ...p, lokasiProgram: e.target.value }))} />
@@ -2661,7 +2661,7 @@
                                             onChange={e => setProgramForm(p => ({ ...p, penanggungJawab: e.target.value }))} />
                                     </div>
                                     <div className="form-group">
-                                        <label className="block text-sm font-medium mb-2">Nomor Account</label>
+                                        <label className="block text-sm font-medium mb-2">NIK AM / HOTD</label>
                                         <input type="number" className="form-control" placeholder="Contoh: 1234567890"
                                             value={programForm.nomorAccount}
                                             onChange={e => setProgramForm(p => ({ ...p, nomorAccount: e.target.value }))} />
@@ -2690,15 +2690,14 @@
                                                 onChange={e => setProgramForm(p => ({ ...p, pemilihanTeknologi: e.target.value }))}>
                                                 <option value="">Pilih Teknologi</option>
                                                 <option value="FO">FO (Fiber Optik)</option>
-                                                <option value="Copper">Copper</option>
                                                 <option value="Wireless">Wireless</option>
-                                                <option value="HFC">HFC</option>
+                                                <option value="Radio">Radio</option>
                                                 <option value="FTTx">FTTx</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <label className="block text-sm font-medium mb-2">Kapasitas - Satuan</label>
+                                        <label className="block text-sm font-medium mb-2">Kapasitas - Tipe</label>
                                         <div className="select">
                                             <select className="form-control"
                                                 value={programForm.satuan}
