@@ -2280,16 +2280,18 @@
                         {/* Input Section */}
                         <div className="card mb-8">
                             <div className="card-header">
-                                <div className="flex items-center justify-between">
-                                    <h2 className="text-xl font-semibold">Parameter Input</h2>
-                                    <button
-                                        onClick={() => setShowFixedParams(true)}
-                                        className="btn btn-outline transition-colors"
-                                        style={{ color: '#ffffff', borderColor: 'rgba(255,255,255,0.4)' }}
-                                        data-testid="button-toggle-fixed-params"
-                                    >
-                                        ⚙️ Parameter Tetap
-                                    </button>
+                                <div className="flex items-center justify-between grid grid-cols-1 md-grid-cols-3 gap-6">
+                                    <div className="form-group">
+                                        <h2 className="text-xl font-semibold">Parameter Input</h2></div>
+                                    <div className="form-group"></div><div className="form-group">
+                                        <button
+                                            onClick={() => setShowFixedParams(true)}
+                                            className="btn btn-outline transition-colors"
+                                            style={{ color: '#ffffff', borderColor: 'rgba(255,255,255,0.4)' }}
+                                            data-testid="button-toggle-fixed-params"
+                                        >
+                                            ⚙️ Parameter Tetap
+                                        </button></div>
                                 </div>
                             </div>
                             <div className="card-content">
