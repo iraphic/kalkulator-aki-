@@ -373,6 +373,60 @@
             display: none;
         }
 
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid #e5e7eb;
+            background: #1e40af;
+            color: white;
+        }
+
+        .modal-body {
+            padding: 1rem 1.25rem;
+            color: #0f172a;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        .modal-close {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        .modal-close:hover {
+            background: #cbd5e1;
+        }
+
+        .modal-alert {
+            color: #1f2937;
+            line-height: 1.5;
+        }
+
         .sheet {
             position: fixed;
             top: 0;
@@ -873,6 +927,60 @@
                 diperiksa: { nik: "", nama: "", jabatan: "" },
                 disetujui: { nik: "", nama: "", jabatan: "" },
             });
+            const [exportPopup, setExportPopup] = React.useState({
+                visible: false,
+                title: '',
+                message: ''
+            });
+
+            const validatePdfExport = () => {
+                const missingFields = [];
+
+                if (!inputs.customerName.trim()) missingFields.push('Nama pelanggan');
+                if (inputs.investmentCost <= 0) missingFields.push('Total BOQ Biaya Investasi');
+                if (inputs.contractPeriod <= 0) missingFields.push('Periode kontrak');
+
+                const hasValidService = inputs.services.some((service) => {
+                    const detail = (service.serviceType === 'custom' ? service.serviceDetails : service.serviceType) || '';
+                    return detail.trim() && (service.monthlyRevenue > 0 || service.otcCost > 0);
+                });
+                if (!hasValidService) missingFields.push('Detail layanan AKI');
+
+                const checkApproval = (person, label) => {
+                    const fields = [];
+                    if (!person.nik.trim()) fields.push(`${label} - NIK`);
+                    if (!person.nama.trim()) fields.push(`${label} - Nama`);
+                    if (!person.jabatan.trim()) fields.push(`${label} - Jabatan`);
+                    return fields;
+                };
+
+                const approvalMissing = [
+                    ...checkApproval(approvalForm.dibuat[0], 'Dibuat 1'),
+                    ...checkApproval(approvalForm.dibuat[1], 'Dibuat 2'),
+                    ...checkApproval(approvalForm.diperiksa, 'Diperiksa'),
+                    ...checkApproval(approvalForm.disetujui, 'Disetujui')
+                ];
+
+                if (approvalMissing.length) {
+                    missingFields.push('Penandatangan: ' + approvalMissing.join(', '));
+                }
+
+                if (missingFields.length > 0) {
+                    setExportPopup({
+                        visible: true,
+                        title: 'Isi form belum lengkap',
+                        message: `Lengkapi terlebih dahulu: ${missingFields.join(', ')}`
+                    });
+                    return false;
+                }
+
+                return true;
+            };
+
+            const handleExportPdfClick = () => {
+                if (!validatePdfExport()) return;
+                exportToPDF(results, inputs, approvalForm);
+            };
 
             const escapeHtml = (value) => {
                 return String(value ?? '').replace(/[&<>"']/g, (ch) => {
@@ -2325,7 +2433,7 @@
                                             </button>
                                             */}
                                             <button
-        onClick={() => exportToPDF(results, inputs, approvalForm)}
+        onClick={handleExportPdfClick}
         className="btn btn-success"
         data-testid="button-export-pdf"
     >
@@ -2345,6 +2453,28 @@
                                             >
                                                 ✍️ Form Penandatangan
                                             </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {exportPopup.visible && (
+                                    <div className="modal-backdrop" onClick={() => setExportPopup({ visible: false, title: '', message: '' })}>
+                                        <div className="modal" onClick={(e) => e.stopPropagation()}>
+                                            <div className="modal-header">
+                                                <h2>{exportPopup.title}</h2>
+                                            </div>
+                                            <div className="modal-body">
+                                                <p className="modal-alert">{exportPopup.message}</p>
+                                            </div>
+                                            <div className="modal-footer">
+                                                <button
+                                                    type="button"
+                                                    className="btn modal-close"
+                                                    onClick={() => setExportPopup({ visible: false, title: '', message: '' })}
+                                                >
+                                                    Tutup
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -2818,7 +2948,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.5.8 - May 8, 2026 - 02.56</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.6 - May 8, 2026 - 10.02</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> | 
     <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
