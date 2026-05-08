@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,9 +15,9 @@
     <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-   <style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
         * {
             margin: 0;
             padding: 0;
@@ -508,43 +509,44 @@
         }
     </style>
 </head>
+
 <body>
     <div id="root"></div>
-    
+
     <!-- Refresh Button -->
     <button class="refresh-btn" onclick="hardRefresh()">🔄 Clear Cache</button>
-    
+
     <script>
         // Fungsi untuk hard refresh dengan clear cache
         function hardRefresh() {
             console.log('Clearing cache and refreshing...');
-            
+
             // Clear semua cache
             if ('caches' in window) {
-                caches.keys().then(function(names) {
-                    names.forEach(function(name) {
+                caches.keys().then(function (names) {
+                    names.forEach(function (name) {
                         caches.delete(name);
                     });
                     console.log('All caches cleared');
                 });
             }
-            
+
             // Clear localStorage jika perlu
             // localStorage.clear();
             // sessionStorage.clear();
-            
+
             // Force reload dari server
             window.location.reload(true);
         }
-        
+
         // Auto clear cache saat halaman dimuat (opsional)
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             console.log('Page loaded - cache management active');
-            
+
             // Clear cache setiap 30 menit (opsional)
             // setInterval(hardRefresh, 1800000);
         });
-        
+
         // Tambahkan timestamp ke resource untuk cache busting
         const timestamp = new Date().getTime();
         console.log(`App version: ${timestamp}`);
@@ -582,7 +584,7 @@
             // Hapus semua karakter non-digit
             const cleaned = value.replace(/[^0-9]/g, '');
             if (!cleaned) return '';
-            
+
             // Format dengan pemisah ribuan
             const number = parseInt(cleaned);
             return new Intl.NumberFormat('id-ID').format(number);
@@ -621,7 +623,7 @@
             // Biaya
             const costIBL = totalRevenue; // Sama dengan revenue untuk IBL
             const costOBL = 0; // Tidak ada biaya OBL
-            
+
             // Perhitungan OPEX akan dihitung per tahun, total akan dihitung nanti
 
             // Depresiasi - berdasarkan CAPEX aktual termasuk biaya tambahan
@@ -633,10 +635,10 @@
 
             // Proyeksi tahunan
             const yearlyProjections = [];
-            
+
             for (let year = 0; year <= 6; year++) {
                 let yearlyRevenue = 0;
-                
+
                 if (year === 0) {
                     yearlyRevenue = otcRevenue;
                 } else if (year <= Math.ceil(contractPeriod / 12)) {
@@ -667,20 +669,20 @@
 
             // Proyeksi COGS
             const cogsProjections = [];
-            
+
             for (let year = 0; year <= 6; year++) {
                 let yearlyOtcCogs = 0;
                 let yearlyMonthlyCogs = 0;
-                
+
                 if (year === 0) {
                     yearlyOtcCogs = otcCogs;
                 } else if (year <= Math.ceil(contractPeriod / 12)) {
                     const yearlyMonthlyRevenue = Math.min(monthlyRevenue * 12, monthlyTotal - (monthlyRevenue * 12 * (year - 1)));
                     yearlyMonthlyCogs = yearlyMonthlyRevenue * 0.7;
                 }
-                
+
                 const yearlyTotalCogs = yearlyOtcCogs + yearlyMonthlyCogs;
-                
+
                 cogsProjections.push({
                     year,
                     otcCogs: yearlyOtcCogs,
@@ -691,11 +693,11 @@
 
             // Proyeksi OPEX - hitung per tahun berdasarkan revenue aktual
             const opexProjections = [];
-            
+
             for (let year = 0; year <= 6; year++) {
                 let yearlyMarketingCost = 0;
                 let yearlyOperationalCost = 0;
-                
+
                 if (year === 0) {
                     // Tahun 0: Tidak ada biaya pemasaran, biaya operasional hanya pada revenue OTC
                     yearlyOperationalCost = otcRevenue * OPERATIONAL_RATE;
@@ -704,15 +706,15 @@
                     const yearlyMonthlyRevenue = Math.min(monthlyRevenue * 12, monthlyTotal - (monthlyRevenue * 12 * (year - 1)));
                     // Dapatkan total revenue tahunan (yang bisa mencakup revenue bulanan dan sisa revenue)
                     const yearlyTotalRevenue = yearlyProjections[year].revenue;
-                    
+
                     // Biaya pemasaran: 30% dari bagian revenue bulanan saja
                     yearlyMarketingCost = yearlyMonthlyRevenue * MARKETING_RATE;
                     // Biaya operasional: 20% dari total revenue tahunan
                     yearlyOperationalCost = yearlyTotalRevenue * OPERATIONAL_RATE;
                 }
-                
+
                 const yearlyTotalOpex = yearlyMarketingCost + yearlyOperationalCost;
-                
+
                 opexProjections.push({
                     year,
                     marketingCost: yearlyMarketingCost,
@@ -764,17 +766,17 @@
 
             // Perhitungan NPV
             const npv = calculateNPV(cashFlowProjections.map(cf => cf.netCashFlow), WACC);
-            
+
             // Perhitungan IRR
             const irr = calculateIRR(cashFlowProjections.map(cf => cf.netCashFlow));
-            
+
             // Perhitungan Payback Period
             const paybackPeriod = calculatePaybackPeriod(cashFlowProjections);
 
             // Hitung metrik profit dan margin
             const grossProfit = totalRevenue - totalCogs;
             const grossProfitMargin = totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
-            
+
             // Hitung total net income dari semua tahun
             const totalNetIncome = yearlyProjections.reduce((sum, projection) => sum + projection.netIncome, 0);
             const netIncomeMargin = totalRevenue > 0 ? (totalNetIncome / totalRevenue) * 100 : 0;
@@ -829,11 +831,11 @@
                 }
 
                 const newRate = rate - npv / dnpv;
-                
+
                 if (Math.abs(newRate - rate) < precision) {
                     return newRate;
                 }
-                
+
                 rate = newRate;
             }
 
@@ -842,32 +844,32 @@
 
         function calculatePaybackPeriod(cashFlowProjections) {
             let cumulativeCashFlow = 0;
-            
+
             for (let i = 0; i < cashFlowProjections.length; i++) {
                 cumulativeCashFlow += cashFlowProjections[i].netCashFlow;
-                
+
                 if (cumulativeCashFlow >= 0) {
                     // Jika mencapai break-even di tahun pertama
                     if (i === 0) {
                         return { years: 0, months: 0, totalMonths: 0 };
                     }
-                    
+
                     // Hitung periode pengembalian yang tepat menggunakan interpolasi
                     const previousCumulativeCashFlow = cumulativeCashFlow - cashFlowProjections[i].netCashFlow;
                     const currentYearCashFlow = cashFlowProjections[i].netCashFlow;
-                    
+
                     // Hitung berapa banyak dari tahun ini yang dibutuhkan untuk mencapai break-even
                     const fractionOfYear = Math.abs(previousCumulativeCashFlow) / currentYearCashFlow;
                     const totalYears = (i - 1) + fractionOfYear;
-                    
+
                     const years = Math.floor(totalYears);
                     const months = Math.round((totalYears - years) * 12);
                     const totalMonths = Math.round(totalYears * 12);
-                    
+
                     return { years, months, totalMonths };
                 }
             }
-            
+
             // Jika periode pengembalian lebih lama dari periode proyeksi
             return { years: 6, months: 12, totalMonths: 84 };
         }
@@ -927,6 +929,22 @@
                 diperiksa: { nik: "", nama: "", jabatan: "" },
                 disetujui: { nik: "", nama: "", jabatan: "" },
             });
+            const [programForm, setProgramForm] = React.useState({
+                idProposal: "",
+                jumlahLop: "1",
+                idLop: "",
+                lokasiProgram: "",
+                penanggungJawab: "",
+                nomorAccount: "",
+                pemilihanTeknologi: "FO",
+                usulanPolaMitraan: "-",
+                alasanKeberadaanProyek: "",
+                rencanaSelesai: String(new Date().getFullYear()),
+                waktuPenyelesaian: "1",
+                bopLakwas: 0,
+                bopLakwasDisplay: "",
+            });
+
             const [exportPopup, setExportPopup] = React.useState({
                 visible: false,
                 title: '',
@@ -979,7 +997,7 @@
 
             const handleExportPdfClick = () => {
                 if (!validatePdfExport()) return;
-                exportToPDF(results, inputs, approvalForm);
+                exportToPDF(results, inputs, approvalForm, programForm);
             };
 
             const escapeHtml = (value) => {
@@ -1072,6 +1090,21 @@
                     picTitle: "Head of Telkom Daerah Cibinong",
                     picContact: "0812-3456-7890",
                 });
+                setProgramForm({
+                    idProposal: "PP-2025-001",
+                    jumlahLop: "1",
+                    idLop: "LOP-001",
+                    lokasiProgram: "STO CSN",
+                    penanggungJawab: "Mungkas Setyabadi",
+                    nomorAccount: "ACC-2025-001",
+                    pemilihanTeknologi: "FO",
+                    usulanPolaMitraan: "-",
+                    alasanKeberadaanProyek: "Permintaan layanan internet dari pelanggan korporat",
+                    rencanaSelesai: "2025",
+                    waktuPenyelesaian: "1",
+                    bopLakwas: 101491,
+                    bopLakwasDisplay: "101.491",
+                });
             };
 
             const generateBeritaAcaraDocx = () => {
@@ -1082,7 +1115,7 @@
                 const picTitle = (beritaAcaraForm.picTitle || "").trim();
                 const picContact = (beritaAcaraForm.picContact || "").trim();
                 const contractPeriod = Number(inputs.contractPeriod || 0);
-                
+
                 const dateText = new Date().toLocaleDateString('id-ID', {
                     day: '2-digit',
                     month: 'long',
@@ -1193,9 +1226,9 @@
                                                 children: [
                                                     new Paragraph({ text: "Pelanggan,", alignment: AlignmentType.CENTER }),
                                                     new Paragraph({ text: "", spacing: { after: 1500 } }), // Space for signature
-                                                    new Paragraph({ 
+                                                    new Paragraph({
                                                         children: [new TextRun({ text: picName, bold: true, underline: {} })],
-                                                        alignment: AlignmentType.CENTER 
+                                                        alignment: AlignmentType.CENTER
                                                     }),
                                                     new Paragraph({ text: picTitle, alignment: AlignmentType.CENTER }),
                                                 ],
@@ -1205,9 +1238,9 @@
                                                 children: [
                                                     new Paragraph({ text: "Telkom,", alignment: AlignmentType.CENTER }),
                                                     new Paragraph({ text: "", spacing: { after: 1500 } }), // Space for signature
-                                                    new Paragraph({ 
+                                                    new Paragraph({
                                                         children: [new TextRun({ text: "(........................................)", bold: true })],
-                                                        alignment: AlignmentType.CENTER 
+                                                        alignment: AlignmentType.CENTER
                                                     }),
                                                     new Paragraph({ text: "(........................................)", alignment: AlignmentType.CENTER }),
                                                 ],
@@ -1391,10 +1424,10 @@
             };
 
             const calculateAnalysis = () => {
-                const hasValidServices = inputs.services.length > 0 && inputs.services.some(service => 
+                const hasValidServices = inputs.services.length > 0 && inputs.services.some(service =>
                     service.serviceDetails.trim() !== "" && (service.monthlyRevenue > 0 || service.otcCost > 0)
                 );
-                
+
                 if (inputs.customerName.trim() !== "" && inputs.investmentCost > 0 && inputs.contractPeriod > 0 && hasValidServices) {
                     const calculatedResults = calculateFinancialAnalysis(inputs);
                     setResults(calculatedResults);
@@ -1403,27 +1436,27 @@
 
             const exportToExcel = (results, inputs, approvalData = { dibuat: { nik: "", nama: "", jabatan: "" }, diperiksa: { nik: "", nama: "", jabatan: "" }, disetujui: { nik: "", nama: "", jabatan: "" } }) => {
                 const wb = XLSX.utils.book_new();
-                
+
                 // Hitung total untuk layanan
                 const totalMonthlyRevenue = inputs.services.reduce((sum, service) => sum + service.monthlyRevenue, 0);
                 const totalOtcCost = inputs.services.reduce((sum, service) => sum + service.otcCost, 0);
-                
+
                 // Hitung total dengan pertimbangan kuantitas
                 const totalMonthlyRevenueWithQty = inputs.services.reduce((sum, service) => sum + (service.monthlyRevenue * getSafeQuantity(service.quantity)), 0);
                 const totalOtcCostWithQty = inputs.services.reduce((sum, service) => sum + (service.otcCost * getSafeQuantity(service.quantity)), 0);
-                
+
                 // Dapatkan tanggal saat ini untuk cover sheet
                 const currentDate = new Date().toLocaleDateString('id-ID', {
                     day: '2-digit',
                     month: '2-digit',
                     year: 'numeric'
                 });
-                
+
                 // Tentukan status kelayakan untuk cover sheet
                 const coverIrrStatus = results.irr >= 15 ? 'Feasible' : 'Not Feasible';
                 const coverNpvStatus = results.npv > 0 ? 'Feasible' : 'Not Feasible';
                 const recommendation = results.isViable ? 'Layak untuk diimplementasikan' : 'Tidak layak untuk diimplementasikan';
-                
+
                 // ===== SHEET 1: BUSINESS PLAN COVER SHEET =====
                 const coverSheetData = [
                     ['Resume :'],
@@ -1437,9 +1470,9 @@
                     ['Catatan:', ''],
                     ['Rekomendasi:', recommendation]
                 ];
-                
+
                 const wsCoverSheet = XLSX.utils.aoa_to_sheet(coverSheetData);
-                
+
                 // Terapkan pemformatan ke cover sheet
                 // Atur lebar kolom
                 wsCoverSheet['!cols'] = [
@@ -1448,7 +1481,7 @@
                     { wch: 15 }, // Kolom C
                     { wch: 15 }  // Kolom D
                 ];
-                
+
                 // Gabungkan sel untuk header
                 if (!wsCoverSheet['!merges']) wsCoverSheet['!merges'] = [];
                 wsCoverSheet['!merges'].push(
@@ -1456,9 +1489,9 @@
                     { s: { r: 8, c: 1 }, e: { r: 8, c: 3 } }, // Catatan space
                     { s: { r: 9, c: 1 }, e: { r: 9, c: 3 } }  // Rekomendasi space
                 );
-                
+
                 XLSX.utils.book_append_sheet(wb, wsCoverSheet, 'BUSINESS PLAN');
-                
+
                 // ===== SHEET 2: Detail Layanan =====
                 const serviceDetailsData = [
                     ['Detail Layanan - Input Komponen Layanan'],
@@ -1507,15 +1540,15 @@
                     ['Total (exc. PPN)', '-', inputs.services.reduce((sum, service) => sum + getSafeQuantity(service.quantity), 0), inputs.services.length > 0 ? (inputs.services[0].unit || '-') : '-', '-', '-', formatCurrency(totalOtcCostWithQty), formatCurrency(totalMonthlyRevenueWithQty), formatCurrency(totalMonthlyRevenueWithQty * inputs.contractPeriod)],
                     [`Total OTC + MRC ${inputs.contractPeriod} Bulan (exc. PPN)`, '', '', '', '', '', '', '', formatCurrency(totalOtcCostWithQty + (totalMonthlyRevenueWithQty * inputs.contractPeriod))]
                 ];
-                
+
                 const wsServiceDetails = XLSX.utils.aoa_to_sheet(serviceDetailsData);
                 XLSX.utils.book_append_sheet(wb, wsServiceDetails, 'Detail Layanan');
-                
+
                 // ===== SHEET 2: COGS+Opex+Ringkasan Analisis (combined sheet) =====
                 const cogsOpexAnalysisData = [
                     ['COGS+OPEX+RINGKASAN ANALISIS'],
                     [''],
-                    
+
                     // Parameter Input Section
                     ['=== PARAMETER INPUT UTAMA ==='],
                     ['Parameter', 'Nilai'],
@@ -1526,7 +1559,7 @@
                     ['Total Pendapatan per Bulan', formatCurrency(totalMonthlyRevenue)],
                     ['Total Biaya Aktivasi (OTC)', formatCurrency(totalOtcCost)],
                     [''],
-                    
+
                     // Fixed Parameters Section
                     ['=== PARAMETER TETAP PERHITUNGAN ==='],
                     ['WACC (Discount Rate)', '15%'],
@@ -1537,7 +1570,7 @@
                     ['Marketing Cost Rate', '30%'],
                     ['Operational Cost Rate', '20%'],
                     [''],
-                    
+
                     // COGS Projection Section
                     ['=== PROYEKSI COGS ==='],
                     ['Label', 'Total', ...results.cogsProjections.map((_, i) => `Tahun ke-${i}`)],
@@ -1545,7 +1578,7 @@
                     ['COGS Bulanan', formatCurrency(results.cogsProjections.reduce((sum, p) => sum + p.monthlyCogs, 0)), ...results.cogsProjections.map(p => formatCurrency(p.monthlyCogs))],
                     ['Total COGS', formatCurrency(results.cogsProjections.reduce((sum, p) => sum + p.totalCogs, 0)), ...results.cogsProjections.map(p => formatCurrency(p.totalCogs))],
                     [''],
-                    
+
                     // OPEX Projection Section
                     ['=== PROYEKSI OPEX ==='],
                     ['Label', 'Total', ...results.opexProjections.map((_, i) => `Tahun ke-${i}`)],
@@ -1553,7 +1586,7 @@
                     ['Operational Cost', formatCurrency(results.opexProjections.reduce((sum, p) => sum + p.operationalCost, 0)), ...results.opexProjections.map(p => formatCurrency(p.operationalCost))],
                     ['Total OPEX', formatCurrency(results.opexProjections.reduce((sum, p) => sum + p.totalOpex, 0)), ...results.opexProjections.map(p => formatCurrency(p.totalOpex))],
                     [''],
-                    
+
                     // Key Summary Metrics Section
                     ['=== RINGKASAN UTAMA HASIL PERHITUNGAN ==='],
                     ['Metric', 'Nilai'],
@@ -1565,7 +1598,7 @@
                     ['Total COGS', formatCurrency(results.cogsProjections.reduce((sum, p) => sum + p.totalCogs, 0))],
                     ['Total OPEX', formatCurrency(results.totalOpex)],
                     [''],
-                    
+
                     // Quick Analysis Summary
                     ['=== RINGKASAN ANALISIS KELAYAKAN ==='],
                     ['NPV', formatCurrency(results.npv)],
@@ -1573,13 +1606,13 @@
                     ['Payback Period', `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`],
                     ['Status Kelayakan', results.isViable ? 'LAYAK' : 'TIDAK LAYAK']
                 ];
-                
+
                 const wsCogsOpexAnalysis = XLSX.utils.aoa_to_sheet(cogsOpexAnalysisData);
                 XLSX.utils.book_append_sheet(wb, wsCogsOpexAnalysis, 'COGS+Opex+Ringkasan');
-                
+
                 // ===== SHEET 3: Revenue & P&L Summary (keep as is) =====
                 const plSummaryHeaders = ['Metrics', 'Total', ...results.yearlyProjections.slice(1).map((_, i) => `Tahun ${i + 1}`)];
-                
+
                 // Calculate totals excluding year 0 to match web interface columns
                 const revenueTotal = results.yearlyProjections.slice(1).reduce((sum, p) => sum + p.revenue, 0);
                 const cogsTotal = results.cogsProjections.slice(1).reduce((sum, p) => sum + p.totalCogs, 0);
@@ -1588,7 +1621,7 @@
                 const netIncomeTotal = results.yearlyProjections.slice(1).reduce((sum, p) => sum + p.netIncome, 0);
                 const grossMarginTotal = revenueTotal > 0 ? (grossProfitTotal / revenueTotal) : 0;
                 const niMarginTotal = revenueTotal > 0 ? (netIncomeTotal / revenueTotal) : 0;
-                
+
                 const plSummaryData = [
                     plSummaryHeaders,
                     ['Revenue', formatCurrency(revenueTotal), ...results.yearlyProjections.slice(1).map(p => formatCurrency(p.revenue))],
@@ -1611,24 +1644,24 @@
                         return formatPercentage(margin);
                     })]
                 ];
-                
+
                 const wsPLSummary = XLSX.utils.aoa_to_sheet(plSummaryData);
                 XLSX.utils.book_append_sheet(wb, wsPLSummary, 'Revenue & P&L Summary');
-                
+
                 // ===== SHEET 4: Cash Flow Summary (keep as is) =====
                 const calculatePVOfFCF = (fcf, year, discountRate = 0.15) => {
                     if (year === 0) return fcf;
                     return fcf / Math.pow(1 + discountRate, year);
                 };
-                
+
                 const cfSummaryHeaders = ['Cash Flow Metrics', 'Total', ...results.cashFlowProjections.slice(1).map((_, i) => `Tahun ${i + 1}`)];
-                
+
                 // Calculate totals excluding year 0 to match web interface columns
                 const cashInflowTotal = results.cashFlowProjections.slice(1).reduce((sum, proj) => sum + proj.totalCashInflow, 0);
                 const capexTotal = results.cashFlowProjections.slice(1).reduce((sum, proj) => sum + proj.capex, 0);
                 const fcfTotal = results.cashFlowProjections.slice(1).reduce((sum, proj) => sum + proj.netCashFlow, 0);
                 const pvFCFTotal = results.cashFlowProjections.slice(1).reduce((sum, proj) => sum + calculatePVOfFCF(proj.netCashFlow, proj.year), 0);
-                
+
                 const cfSummaryData = [
                     cfSummaryHeaders,
                     ['EBIT+ (after tax)', formatCurrency(cashInflowTotal), ...results.cashFlowProjections.slice(1).map(cf => formatCurrency(cf.totalCashInflow))],
@@ -1637,18 +1670,18 @@
                     ['WACC Discount Rate', '15%', ...results.cashFlowProjections.slice(1).map(() => '15%')],
                     ['PV (Present Value) of FCF', formatCurrency(pvFCFTotal), ...results.cashFlowProjections.slice(1).map(cf => formatCurrency(calculatePVOfFCF(cf.netCashFlow, cf.year)))]
                 ];
-                
+
                 const wsCFSummary = XLSX.utils.aoa_to_sheet(cfSummaryData);
                 XLSX.utils.book_append_sheet(wb, wsCFSummary, 'Cash Flow Summary');
-                
+
                 // ===== SHEET 5: Analisis NPV, IRR, Payback & Feasibility (combined sheet) =====
                 const npvStatus = results.npv > 0 ? 'Layak' : 'Tidak Layak';
                 const irrStatus = results.irr >= 0.15 ? 'Layak' : 'Tidak Layak';
-                
+
                 const npvFeasibilityData = [
                     ['ANALISIS NPV, IRR, PAYBACK & FEASIBILITY'],
                     [''],
-                    
+
                     // NPV Analysis Section
                     ['=== ANALISIS NPV, IRR & PAYBACK PERIOD ==='],
                     ['Analisis Kelayakan', 'Nilai', 'Kriteria', 'Status', ...results.cashFlowProjections.slice(1).map((_, i) => `Tahun ${i + 1}`)],
@@ -1656,7 +1689,7 @@
                     ['IRR', formatPercentage(results.irr), '>= 15%', irrStatus, ...results.cashFlowProjections.slice(1).map(() => '-')],
                     ['Payback Period', `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`, 'Semakin Pendek Semakin Baik', '-', ...results.cashFlowProjections.slice(1).map(() => '-')],
                     [''],
-                    
+
                     // Investment Cash Flow Breakdown for Analysis
                     ['=== BREAKDOWN CASH FLOW UNTUK ANALISIS ==='],
                     ['Tahun', 'Net Cash Flow', 'Cumulative Cash Flow', 'PV Factor (15%)', 'Present Value'],
@@ -1674,7 +1707,7 @@
                         ];
                     }),
                     [''],
-                    
+
                     // Feasibility Analysis Section
                     ['=== ANALISIS KELAYAKAN INVESTASI ==='],
                     ['Metrics', 'Value', 'Threshold', 'Status', 'Keterangan'],
@@ -1682,7 +1715,7 @@
                     ['IRR', formatPercentage(results.irr), '> 15 %', irrStatus, irrStatus === 'Layak' ? 'Return melebihi cost of capital' : 'Return di bawah cost of capital'],
                     ['Payback Period', `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`, 'Reasonable Period', '-', 'Waktu pengembalian modal investasi'],
                     [''],
-                    
+
                     // Investment Recommendation
                     ['=== REKOMENDASI INVESTASI ==='],
                     ['Aspek Penilaian', 'Hasil', 'Interpretasi'],
@@ -1693,14 +1726,14 @@
                     ['KESIMPULAN AKHIR', '', ''],
                     ['Status Kelayakan', results.isViable ? 'LAYAK' : 'TIDAK LAYAK', results.isViable ? 'Investasi direkomendasikan untuk dilaksanakan' : 'Investasi tidak direkomendasikan'],
                     ['Tingkat Kepercayaan', results.npv > 0 && results.irr > 0.15 ? 'TINGGI' : results.npv > 0 || results.irr > 0.15 ? 'SEDANG' : 'RENDAH', 'Berdasarkan konsistensi indikator kelayakan'],
-                    ['Rekomendasi Tindakan', 
-                        results.isViable ? 'PROCEED' : 'REVIEW/REJECT', 
+                    ['Rekomendasi Tindakan',
+                        results.isViable ? 'PROCEED' : 'REVIEW/REJECT',
                         results.isViable ? 'Lanjutkan ke tahap implementasi' : 'Tinjau ulang parameter atau tolak investasi']
                 ];
-                
+
                 const wsNPVFeasibility = XLSX.utils.aoa_to_sheet(npvFeasibilityData);
                 XLSX.utils.book_append_sheet(wb, wsNPVFeasibility, 'NPV, IRR & Feasibility');
-                
+
                 // ===== SHEET 6: Approval Signatures =====
                 const approvalSheetData = [
                     ['LEMBAR APPROVAL & TANDA TANGAN DIGITAL'],
@@ -1713,30 +1746,30 @@
                     ['Nama', approvalData.dibuat[0].nama, '', ''],
                     ['Jabatan', approvalData.dibuat[0].jabatan, '', ''],
                     ['Tanda Tangan', '', '', ''],
-                    
+
                     [''],
-                    
+
                     ['NIK', approvalData.dibuat[1].nik, '', ''],
                     ['Nama', approvalData.dibuat[1].nama, '', ''],
                     ['Jabatan', approvalData.dibuat[1].jabatan, '', ''],
                     ['Tanda Tangan', '', '', ''],
-                    
+
                     [''],
                     ['DIPERIKSA OLEH', '', '', ''],
                     ['NIK', approvalData.diperiksa.nik, '', ''],
                     ['Nama', approvalData.diperiksa.nama, '', ''],
                     ['Jabatan', approvalData.diperiksa.jabatan, '', ''],
                     ['Tanda Tangan', '', '', ''],
-                    
+
                     [''],
                     ['DISETUJUI OLEH', '', '', ''],
                     ['NIK', approvalData.disetujui.nik, '', ''],
                     ['Nama', approvalData.disetujui.nama, '', ''],
                     ['Jabatan', approvalData.disetujui.jabatan, '', ''],
                     ['Tanda Tangan', '', '', ''],
-                    
+
                 ];
-                
+
                 const wsApprovalSheet = XLSX.utils.aoa_to_sheet(approvalSheetData);
                 wsApprovalSheet['!cols'] = [
                     { wch: 25 },
@@ -1745,360 +1778,459 @@
                     { wch: 15 }
                 ];
                 XLSX.utils.book_append_sheet(wb, wsApprovalSheet, 'Approval & Signatures');
-                
+
                 const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
                 const blob = new Blob([wbout], { type: 'application/octet-stream' });
-                
+
                 // Generate filename with customer name or placeholder
                 const customerNameForFile = inputs.customerName ? inputs.customerName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_') : 'Nama_Customer';
                 const filename = `AKI PT ${customerNameForFile}.xlsx`;
-                
+
                 saveAs(blob, filename);
             };
 
-            const exportToPDF = (results, inputs, approvalData = { dibuat: { nik: "", nama: "", jabatan: "" }, diperiksa: { nik: "", nama: "", jabatan: "" }, disetujui: { nik: "", nama: "", jabatan: "" } }) => {
-    if (!window.jspdf || !window.jspdf.jsPDF) {
-        alert('Fitur PDF belum siap. Silakan refresh halaman.');
-        return;
-    }
+            const exportToPDF = (results, inputs, approvalData = { dibuat: [{ nik: "", nama: "", jabatan: "" }, { nik: "", nama: "", jabatan: "" }], diperiksa: { nik: "", nama: "", jabatan: "" }, disetujui: { nik: "", nama: "", jabatan: "" } }, progForm = {}) => {
+                if (!window.jspdf || !window.jspdf.jsPDF) {
+                    alert('Fitur PDF belum siap. Silakan refresh halaman.');
+                    return;
+                }
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('p', 'mm', 'a4');
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
 
-    const totalMonthlyRevenue = inputs.services.reduce(
-        (sum, service) => sum + service.monthlyRevenue,
-        0
-    );
-    const totalOtcCost = inputs.services.reduce(
-        (sum, service) => sum + service.otcCost,
-        0
-    );
-    const totalMonthlyRevenueWithQty = inputs.services.reduce(
-        (sum, service) => sum + (service.monthlyRevenue * getSafeQuantity(service.quantity)),
-        0
-    );
-    const totalOtcCostWithQty = inputs.services.reduce(
-        (sum, service) => sum + (service.otcCost * getSafeQuantity(service.quantity)),
-        0
-    );
+                const totalMonthlyRevenue = inputs.services.reduce(
+                    (sum, service) => sum + service.monthlyRevenue,
+                    0
+                );
+                const totalOtcCost = inputs.services.reduce(
+                    (sum, service) => sum + service.otcCost,
+                    0
+                );
+                const totalMonthlyRevenueWithQty = inputs.services.reduce(
+                    (sum, service) => sum + (service.monthlyRevenue * getSafeQuantity(service.quantity)),
+                    0
+                );
+                const totalOtcCostWithQty = inputs.services.reduce(
+                    (sum, service) => sum + (service.otcCost * getSafeQuantity(service.quantity)),
+                    0
+                );
 
-    const customerNameForFile = inputs.customerName
-        ? inputs.customerName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_')
-        : 'Nama_Customer';
-    const reportTitle = `AKI Report - ${inputs.customerName || 'Nama Customer'}`;
+                const customerNameForFile = inputs.customerName
+                    ? inputs.customerName.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_')
+                    : 'Nama_Customer';
+                const reportTitle = `AKI Report - ${inputs.customerName || 'Nama Customer'}`;
 
-    const coverIrrStatus = results.irr >= 15 ? 'Feasible' : 'Not Feasible';
-    const coverNpvStatus = results.npv > 0 ? 'Feasible' : 'Not Feasible';
-    const recommendation = results.isViable
-        ? 'Layak untuk diimplementasikan'
-        : 'Tidak layak untuk diimplementasikan';
+                const coverIrrStatus = results.irr >= 15 ? 'Feasible' : 'Not Feasible';
+                const coverNpvStatus = results.npv > 0 ? 'Feasible' : 'Not Feasible';
+                const recommendation = results.isViable
+                    ? 'Layak untuk diimplementasikan'
+                    : 'Tidak layak untuk diimplementasikan';
 
-    let y = 12;
+                let y = 12;
 
-    doc.setFontSize(14);
-    doc.text(reportTitle, 105, y, { align: 'center' });
-    y += 8;
+                doc.setFontSize(14);
+                doc.text(reportTitle, 105, y, { align: 'center' });
+                y += 8;
 
-    // ================== SEGMENT 1: REVENUE PLAN ==================
-    doc.setFontSize(11);
-    doc.text('Revenue Plan', 14, y);
-    y += 4;
+                // ================== SEGMENT 1: REVENUE PLAN ==================
+                doc.setFontSize(11);
+                doc.text('Revenue Plan', 14, y);
+                y += 4;
 
-    // Resume: mengikuti sheet BUSINESS PLAN (coverSheetData)
-    const resumeBody = [
-        ['Total Investasi', formatCurrency(inputs.investmentCost)],
-        ['Pendapatan PSB', formatCurrency(results.otcRevenue)],
-        ['Pendapatan Abonemen IBL', `${formatCurrency(totalMonthlyRevenueWithQty)} /bulan`],
-        ['IRR', `${formatPercentage(results.irr)} ${coverIrrStatus}`],
-        ['NPV', `${formatCurrency(results.npv)} ${coverNpvStatus}`],
-        ['PAYBACK PERIODE', `${results.paybackPeriod.years} years ${results.paybackPeriod.months} months`],
-        ['Rekomendasi', recommendation]
-    ];
+                // Resume: mengikuti sheet BUSINESS PLAN (coverSheetData)
+                const resumeBody = [
+                    ['Total Investasi', formatCurrency(inputs.investmentCost)],
+                    ['Pendapatan PSB', formatCurrency(results.otcRevenue)],
+                    ['Pendapatan Abonemen IBL', `${formatCurrency(totalMonthlyRevenueWithQty)} /bulan`],
+                    ['IRR', `${formatPercentage(results.irr)} ${coverIrrStatus}`],
+                    ['NPV', `${formatCurrency(results.npv)} ${coverNpvStatus}`],
+                    ['PAYBACK PERIODE', `${results.paybackPeriod.years} years ${results.paybackPeriod.months} months`],
+                    ['Rekomendasi', recommendation]
+                ];
 
-    doc.autoTable({
-        startY: y,
-        head: [['Resume', 'Nilai']],
-        body: resumeBody,
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
-        theme: 'grid',
-        columnStyles: {
-            0: { cellWidth: 75 },
-            1: { cellWidth: 100 }
-        }
-    });
+                doc.autoTable({
+                    startY: y,
+                    head: [['Resume', 'Nilai']],
+                    body: resumeBody,
+                    styles: { fontSize: 8 },
+                    headStyles: { fillColor: [30, 64, 175], textColor: 255 },
+                    theme: 'grid',
+                    columnStyles: {
+                        0: { cellWidth: 75 },
+                        1: { cellWidth: 100 }
+                    }
+                });
 
-    y = doc.lastAutoTable.finalY + 6;
+                y = doc.lastAutoTable.finalY + 6;
 
-    // Detail Layanan: mengikuti bagian DETAIL BREAKDOWN LAYANAN
-    doc.setFontSize(11);
-    doc.text('Detail Layanan', 14, y);
-    y += 4;
+                // Detail Layanan: mengikuti bagian DETAIL BREAKDOWN LAYANAN
+                doc.setFontSize(11);
+                doc.text('Detail Layanan', 14, y);
+                y += 4;
 
-    const servicesTableBody = inputs.services.length > 0
-        ? inputs.services.map((service, index) => [
-            String(index + 1),
-            service.serviceDetails || service.serviceType || `Layanan ${index + 1}`,
-            service.bandwidth || '-',
-            service.quantity != null && service.quantity !== '' ? String(service.quantity) : '-',
-            service.unit || '-',
-            formatCurrency(service.otcCost),
-            formatCurrency(service.monthlyRevenue),
-            formatCurrency(service.otcCost * getSafeQuantity(service.quantity)),
-            formatCurrency(service.monthlyRevenue * getSafeQuantity(service.quantity)),
-            formatCurrency(
-                service.monthlyRevenue * getSafeQuantity(service.quantity) * inputs.contractPeriod
-            )
-        ])
-        : [['-', '-', '-', '-', '-', '-', '-', '-', '-', '-']];
+                const servicesTableBody = inputs.services.length > 0
+                    ? inputs.services.map((service, index) => [
+                        String(index + 1),
+                        service.serviceDetails || service.serviceType || `Layanan ${index + 1}`,
+                        service.bandwidth || '-',
+                        service.quantity != null && service.quantity !== '' ? String(service.quantity) : '-',
+                        service.unit || '-',
+                        formatCurrency(service.otcCost),
+                        formatCurrency(service.monthlyRevenue),
+                        formatCurrency(service.otcCost * getSafeQuantity(service.quantity)),
+                        formatCurrency(service.monthlyRevenue * getSafeQuantity(service.quantity)),
+                        formatCurrency(
+                            service.monthlyRevenue * getSafeQuantity(service.quantity) * inputs.contractPeriod
+                        )
+                    ])
+                    : [['-', '-', '-', '-', '-', '-', '-', '-', '-', '-']];
 
-    const totalRow = [
-        '',
-        'Total (exc. PPN)',
-        '-',
-        inputs.services
-            .reduce((sum, service) => sum + getSafeQuantity(service.quantity), 0)
-            .toString(),
-        inputs.services.length > 0 ? (inputs.services[0].unit || '-') : '-',
-        formatCurrency(totalOtcCost),
-        formatCurrency(totalMonthlyRevenue),
-        formatCurrency(totalOtcCostWithQty),
-        formatCurrency(totalMonthlyRevenueWithQty),
-        formatCurrency(totalMonthlyRevenueWithQty * inputs.contractPeriod)
-    ];
+                const totalRow = [
+                    '',
+                    'Total (exc. PPN)',
+                    '-',
+                    inputs.services
+                        .reduce((sum, service) => sum + getSafeQuantity(service.quantity), 0)
+                        .toString(),
+                    inputs.services.length > 0 ? (inputs.services[0].unit || '-') : '-',
+                    formatCurrency(totalOtcCost),
+                    formatCurrency(totalMonthlyRevenue),
+                    formatCurrency(totalOtcCostWithQty),
+                    formatCurrency(totalMonthlyRevenueWithQty),
+                    formatCurrency(totalMonthlyRevenueWithQty * inputs.contractPeriod)
+                ];
 
-    const servicesTableWithTotal = [...servicesTableBody, totalRow];
+                const servicesTableWithTotal = [...servicesTableBody, totalRow];
 
-    doc.autoTable({
-        startY: y,
-        head: [[
-            'No.',
-            'Layanan',
-            'BW (Mbps)',
-            'Qty',
-            'Satuan',
-            'OTC',
-            'MRC',
-            'Total OTC',
-            'Total MRC',
-            `Total MRC ${inputs.contractPeriod} Bulan`
-        ]],
-        body: servicesTableWithTotal,
-        styles: { fontSize: 7 },
-        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
-        theme: 'grid'
-    });
+                doc.autoTable({
+                    startY: y,
+                    head: [[
+                        'No.',
+                        'Layanan',
+                        'BW (Mbps)',
+                        'Qty',
+                        'Satuan',
+                        'OTC',
+                        'MRC',
+                        'Total OTC',
+                        'Total MRC',
+                        `Total MRC ${inputs.contractPeriod} Bulan`
+                    ]],
+                    body: servicesTableWithTotal,
+                    styles: { fontSize: 7 },
+                    headStyles: { fillColor: [30, 64, 175], textColor: 255 },
+                    theme: 'grid'
+                });
 
-    // ================== SEGMENT 2: ANALISA KELAYAKAN INVESTASI ==================
-    doc.addPage();
-    y = 12;
+                // ================== SEGMENT 2: ANALISA KELAYAKAN INVESTASI ==================
+                doc.addPage();
+                y = 12;
 
-    doc.setFontSize(11);
-    doc.text('Analisa Kelayakan Investasi', 14, y);
-    y += 6;
+                doc.setFontSize(11);
+                doc.text('Analisa Kelayakan Investasi', 14, y);
+                y += 6;
 
-    const npvStatus = results.npv > 0 ? 'Layak' : 'Tidak Layak';
-    const irrStatus = results.irr > 0.15 ? 'Layak' : 'Tidak Layak';
+                const npvStatus = results.npv > 0 ? 'Layak' : 'Tidak Layak';
+                const irrStatus = results.irr > 0.15 ? 'Layak' : 'Tidak Layak';
 
-    // Ringkasan utama: mengikuti bagian "RINGKASAN UTAMA HASIL PERHITUNGAN"
-    const ringkasanBody = [
-        ['Total Revenue (Lifetime)', formatCurrency(results.totalRevenue)],
-        ['OTC Revenue', formatCurrency(results.otcRevenue)],
-        ['Monthly Revenue Total', formatCurrency(results.monthlyTotal)],
-        ['Total COGS', formatCurrency(results.cogsProjections
-            .reduce((sum, p) => sum + p.totalCogs, 0))],
-        ['Total OPEX', formatCurrency(results.totalOpex)],
-        ['NPV', formatCurrency(results.npv)],
-        ['IRR', formatPercentage(results.irr)],
-        ['Payback Period', `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`],
-        ['Status Kelayakan', results.isViable ? 'LAYAK' : 'TIDAK LAYAK']
-    ];
+                // Ringkasan utama: mengikuti bagian "RINGKASAN UTAMA HASIL PERHITUNGAN"
+                const ringkasanBody = [
+                    ['Total Revenue (Lifetime)', formatCurrency(results.totalRevenue)],
+                    ['OTC Revenue', formatCurrency(results.otcRevenue)],
+                    ['Monthly Revenue Total', formatCurrency(results.monthlyTotal)],
+                    ['Total COGS', formatCurrency(results.cogsProjections
+                        .reduce((sum, p) => sum + p.totalCogs, 0))],
+                    ['Total OPEX', formatCurrency(results.totalOpex)],
+                    ['NPV', formatCurrency(results.npv)],
+                    ['IRR', formatPercentage(results.irr)],
+                    ['Payback Period', `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`],
+                    ['Status Kelayakan', results.isViable ? 'LAYAK' : 'TIDAK LAYAK']
+                ];
 
-    doc.autoTable({
-        startY: y,
-        head: [['Metric', 'Nilai']],
-        body: ringkasanBody,
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
-        theme: 'grid',
-        columnStyles: {
-            0: { cellWidth: 80 },
-            1: { cellWidth: 90 }
-        }
-    });
+                doc.autoTable({
+                    startY: y,
+                    head: [['Metric', 'Nilai']],
+                    body: ringkasanBody,
+                    styles: { fontSize: 8 },
+                    headStyles: { fillColor: [30, 64, 175], textColor: 255 },
+                    theme: 'grid',
+                    columnStyles: {
+                        0: { cellWidth: 80 },
+                        1: { cellWidth: 90 }
+                    }
+                });
 
-    y = doc.lastAutoTable.finalY + 6;
+                y = doc.lastAutoTable.finalY + 6;
 
-    // Tabel ANALISIS KELAYAKAN INVESTASI (NPV, IRR, Payback + keterangan)
-    const feasibilityBody = [
-        [
-            'NPV',
-            formatCurrency(results.npv),
-            '> Rp 0',
-            npvStatus,
-            npvStatus === 'Layak'
-                ? 'Investasi menghasilkan nilai positif'
-                : 'Investasi tidak menghasilkan nilai positif'
-        ],
-        [
-            'IRR',
-            formatPercentage(results.irr),
-            '> 15%',
-            irrStatus,
-            irrStatus === 'Layak'
-                ? 'Return melebihi cost of capital'
-                : 'Return di bawah cost of capital'
-        ],
-        [
-            'Payback Period',
-            `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`,
-            'Reasonable Period',
-            '-',
-            'Waktu pengembalian modal investasi'
-        ]
-    ];
+                // Tabel ANALISIS KELAYAKAN INVESTASI (NPV, IRR, Payback + keterangan)
+                const feasibilityBody = [
+                    [
+                        'NPV',
+                        formatCurrency(results.npv),
+                        '> Rp 0',
+                        npvStatus,
+                        npvStatus === 'Layak'
+                            ? 'Investasi menghasilkan nilai positif'
+                            : 'Investasi tidak menghasilkan nilai positif'
+                    ],
+                    [
+                        'IRR',
+                        formatPercentage(results.irr),
+                        '> 15%',
+                        irrStatus,
+                        irrStatus === 'Layak'
+                            ? 'Return melebihi cost of capital'
+                            : 'Return di bawah cost of capital'
+                    ],
+                    [
+                        'Payback Period',
+                        `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`,
+                        'Reasonable Period',
+                        '-',
+                        'Waktu pengembalian modal investasi'
+                    ]
+                ];
 
-    doc.autoTable({
-        startY: y,
-        head: [['Metrics', 'Value', 'Threshold', 'Status', 'Keterangan']],
-        body: feasibilityBody,
-        styles: { fontSize: 7 },
-        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
-        theme: 'grid'
-    });
+                doc.autoTable({
+                    startY: y,
+                    head: [['Metrics', 'Value', 'Threshold', 'Status', 'Keterangan']],
+                    body: feasibilityBody,
+                    styles: { fontSize: 7 },
+                    headStyles: { fillColor: [30, 64, 175], textColor: 255 },
+                    theme: 'grid'
+                });
 
-    y = doc.lastAutoTable.finalY + 6;
+                y = doc.lastAutoTable.finalY + 6;
 
-    // Tabel REKOMENDASI INVESTASI
-    const rekomendasiBody = [
-        [
-            'Profitabilitas (NPV)',
-            results.npv > 0 ? 'POSITIF' : 'NEGATIF',
-            results.npv > 0 ? 'Investasi menguntungkan' : 'Investasi merugikan'
-        ],
-        [
-            'Efisiensi Return (IRR)',
-            results.irr >= 0.15 ? 'MEMADAI' : 'TIDAK MEMADAI',
-            results.irr >= 0.15 ? 'Return sesuai ekspektasi' : 'Return di bawah ekspektasi'
-        ],
-        [
-            'Risiko Waktu (Payback)',
-            `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`,
-            'Waktu pengembalian investasi'
-        ],
-        [
-            'Status Kelayakan',
-            results.isViable ? 'LAYAK' : 'TIDAK LAYAK',
-            results.isViable
-                ? 'Investasi direkomendasikan untuk dilaksanakan'
-                : 'Investasi tidak direkomendasikan'
-        ],
-        [
-            'Tingkat Kepercayaan',
-            results.npv > 0 && results.irr > 0.15
-                ? 'TINGGI'
-                : results.npv > 0 || results.irr > 0.15
-                    ? 'SEDANG'
-                    : 'RENDAH',
-            'Berdasarkan konsistensi indikator kelayakan'
-        ],
-        [
-            'Rekomendasi Tindakan',
-            results.isViable ? 'PROCEED' : 'REVIEW/REJECT',
-            results.isViable
-                ? 'Lanjutkan ke tahap implementasi'
-                : 'Tinjau ulang parameter atau tolak investasi'
-        ]
-    ];
+                // Tabel REKOMENDASI INVESTASI
+                const rekomendasiBody = [
+                    [
+                        'Profitabilitas (NPV)',
+                        results.npv > 0 ? 'POSITIF' : 'NEGATIF',
+                        results.npv > 0 ? 'Investasi menguntungkan' : 'Investasi merugikan'
+                    ],
+                    [
+                        'Efisiensi Return (IRR)',
+                        results.irr >= 0.15 ? 'MEMADAI' : 'TIDAK MEMADAI',
+                        results.irr >= 0.15 ? 'Return sesuai ekspektasi' : 'Return di bawah ekspektasi'
+                    ],
+                    [
+                        'Risiko Waktu (Payback)',
+                        `${results.paybackPeriod.years} tahun ${results.paybackPeriod.months} bulan`,
+                        'Waktu pengembalian investasi'
+                    ],
+                    [
+                        'Status Kelayakan',
+                        results.isViable ? 'LAYAK' : 'TIDAK LAYAK',
+                        results.isViable
+                            ? 'Investasi direkomendasikan untuk dilaksanakan'
+                            : 'Investasi tidak direkomendasikan'
+                    ],
+                    [
+                        'Tingkat Kepercayaan',
+                        results.npv > 0 && results.irr > 0.15
+                            ? 'TINGGI'
+                            : results.npv > 0 || results.irr > 0.15
+                                ? 'SEDANG'
+                                : 'RENDAH',
+                        'Berdasarkan konsistensi indikator kelayakan'
+                    ],
+                    [
+                        'Rekomendasi Tindakan',
+                        results.isViable ? 'PROCEED' : 'REVIEW/REJECT',
+                        results.isViable
+                            ? 'Lanjutkan ke tahap implementasi'
+                            : 'Tinjau ulang parameter atau tolak investasi'
+                    ]
+                ];
 
-    doc.autoTable({
-        startY: y,
-        head: [['Aspek Penilaian', 'Hasil', 'Interpretasi']],
-        body: rekomendasiBody,
-        styles: { fontSize: 7 },
-        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
-        theme: 'grid'
-    });
+                doc.autoTable({
+                    startY: y,
+                    head: [['Aspek Penilaian', 'Hasil', 'Interpretasi']],
+                    body: rekomendasiBody,
+                    styles: { fontSize: 7 },
+                    headStyles: { fillColor: [30, 64, 175], textColor: 255 },
+                    theme: 'grid'
+                });
 
-    // ================== SEGMENT 3: APPROVAL & SIGNATURES ==================
-    doc.addPage();
-    y = 12;
+                // ================== SEGMENT 2.5: HASIL EVALUASI AKI CAPEX ==================
+                doc.addPage();
+                y = 12;
 
-    doc.setFontSize(12);
-    doc.text('Lembar Approval & Tanda Tangan Digital', 105, y, { align: 'center' });
-    y += 8;
+                const currentYear = new Date().getFullYear();
+                const totalQtyAll = inputs.services.reduce((sum, s) => sum + getSafeQuantity(s.quantity), 0);
+                const capexPerLine = totalQtyAll > 0 ? inputs.investmentCost / totalQtyAll : 0;
+                const arpu = totalQtyAll > 0 ? totalMonthlyRevenueWithQty / totalQtyAll : 0;
+                const bcrValue = (inputs.investmentCost * (1 + CAPEX_ADDITIONAL)) > 0
+                    ? results.totalRevenue / (inputs.investmentCost * (1 + CAPEX_ADDITIONAL))
+                    : 0;
+                const kontrakTahun = Math.floor(inputs.contractPeriod / 12);
+                const kontrakBulan = inputs.contractPeriod % 12;
+                const namaProgram = inputs.services.map(s => s.serviceDetails || s.serviceType).filter(Boolean).join(', ') || inputs.customerName;
+                const satuanFirst = inputs.services.length > 0 ? (inputs.services[0].unit || 'ODP') : 'ODP';
 
-    const currentDateTime = new Date().toLocaleDateString('id-ID', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'bold');
+                doc.text('HASIL EVALUASI AKI CAPEX PT. TELKOM TAHUN ' + currentYear, 105, y, { align: 'center' });
+                doc.setFont(undefined, 'normal');
+                y += 8;
 
-    const approvalTableBody = [
-        [
-            { content: 'Dibuat Oleh', rowSpan: 2 },
-            `${approvalData.dibuat[0].nama || '...........................'}\nNIK. ${approvalData.dibuat[0].nik || '...........................'}\n${approvalData.dibuat[0].jabatan || '...........................'}`,
-            currentDateTime,
-            ''
-        ],
-        [
-            `${approvalData.dibuat[1].nama || '...........................'}\nNIK. ${approvalData.dibuat[1].nik || '...........................'}\n${approvalData.dibuat[1].jabatan || '...........................'}`,
-            currentDateTime,
-            ''
-        ],
-        [
-            'Diperiksa Oleh',
-            `${approvalData.diperiksa.nama || '...........................'}\nNIK. ${approvalData.diperiksa.nik || '...........................'}\n${approvalData.diperiksa.jabatan || '...........................'}`,
-            currentDateTime,
-            ''
-        ],
-        [
-            'Disetujui Oleh',
-            `${approvalData.disetujui.nama || '...........................'}\nNIK. ${approvalData.disetujui.nik || '...........................'}\n${approvalData.disetujui.jabatan || '...........................'}`,
-            currentDateTime,
-            ''
-        ]
-    ];
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'bold');
+                doc.text('USULAN PROGRAM PP', 14, y);
+                doc.setFont(undefined, 'normal');
+                y += 4;
 
-    doc.autoTable({
-        startY: y,
-        head: [[
-            '',
-            'Nama / NIK / Jabatan',
-            'Tanggal',
-            'Tanda Tangan'
-        ]],
-        body: approvalTableBody,
-        styles: { fontSize: 8, minCellHeight: 14, cellPadding: 4 },
-        headStyles: { fillColor: [30, 64, 175], textColor: 255 },
-        theme: 'grid',
-        tableWidth: 'auto',
-        columnStyles: {
-            0: { cellWidth: 30 },
-            1: { cellWidth: 70 },
-            2: { cellWidth: 30 },
-            3: { cellWidth: 40 }
-        },
-        didDrawCell: (data) => {
-            if (data.section === 'body' && data.column.index === 3) {
-                const x = data.cell.x + 1;
-                const yCell = data.cell.y + 1;
-                const width = data.cell.width - 2;
-                const height = data.cell.height - 2;
-                doc.setDrawColor(0);
-                doc.rect(x, yCell, width, height);
-            }
-        }
-    });
+                const evalBody = [
+                    ['ID Proposal', ':', progForm.idProposal || ''],
+                    ['Nama Program', ':', namaProgram],
+                    ['Jumlah LOP', ':', progForm.jumlahLop || '1'],
+                    ['ID LOP (sesuai jumlah LOP)', ':', progForm.idLop || ''],
+                    ['Lokasi / Site Program', ':', progForm.lokasiProgram || ''],
+                    [{ content: 'Kapasitas', rowSpan: 2 }, 'VOLUME   :', String(totalQtyAll)],
+                    ['', 'SATUAN   :', satuanFirst],
+                    ['Penanggung Jawab', ':', progForm.penanggungJawab || ''],
+                    ['Nomor Account', ':', progForm.nomorAccount || ''],
+                    [{ content: 'Nilai Program', rowSpan: 2 }, 'CAPEX    :', 'Rp  ' + formatCurrency(inputs.investmentCost).replace(/^Rp\s*/, '')],
+                    ['', 'BOP LAKWAS :', 'Rp  ' + formatCurrency(inputs.investmentCost * 0.004).replace(/^Rp\s*/, '')],
+                    ['Capex / Line', ':', formatCurrency(capexPerLine)],
+                    ['Waktu Penyelesaian', 'bulan :', progForm.waktuPenyelesaian || '1'],
+                    ['Rencana Selesai', ':', progForm.rencanaSelesai || String(currentYear)],
+                    ['Masa kontrak/berlangganan', 'tahun :', `${kontrakTahun} Tahun ${kontrakBulan} Bulan`],
+                    ['Pemilihan Teknologi', ':', progForm.pemilihanTeknologi || 'FO'],
+                    ['Usulan pola kemitraan', ':', progForm.usulanPolaMitraan || '-'],
+                    ['Alasan keberadaan proyek', ':', progForm.alasanKeberadaanProyek || ''],
+                    [{ content: 'Kinerja Bisnis', rowSpan: 4 }, 'IRR                     :', formatPercentage(results.irr)],
+                    ['', 'NPV                    :', formatCurrency(results.npv)],
+                    ['', 'Payback Periode :', `${results.paybackPeriod.years} Tahun ${results.paybackPeriod.months} Bulan`],
+                    ['', 'BCR                    :', bcrValue.toFixed(2)],
+                    ['', 'Gross Profit Margin :', formatPercentage(results.grossProfitMargin)],
+                    ['', 'Net Income Margin  :', formatPercentage(results.netIncomeMargin)],
+                    ['', 'Loss Rev/bln          :', ''],
+                    ['KRITERIA INVESTASI UNTUK PERIODE PEMAKAIAN', ':', results.isViable ? 'LAYAK' : 'TIDAK LAYAK'],
+                    [{ content: 'Catatan penting tembahan untuk pertimbangan penarikan', rowSpan: 2 }, 'ARPU              :', formatCurrency(arpu)],
+                    ['', 'CAPEX PER PORT :', formatCurrency(capexPerLine)],
+                ];
 
-    doc.save(`AKI_PT_${customerNameForFile}_unsigned.pdf`);
-};
+                doc.autoTable({
+                    startY: y,
+                    body: evalBody,
+                    styles: { fontSize: 8, cellPadding: 2 },
+                    theme: 'grid',
+                    columnStyles: {
+                        0: { cellWidth: 65 },
+                        1: { cellWidth: 30 },
+                        2: { cellWidth: 80 },
+                    },
+                    didDrawCell: (data) => {
+                        if (data.section === 'body' && data.column.index === 2) {
+                            const rowLabel = evalBody[data.row.index];
+                            const isKriteria = Array.isArray(rowLabel) && rowLabel[0] === 'KRITERIA INVESTASI UNTUK PERIODE PEMAKAIAN';
+                            if (isKriteria) {
+                                const isLayak = results.isViable;
+                                doc.setFillColor(isLayak ? 146 : 220, isLayak ? 208 : 53, isLayak ? 80 : 69);
+                                doc.rect(data.cell.x, data.cell.y, data.cell.width, data.cell.height, 'F');
+                                doc.setTextColor(255, 255, 255);
+                                doc.setFontSize(8);
+                                doc.setFont(undefined, 'bold');
+                                doc.text(
+                                    isLayak ? 'LAYAK' : 'TIDAK LAYAK',
+                                    data.cell.x + data.cell.width / 2,
+                                    data.cell.y + data.cell.height / 2,
+                                    { align: 'center', baseline: 'middle' }
+                                );
+                                doc.setFont(undefined, 'normal');
+                                doc.setTextColor(0, 0, 0);
+                            }
+                        }
+                    }
+                });
+
+                y = doc.lastAutoTable.finalY + 5;
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'bolditalic');
+                doc.text('GO CRITERIA: POTS: ARPU > 439rb & CPP <1.7jt  |  DATIN: AKI LAYAK', 14, y);
+                doc.setFont(undefined, 'normal');
+
+                // ================== SEGMENT 3: APPROVAL & SIGNATURES ==================
+                doc.addPage();
+                y = 12;
+
+                doc.setFontSize(12);
+                doc.text('Lembar Approval & Tanda Tangan Digital', 105, y, { align: 'center' });
+                y += 8;
+
+                const currentDateTime = new Date().toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+
+                const approvalTableBody = [
+                    [
+                        { content: 'Dibuat Oleh', rowSpan: 2 },
+                        `${approvalData.dibuat[0].nama || '...........................'}\nNIK. ${approvalData.dibuat[0].nik || '...........................'}\n${approvalData.dibuat[0].jabatan || '...........................'}`,
+                        currentDateTime,
+                        ''
+                    ],
+                    [
+                        `${approvalData.dibuat[1].nama || '...........................'}\nNIK. ${approvalData.dibuat[1].nik || '...........................'}\n${approvalData.dibuat[1].jabatan || '...........................'}`,
+                        currentDateTime,
+                        ''
+                    ],
+                    [
+                        'Diperiksa Oleh',
+                        `${approvalData.diperiksa.nama || '...........................'}\nNIK. ${approvalData.diperiksa.nik || '...........................'}\n${approvalData.diperiksa.jabatan || '...........................'}`,
+                        currentDateTime,
+                        ''
+                    ],
+                    [
+                        'Disetujui Oleh',
+                        `${approvalData.disetujui.nama || '...........................'}\nNIK. ${approvalData.disetujui.nik || '...........................'}\n${approvalData.disetujui.jabatan || '...........................'}`,
+                        currentDateTime,
+                        ''
+                    ]
+                ];
+
+                doc.autoTable({
+                    startY: y,
+                    head: [[
+                        '',
+                        'Nama / NIK / Jabatan',
+                        'Tanggal',
+                        'Tanda Tangan'
+                    ]],
+                    body: approvalTableBody,
+                    styles: { fontSize: 8, minCellHeight: 14, cellPadding: 4 },
+                    headStyles: { fillColor: [30, 64, 175], textColor: 255 },
+                    theme: 'grid',
+                    tableWidth: 'auto',
+                    columnStyles: {
+                        0: { cellWidth: 30 },
+                        1: { cellWidth: 70 },
+                        2: { cellWidth: 30 },
+                        3: { cellWidth: 40 }
+                    },
+                    didDrawCell: (data) => {
+                        if (data.section === 'body' && data.column.index === 3) {
+                            const x = data.cell.x + 1;
+                            const yCell = data.cell.y + 1;
+                            const width = data.cell.width - 2;
+                            const height = data.cell.height - 2;
+                            doc.setDrawColor(0);
+                            doc.rect(x, yCell, width, height);
+                        }
+                    }
+                });
+
+                doc.save(`AKI_PT_${customerNameForFile}_unsigned.pdf`);
+            };
 
             React.useEffect(() => {
-                const hasValidServices = inputs.services.length > 0 && inputs.services.some(service => 
+                const hasValidServices = inputs.services.length > 0 && inputs.services.some(service =>
                     service.serviceDetails.trim() !== "" && (service.monthlyRevenue > 0 || service.otcCost > 0)
                 );
-                
+
                 if (inputs.customerName.trim() !== "" && inputs.investmentCost > 0 && inputs.contractPeriod > 0 && hasValidServices) {
                     calculateAnalysis();
                 }
@@ -2141,7 +2273,7 @@
                                 {/* Variable Inputs Section */}
                                 <div>
                                     <h3 className="font-medium text-foreground mb-4">Input Variabel</h3>
-                                    
+
                                     {/* 3x3 Grid Layout */}
                                     <div className="grid grid-cols-1 md-grid-cols-3 gap-6">
                                         {/* Row 1: Nama Pelanggan | Total BOQ Biaya Investasi | Periode Kontrak */}
@@ -2211,7 +2343,7 @@
                                         </div>
 
                                     </div>
-                                    
+
                                     {/* Services Section */}
                                     <div className="mt-8">
                                         <div className="flex items-center justify-between mb-4">
@@ -2225,7 +2357,7 @@
                                                 ⊕ Tambah Layanan Lainnya
                                             </button>
                                         </div>
-                                        
+
                                         <div className="space-y-4">
                                             {inputs.services.map((service, index) => (
                                                 <div key={service.id} className="service-card">
@@ -2244,7 +2376,7 @@
                                                             </button>
                                                         )}
                                                     </div>
-                                                    
+
                                                     <div className="grid grid-cols-1 md-grid-cols-3 gap-4">
                                                         <div className="form-group">
                                                             <label className="block text-sm font-medium text-foreground mb-2">
@@ -2290,7 +2422,7 @@
                                                                 />
                                                             </div>
                                                         )}
-                                                        
+
                                                         <div className="form-group">
                                                             <label className="block text-sm font-medium text-foreground mb-2">
                                                                 BW (Bandwidth)
@@ -2304,7 +2436,7 @@
                                                                 data-testid={`input-bandwidth-${service.id}`}
                                                             />
                                                         </div>
-                                                        
+
                                                         <div className="form-group">
                                                             <label className="block text-sm font-medium text-foreground mb-2">
                                                                 Qty (Quantity)
@@ -2321,7 +2453,7 @@
                                                             />
                                                         </div>
                                                     </div>
-                                                    
+
                                                     <div className="grid grid-cols-1 md-grid-cols-3 gap-4 mt-4">
                                                         <div className="form-group">
                                                             <label className="block text-sm font-medium text-foreground mb-2">
@@ -2340,7 +2472,7 @@
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                        
+
                                                         <div className="form-group">
                                                             <label className="block text-sm font-medium text-foreground mb-2">
                                                                 Biaya Bulanan
@@ -2357,7 +2489,7 @@
                                                                 />
                                                             </div>
                                                         </div>
-                                                        
+
                                                         <div className="form-group">
                                                             <label className="block text-sm font-medium text-foreground mb-2">
                                                                 Biaya Aktivasi
@@ -2379,7 +2511,7 @@
                                             ))}
                                         </div>
                                     </div>
-                                    
+
                                     {/* Totals Section */}
                                     <div className="mt-8">
                                         <h3 className="font-medium text-foreground mb-4">Total Keseluruhan</h3>
@@ -2399,7 +2531,7 @@
                                                     />
                                                 </div>
                                             </div>
-                                            
+
                                             <div className="form-group">
                                                 <label className="block text-sm font-medium text-foreground mb-2">
                                                     Total Biaya Aktivasi
@@ -2433,12 +2565,12 @@
                                             </button>
                                             */}
                                             <button
-        onClick={handleExportPdfClick}
-        className="btn btn-success"
-        data-testid="button-export-pdf"
-    >
-        📊 Download AKI as PDF
-    </button>
+                                                onClick={handleExportPdfClick}
+                                                className="btn btn-success"
+                                                data-testid="button-export-pdf"
+                                            >
+                                                📊 Download AKI as PDF
+                                            </button>
                                             <button
                                                 onClick={openBeritaAcaraSheet}
                                                 className="btn btn-primary"
@@ -2482,6 +2614,102 @@
                             </div>
                         </div>
 
+                        {/* Data Program PP Card */}
+                        <div className="card mb-8">
+                            <div className="card-header">
+                                <h2 className="text-xl font-semibold">📋 Data Usulan Program PP</h2>
+                            </div>
+                            <div className="card-content">
+                                <p className="ba-small mb-4">Data tambahan untuk dokumen Hasil Evaluasi AKI CAPEX PT. Telkom</p>
+                                <div className="grid grid-cols-1 md-grid-cols-3 gap-4">
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">ID Proposal</label>
+                                        <input type="text" className="form-control" placeholder="Contoh: PP-2025-001"
+                                            value={programForm.idProposal}
+                                            onChange={e => setProgramForm(p => ({ ...p, idProposal: e.target.value }))} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">Jumlah LOP</label>
+                                        <input type="number" className="form-control" placeholder="1"
+                                            value={programForm.jumlahLop}
+                                            onChange={e => setProgramForm(p => ({ ...p, jumlahLop: e.target.value }))} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">ID LOP (sesuai jumlah LOP)</label>
+                                        <input type="text" className="form-control" placeholder="Contoh: LOP-001"
+                                            value={programForm.idLop}
+                                            onChange={e => setProgramForm(p => ({ ...p, idLop: e.target.value }))} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">Lokasi / Site Program</label>
+                                        <input type="text" className="form-control" placeholder="Contoh: STO CSN"
+                                            value={programForm.lokasiProgram}
+                                            onChange={e => setProgramForm(p => ({ ...p, lokasiProgram: e.target.value }))} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">Penanggung Jawab</label>
+                                        <input type="text" className="form-control" placeholder="Nama Penanggung Jawab"
+                                            value={programForm.penanggungJawab}
+                                            onChange={e => setProgramForm(p => ({ ...p, penanggungJawab: e.target.value }))} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">Nomor Account</label>
+                                        <input type="text" className="form-control" placeholder="Nomor Account"
+                                            value={programForm.nomorAccount}
+                                            onChange={e => setProgramForm(p => ({ ...p, nomorAccount: e.target.value }))} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">BOP LAKWAS <span className="ba-small">(0,4% dari CAPEX — otomatis)</span></label>
+                                        <div className="currency-input">
+                                            <span>Rp</span>
+                                            <input type="text" className="form-control" readOnly
+                                                value={inputs.investmentCost > 0 ? stripCurrencyPrefix(formatCurrency(inputs.investmentCost * 0.004)) : '0'}
+                                                style={{ background: '#f3f4f6', color: '#6b7280' }} />
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">Waktu Penyelesaian (bulan)</label>
+                                        <input type="number" className="form-control" placeholder="1"
+                                            value={programForm.waktuPenyelesaian}
+                                            onChange={e => setProgramForm(p => ({ ...p, waktuPenyelesaian: e.target.value }))} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">Rencana Selesai (Tahun)</label>
+                                        <input type="number" className="form-control" placeholder="2025"
+                                            value={programForm.rencanaSelesai}
+                                            onChange={e => setProgramForm(p => ({ ...p, rencanaSelesai: e.target.value }))} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">Pemilihan Teknologi</label>
+                                        <div className="select">
+                                            <select className="form-control"
+                                                value={programForm.pemilihanTeknologi}
+                                                onChange={e => setProgramForm(p => ({ ...p, pemilihanTeknologi: e.target.value }))}>
+                                                <option value="">Pilih Teknologi</option>
+                                                <option value="FO">FO (Fiber Optik)</option>
+                                                <option value="Copper">Copper</option>
+                                                <option value="Wireless">Wireless</option>
+                                                <option value="HFC">HFC</option>
+                                                <option value="FTTx">FTTx</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">Usulan Pola Kemitraan</label>
+                                        <input type="text" className="form-control" placeholder="-"
+                                            value={programForm.usulanPolaMitraan}
+                                            onChange={e => setProgramForm(p => ({ ...p, usulanPolaMitraan: e.target.value }))} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">Alasan Keberadaan Proyek</label>
+                                        <input type="text" className="form-control" placeholder="Alasan keberadaan proyek"
+                                            value={programForm.alasanKeberadaanProyek}
+                                            onChange={e => setProgramForm(p => ({ ...p, alasanKeberadaanProyek: e.target.value }))} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Results Section */}
                         {results && (
                             <div className="space-y-8">
@@ -2505,7 +2733,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="flex justify-between py-2 border-b border-border">
                                                     <span className="text-muted">COGS (70% dari harga)</span>
                                                     <div className="text-right">
@@ -2518,7 +2746,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="flex justify-between py-2 border-b border-border">
                                                     <span className="text-muted">Cost IBL</span>
                                                     <div className="text-right">
@@ -2531,7 +2759,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="flex justify-between py-2 border-b border-border">
                                                     <span className="text-muted">Cost OBL</span>
                                                     <div className="text-right">
@@ -2543,7 +2771,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
                                             <div className="space-y-4">
                                                 <div className="summary-box">
                                                     <h3>OPEX (Operasional + Marketing)</h3>
@@ -2754,32 +2982,32 @@
                                                 </div>
 
                                                 <div className="form-group">
-  <label className="block text-sm font-medium text-foreground mb-2">
-    Payback Period
-  </label>
-  <div className="flex items-center gap-2">
-    <div className="flex-1">
-      <input
-        type="text"
-        value={`${results.paybackPeriod.years}`}
-        readOnly
-        className="form-control text-center"
-        data-testid="output-payback-years"
-      />
-    </div>
-    <span className="text-sm text-muted-foreground">tahun</span>
-    <div className="flex-1">
-      <input
-        type="text"
-        value={`${results.paybackPeriod.months}`}
-        readOnly
-        className="form-control text-center"
-        data-testid="output-payback-months"
-      />
-    </div>
-    <span className="text-sm text-muted-foreground">bulan</span>
-  </div>
-</div>
+                                                    <label className="block text-sm font-medium text-foreground mb-2">
+                                                        Payback Period
+                                                    </label>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex-1">
+                                                            <input
+                                                                type="text"
+                                                                value={`${results.paybackPeriod.years}`}
+                                                                readOnly
+                                                                className="form-control text-center"
+                                                                data-testid="output-payback-years"
+                                                            />
+                                                        </div>
+                                                        <span className="text-sm text-muted-foreground">tahun</span>
+                                                        <div className="flex-1">
+                                                            <input
+                                                                type="text"
+                                                                value={`${results.paybackPeriod.months}`}
+                                                                readOnly
+                                                                className="form-control text-center"
+                                                                data-testid="output-payback-months"
+                                                            />
+                                                        </div>
+                                                        <span className="text-sm text-muted-foreground">bulan</span>
+                                                    </div>
+                                                </div>
 
                                             </div>
 
@@ -2787,16 +3015,14 @@
                                             <div className="mt-8 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-lg border">
                                                 <h3 className="font-semibold text-foreground mb-3">Status Kelayakan</h3>
                                                 <div className="grid grid-cols-1 md-grid-cols-2 gap-4">
-                                                    <div className={`p-3 rounded-md border ${
-                                                        results.npv > 0 ? 'status-badge success' : 'status-badge danger'
-                                                    }`}>
+                                                    <div className={`p-3 rounded-md border ${results.npv > 0 ? 'status-badge success' : 'status-badge danger'
+                                                        }`}>
                                                         <div className="font-medium text-sm">
                                                             NPV: {results.npv > 0 ? 'Layak' : 'Tidak Layak'}
                                                         </div>
                                                     </div>
-                                                    <div className={`p-3 rounded-md border ${
-                                                        results.irr >= 0.15 ? 'status-badge success' : 'status-badge danger'
-                                                    }`}>
+                                                    <div className={`p-3 rounded-md border ${results.irr >= 0.15 ? 'status-badge success' : 'status-badge danger'
+                                                        }`}>
                                                         <div className="font-medium text-sm">
                                                             IRR: {results.irr >= 0.15 ? 'Layak' : 'Tidak Layak'}
                                                         </div>
@@ -2836,7 +3062,7 @@
                                                                     <td className="text-right">{formatCurrency(service.monthlyRevenue * getSafeQuantity(service.quantity) * inputs.contractPeriod)}</td>
                                                                 </tr>
                                                             ))}
-                                                            
+
                                                             {/* Total (exc. PPN) Row */}
                                                             <tr className="bg-slate-100 border-t-2 border-slate-300">
                                                                 <td className="border-r font-bold text-foreground">Total (exc. PPN)</td>
@@ -2935,7 +3161,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
                                             {/* Revenue Recommendation Table */}
                                             <div className="mt-8">
                                                 <RevenueRecommendationTable results={results} inputs={inputs} />
@@ -2948,9 +3174,9 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.6 - May 8, 2026 - 10.02</p><br></br>
-                            <p><a href="/index2.html">Another Version Calc </a> | 
-    <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.6.1 - May 8, 2026 - 13.36</p><br></br>
+                            <p><a href="/index2.html">Another Version Calc </a> |
+                                <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
                     </div>
 
@@ -3618,7 +3844,7 @@
         function FeasibilityAnalysisTable({ results }) {
             const npvStatus = results.npv > 0 ? 'Layak' : 'Tidak Layak';
             const irrStatus = results.irr >= 15 ? 'Layak' : 'Tidak Layak';
-            
+
             return (
                 <div className="overflow-x-auto">
                     <table className="table table-striped">
@@ -3664,17 +3890,17 @@
             const getSafeQuantity = (quantity) => {
                 return Number.isFinite(quantity) ? Math.max(quantity, 0) : 1;
             };
-            
+
             // Menghitung rekomendasi revenue agar proyek menjadi layak
             const calculateRecommendedRevenue = () => {
                 // Hitung total jumlah titik/SSL
                 const totalPoints = inputs.services.reduce((sum, service) => sum + getSafeQuantity(service.quantity), 0);
-                
+
                 // Jika proyek sudah layak, tidak perlu rekomendasi tambahan
                 if (results.npv > 0 && results.irr >= 15) {
                     const currentMonthlyTotal = inputs.services.reduce((sum, service) => sum + (service.monthlyRevenue * getSafeQuantity(service.quantity)), 0);
                     const currentOtcTotal = inputs.services.reduce((sum, service) => sum + (service.otcCost * getSafeQuantity(service.quantity)), 0);
-                    
+
                     return {
                         needsAdjustment: false,
                         recommendedMonthlyIncrease: 0,
@@ -3807,9 +4033,9 @@
                     };
                 }
             };
-            
+
             const recommendation = calculateRecommendedRevenue();
-            
+
             return (
                 <div className="card">
                     <div className="card-header">
@@ -3829,7 +4055,7 @@
                                 </p>
                             </div>
                         )}
-                        
+
                         <div className="overflow-x-auto">
                             <table className="table table-striped">
                                 <thead>
@@ -3852,7 +4078,7 @@
                                         <td className="px-4 py-3 text-center">
                                             {recommendation.recommendedMonthlyIncrease > 0 ? (
                                                 <span className="text-amber-600">
-                                                    +{formatCurrency(recommendation.recommendedMonthlyIncrease)} 
+                                                    +{formatCurrency(recommendation.recommendedMonthlyIncrease)}
                                                     ({Math.round(recommendation.increasePercentage)}%)
                                                 </span>
                                             ) : "Tidak ada perubahan"}
@@ -3912,7 +4138,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        
+
                         <div className="mt-4">
                             <h3 className="font-semibold mb-2">Catatan Rekomendasi:</h3>
                             <ul className="list-disc pl-5 space-y-1">
@@ -3947,5 +4173,5 @@
         root.render(<FinancialAnalysis />);
     </script>
 </body>
-</html>
 
+</html>
