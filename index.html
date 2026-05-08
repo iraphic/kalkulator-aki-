@@ -1064,31 +1064,31 @@
             const fillDummyData = () => {
                 const dummyInputs = {
                     customerName: "PT Telkom Indonesia",
-                    investmentCost: 240000000,
-                    contractPeriod: 36,
+                    investmentCost: 800000,
+                    contractPeriod: 12,
                     services: [{
                         id: "1",
-                        serviceType: "Astinet",
-                        serviceDetails: "Astinet 200 Mbps",
-                        monthlyRevenue: 42000000,
-                        otcCost: 7200000,
-                        bandwidth: "200 Mbps",
+                        serviceType: "Indibiz",
+                        serviceDetails: "100 Mbps",
+                        monthlyRevenue: 557000,
+                        otcCost: 150000,
+                        bandwidth: "100 Mbps",
                         quantity: 1,
                         unit: "titik",
                     }],
                 };
 
                 const dummyInputValues = {
-                    customerName: "PT Telkom Indonesia",
-                    investmentCost: formatInputCurrency("240000000"),
-                    contractPeriod: "36",
+                    customerName: "PT ABCD",
+                    investmentCost: formatInputCurrency("800000"),
+                    contractPeriod: "12",
                     services: [{
                         id: "1",
-                        serviceType: "Astinet",
-                        serviceDetails: "Astinet 200 Mbps",
-                        monthlyRevenue: formatInputCurrency("42000000"),
-                        otcCost: formatInputCurrency("7200000"),
-                        bandwidth: "200 Mbps",
+                        serviceType: "Indibiz",
+                        serviceDetails: "100 Mbps",
+                        monthlyRevenue: formatInputCurrency("557000"),
+                        otcCost: formatInputCurrency("1500000"),
+                        bandwidth: "100 Mbps",
                         quantity: "1",
                         unit: "titik",
                     }],
@@ -1096,7 +1096,7 @@
 
                 setInputs(dummyInputs);
                 setInputValues(dummyInputValues);
-                setPeriodType("36");
+                setPeriodType("12");
                 setCustomPeriod("");
                 setApprovalForm({
                     dibuat: [
@@ -1107,10 +1107,10 @@
                     disetujui: { nik: "720470", nama: "Dodi Suparman", jabatan: "GENERAL MANAGER WITEL PRIANGAN BARAT" }
                 });
                 setBeritaAcaraForm({
-                    customerName: "PT Telkom Indonesia",
+                    customerName: "PT ABCD",
                     picName: "Mungkas Setyabadi",
                     picTitle: "Head of Telkom Daerah Cibinong",
-                    picContact: "0812-3456-7890",
+                    picContact: "081234567890",
                 });
                 setProgramForm({
                     idProposal: "LOP-2025001",
