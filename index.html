@@ -2655,7 +2655,7 @@
                                             onChange={e => setProgramForm(p => ({ ...p, lokasiProgram: e.target.value }))} />
                                     </div>
                                     <div className="form-group">
-                                        <label className="block text-sm font-medium mb-2">Penanggung Jawab</label>
+                                        <label className="block text-sm font-medium mb-2">Penanggung Jawab (AM / HOTD)</label>
                                         <input type="text" className="form-control" placeholder="Nama Penanggung Jawab"
                                             value={programForm.penanggungJawab}
                                             onChange={e => setProgramForm(p => ({ ...p, penanggungJawab: e.target.value }))} />
@@ -2715,7 +2715,7 @@
                                         <input type="number" className="form-control" placeholder="Contoh: 8"
                                             value={programForm.volumePort}
                                             onChange={e => setProgramForm(p => ({ ...p, volumePort: e.target.value }))} />
-                                        <p className="ba-small mt-1">Digunakan untuk hitung CAPEX PER PORT = CAPEX ÷ Volume Port</p>
+                                        {/* <p className="ba-small mt-1">Digunakan untuk hitung CAPEX PER PORT = CAPEX ÷ Volume Port</p>*/}
                                     </div>
                                     <div className="form-group">
                                         <label className="block text-sm font-medium mb-2">Usulan Pola Kemitraan</label>
