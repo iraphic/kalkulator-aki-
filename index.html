@@ -2110,7 +2110,7 @@
                     ['Jumlah LOP', ':', progForm.jumlahLop || '1'],
                     ['ID LOP (sesuai jumlah LOP)', ':', progForm.idLop || ''],
                     ['Lokasi / Site Program', ':', progForm.lokasiProgram || ''],
-                    ['Kapasitas - Volume Port (ODP/ODC/Feeder/OLT)', ':', progForm.volumePort || String(totalQtyAll)],
+                    ['Kapasitas - VOLUME', ':', progForm.volumePort || String(totalQtyAll)],
                     ['Kapasitas - SATUAN', ':', progForm.satuan || satuanFirst],
                     ['Penanggung Jawab', ':', progForm.penanggungJawab || ''],
                     ['Nomor Account', ':', progForm.nomorAccount || ''],
@@ -2142,7 +2142,7 @@
                 doc.autoTable({
                     startY: y,
                     body: evalBody,
-                    styles: { fontSize: 5.5, cellPadding: 0.8 },
+                    styles: { fontSize: 6, cellPadding: 0.8 },
                     theme: 'grid',
                     columnStyles: {
                         0: { cellWidth: 88 },
@@ -3213,7 +3213,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.7.1 - May 8, 2026 - 15.16</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.7.5 - May 8, 2026 - 15.16</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
