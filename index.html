@@ -938,6 +938,7 @@
                 nomorAccount: "",
                 pemilihanTeknologi: "FO",
                 satuan: "ODP",
+                volumePort: "",
                 usulanPolaMitraan: "-",
                 alasanKeberadaanProyek: "",
                 rencanaSelesai: String(new Date().getFullYear()),
@@ -1100,6 +1101,7 @@
                     nomorAccount: "ACC-2025-001",
                     pemilihanTeknologi: "FO",
                     satuan: "ODP",
+                    volumePort: "1",
                     usulanPolaMitraan: "-",
                     alasanKeberadaanProyek: "Permintaan layanan internet dari pelanggan korporat",
                     rencanaSelesai: "2025",
@@ -2089,7 +2091,7 @@
                     ['Jumlah LOP', ':', progForm.jumlahLop || '1'],
                     ['ID LOP (sesuai jumlah LOP)', ':', progForm.idLop || ''],
                     ['Lokasi / Site Program', ':', progForm.lokasiProgram || ''],
-                    ['Kapasitas - VOLUME', ':', String(totalQtyAll)],
+                    ['Kapasitas - Volume Port (ODP/ODC/Feeder/OLT)', ':', progForm.volumePort || String(totalQtyAll)],
                     ['Kapasitas - SATUAN', ':', progForm.satuan || satuanFirst],
                     ['Penanggung Jawab', ':', progForm.penanggungJawab || ''],
                     ['Nomor Account', ':', progForm.nomorAccount || ''],
@@ -2111,7 +2113,11 @@
                     ['Loss Rev/bln', ':', ''],
                     ['KRITERIA INVESTASI UNTUK PERIODE PEMAKAIAN', ':', results.isViable ? 'LAYAK' : 'TIDAK LAYAK'],
                     ['ARPU', ':', formatCurrency(arpu)],
-                    ['CAPEX PER PORT', ':', formatCurrency(totalQtyAll > 0 ? inputs.investmentCost / totalQtyAll : 0)],
+                    ['CAPEX PER PORT', ':', formatCurrency((
+                        progForm.volumePort && Number(progForm.volumePort) > 0
+                            ? inputs.investmentCost / Number(progForm.volumePort)
+                            : totalQtyAll > 0 ? inputs.investmentCost / totalQtyAll : 0
+                    ))],
                 ];
 
                 doc.autoTable({
@@ -2669,12 +2675,7 @@
                                                 style={{ background: '#f3f4f6', color: '#6b7280' }} />
                                         </div>
                                     </div>
-                                    <div className="form-group">
-                                        <label className="block text-sm font-medium mb-2">Waktu Penyelesaian (bulan)</label>
-                                        <input type="number" className="form-control" placeholder="1"
-                                            value={programForm.waktuPenyelesaian}
-                                            onChange={e => setProgramForm(p => ({ ...p, waktuPenyelesaian: e.target.value }))} />
-                                    </div>
+
                                     <div className="form-group">
                                         <label className="block text-sm font-medium mb-2">Rencana Selesai (Tahun)</label>
                                         <input type="number" className="form-control" placeholder="2025"
@@ -2708,6 +2709,13 @@
                                                 <option value="OLT">OLT</option>
                                             </select>
                                         </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">Kapasitas - Volume Port</label>
+                                        <input type="number" className="form-control" placeholder="Contoh: 8"
+                                            value={programForm.volumePort}
+                                            onChange={e => setProgramForm(p => ({ ...p, volumePort: e.target.value }))} />
+                                        <p className="ba-small mt-1">Digunakan untuk hitung CAPEX PER PORT = CAPEX ÷ Volume Port</p>
                                     </div>
                                     <div className="form-group">
                                         <label className="block text-sm font-medium mb-2">Usulan Pola Kemitraan</label>
@@ -3189,7 +3197,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.6.3 - May 8, 2026 - 14.06</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.6.4 - May 8, 2026 - 14.16</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
