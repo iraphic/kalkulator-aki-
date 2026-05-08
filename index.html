@@ -937,6 +937,7 @@
                 penanggungJawab: "",
                 nomorAccount: "",
                 pemilihanTeknologi: "FO",
+                satuan: "ODP",
                 usulanPolaMitraan: "-",
                 alasanKeberadaanProyek: "",
                 rencanaSelesai: String(new Date().getFullYear()),
@@ -1098,6 +1099,7 @@
                     penanggungJawab: "Mungkas Setyabadi",
                     nomorAccount: "ACC-2025-001",
                     pemilihanTeknologi: "FO",
+                    satuan: "ODP",
                     usulanPolaMitraan: "-",
                     alasanKeberadaanProyek: "Permintaan layanan internet dari pelanggan korporat",
                     rencanaSelesai: "2025",
@@ -1842,8 +1844,8 @@
                     ['Total Investasi', formatCurrency(inputs.investmentCost)],
                     ['Pendapatan PSB', formatCurrency(results.otcRevenue)],
                     ['Pendapatan Abonemen IBL', `${formatCurrency(totalMonthlyRevenueWithQty)} /bulan`],
-                    ['IRR', `${formatPercentage(results.irr)} ${coverIrrStatus}`],
-                    ['NPV', `${formatCurrency(results.npv)} ${coverNpvStatus}`],
+                    ['IRR', `${formatPercentage(results.irr)} (${coverIrrStatus})`],
+                    ['NPV', `${formatCurrency(results.npv)} (${coverNpvStatus})`],
                     ['PAYBACK PERIODE', `${results.paybackPeriod.years} years ${results.paybackPeriod.months} months`],
                     ['Rekomendasi', recommendation]
                 ];
@@ -2082,34 +2084,34 @@
                 y += 4;
 
                 const evalBody = [
-                    ['ID Proposal',                              ':', progForm.idProposal || ''],
-                    ['Nama Program',                             ':', namaProgram],
-                    ['Jumlah LOP',                               ':', progForm.jumlahLop || '1'],
-                    ['ID LOP (sesuai jumlah LOP)',               ':', progForm.idLop || ''],
-                    ['Lokasi / Site Program',                    ':', progForm.lokasiProgram || ''],
-                    ['Kapasitas - VOLUME',                       ':', String(totalQtyAll)],
-                    ['Kapasitas - SATUAN',                       ':', satuanFirst],
-                    ['Penanggung Jawab',                         ':', progForm.penanggungJawab || ''],
-                    ['Nomor Account',                            ':', progForm.nomorAccount || ''],
-                    ['Nilai Program - CAPEX',                    ':', formatCurrency(inputs.investmentCost)],
-                    ['Nilai Program - BOP LAKWAS (0,4% CAPEX)',  ':', formatCurrency(inputs.investmentCost * 0.004)],
-                    ['Capex / Line',                             ':', formatCurrency(capexPerLine)],
-                    ['Waktu Penyelesaian (bulan)',                ':', progForm.waktuPenyelesaian || '1'],
-                    ['Rencana Selesai',                          ':', progForm.rencanaSelesai || String(currentYear)],
-                    ['Masa kontrak/berlangganan',                ':', `${kontrakTahun} Tahun ${kontrakBulan} Bulan`],
-                    ['Pemilihan Teknologi',                      ':', progForm.pemilihanTeknologi || 'FO'],
-                    ['Usulan pola kemitraan',                    ':', progForm.usulanPolaMitraan || '-'],
-                    ['Alasan keberadaan proyek',                 ':', progForm.alasanKeberadaanProyek || ''],
-                    ['Kinerja Bisnis - IRR',                     ':', formatPercentage(results.irr)],
-                    ['Kinerja Bisnis - NPV',                     ':', formatCurrency(results.npv)],
-                    ['Kinerja Bisnis - Payback Periode',         ':', `${results.paybackPeriod.years} Tahun ${results.paybackPeriod.months} Bulan`],
-                    ['Kinerja Bisnis - BCR',                     ':', bcrValue.toFixed(2)],
-                    ['Gross Profit Margin',                      ':', formatPercentage(results.grossProfitMargin)],
-                    ['Net Income Margin',                        ':', formatPercentage(results.netIncomeMargin)],
-                    ['Loss Rev/bln',                             ':', ''],
+                    ['ID Proposal', ':', progForm.idProposal || ''],
+                    ['Nama Program', ':', namaProgram],
+                    ['Jumlah LOP', ':', progForm.jumlahLop || '1'],
+                    ['ID LOP (sesuai jumlah LOP)', ':', progForm.idLop || ''],
+                    ['Lokasi / Site Program', ':', progForm.lokasiProgram || ''],
+                    ['Kapasitas - VOLUME', ':', String(totalQtyAll)],
+                    ['Kapasitas - SATUAN', ':', progForm.satuan || satuanFirst],
+                    ['Penanggung Jawab', ':', progForm.penanggungJawab || ''],
+                    ['Nomor Account', ':', progForm.nomorAccount || ''],
+                    ['Nilai Program - CAPEX', ':', formatCurrency(inputs.investmentCost)],
+                    ['Nilai Program - BOP LAKWAS', ':', formatCurrency(inputs.investmentCost * 0.004)],
+                    ['Capex / Line', ':', formatCurrency(capexPerLine)],
+                    ['Waktu Penyelesaian (bulan)', ':', progForm.waktuPenyelesaian || '1'],
+                    ['Rencana Selesai', ':', progForm.rencanaSelesai || String(currentYear)],
+                    ['Masa kontrak/berlangganan', ':', `${kontrakTahun} Tahun ${kontrakBulan} Bulan`],
+                    ['Pemilihan Teknologi', ':', progForm.pemilihanTeknologi || 'FO'],
+                    ['Usulan pola kemitraan', ':', progForm.usulanPolaMitraan || '-'],
+                    ['Alasan keberadaan proyek', ':', progForm.alasanKeberadaanProyek || ''],
+                    ['Kinerja Bisnis - IRR', ':', formatPercentage(results.irr)],
+                    ['Kinerja Bisnis - NPV', ':', formatCurrency(results.npv)],
+                    ['Kinerja Bisnis - Payback Periode', ':', `${results.paybackPeriod.years} Tahun ${results.paybackPeriod.months} Bulan`],
+                    ['Kinerja Bisnis - BCR', ':', bcrValue.toFixed(2)],
+                    ['Gross Profit Margin', ':', formatPercentage(results.grossProfitMargin)],
+                    ['Net Income Margin', ':', formatPercentage(results.netIncomeMargin)],
+                    ['Loss Rev/bln', ':', ''],
                     ['KRITERIA INVESTASI UNTUK PERIODE PEMAKAIAN', ':', results.isViable ? 'LAYAK' : 'TIDAK LAYAK'],
-                    ['ARPU',                                     ':', formatCurrency(arpu)],
-                    ['CAPEX PER PORT',                           ':', formatCurrency(capexPerLine)],
+                    ['ARPU', ':', formatCurrency(arpu)],
+                    ['CAPEX PER PORT', ':', formatCurrency(totalQtyAll > 0 ? inputs.investmentCost / totalQtyAll : 0)],
                 ];
 
                 doc.autoTable({
@@ -2659,7 +2661,7 @@
                                             onChange={e => setProgramForm(p => ({ ...p, nomorAccount: e.target.value }))} />
                                     </div>
                                     <div className="form-group">
-                                        <label className="block text-sm font-medium mb-2">BOP LAKWAS <span className="ba-small">(0,4% dari CAPEX — otomatis)</span></label>
+                                        <label className="block text-sm font-medium mb-2">BOP LAKWAS</label>
                                         <div className="currency-input">
                                             <span>Rp</span>
                                             <input type="text" className="form-control" readOnly
@@ -2691,6 +2693,19 @@
                                                 <option value="Wireless">Wireless</option>
                                                 <option value="HFC">HFC</option>
                                                 <option value="FTTx">FTTx</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">Kapasitas - Satuan</label>
+                                        <div className="select">
+                                            <select className="form-control"
+                                                value={programForm.satuan}
+                                                onChange={e => setProgramForm(p => ({ ...p, satuan: e.target.value }))}>
+                                                <option value="ODP">ODP</option>
+                                                <option value="ODC">ODC</option>
+                                                <option value="Feeder">Feeder</option>
+                                                <option value="OLT">OLT</option>
                                             </select>
                                         </div>
                                     </div>
@@ -3174,7 +3189,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.6.1 - May 8, 2026 - 13.36</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.6.3 - May 8, 2026 - 14.06</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
