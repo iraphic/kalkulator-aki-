@@ -197,6 +197,26 @@
             background: #1e3a8a;
         }
 
+        .refresh-btn {
+            position: fixed;
+            left: 1rem;
+            bottom: 1rem;
+            z-index: 999;
+            padding: 0.5rem 0.75rem;
+            border-radius: 9999px;
+            background: #1e40af;
+            color: white;
+            font-size: 0.85rem;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .refresh-btn:hover {
+            background: #1e3a8a;
+        }
+
         .service-card {
             border: 1px solid #e5e7eb;
             border-radius: 8px;
@@ -2260,7 +2280,8 @@
                         {/* Input Section */}
                         <div className="card mb-8">
                             <div className="card-header">
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-xl font-semibold">Parameter Input</h2>
                                     <button
                                         onClick={() => setShowFixedParams(true)}
                                         className="btn btn-outline transition-colors"
@@ -2269,7 +2290,6 @@
                                     >
                                         ⚙️ Parameter Tetap
                                     </button>
-                                    <h2 className="text-xl font-semibold">Parameter Input</h2>
                                 </div>
                             </div>
                             <div className="card-content">
