@@ -1093,12 +1093,12 @@
                     picContact: "0812-3456-7890",
                 });
                 setProgramForm({
-                    idProposal: "PP-2025-001",
+                    idProposal: "LOP-2025001",
                     jumlahLop: "1",
-                    idLop: "LOP-001",
+                    idLop: "B26-123456",
                     lokasiProgram: "STO CSN",
                     penanggungJawab: "Mungkas Setyabadi",
-                    nomorAccount: "ACC-2025-001",
+                    nomorAccount: "980765",
                     pemilihanTeknologi: "FO",
                     satuan: "ODP",
                     volumePort: "1",
@@ -2260,15 +2260,16 @@
                         {/* Input Section */}
                         <div className="card mb-8">
                             <div className="card-header">
-                                <div className="flex items-center justify-between">
-                                    <h2 className="text-xl font-semibold">Parameter Input</h2>
+                                <div className="flex items-center gap-4">
                                     <button
                                         onClick={() => setShowFixedParams(true)}
-                                        className="btn btn-outline text-muted hover:text-foreground transition-colors"
+                                        className="btn btn-outline transition-colors"
+                                        style={{ color: '#ffffff', borderColor: 'rgba(255,255,255,0.4)' }}
                                         data-testid="button-toggle-fixed-params"
                                     >
                                         ⚙️ Parameter Tetap
                                     </button>
+                                    <h2 className="text-xl font-semibold">Parameter Input</h2>
                                 </div>
                             </div>
                             <div className="card-content">
