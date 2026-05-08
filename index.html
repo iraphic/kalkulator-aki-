@@ -1927,8 +1927,7 @@
                 });
 
                 // ================== SEGMENT 2: ANALISA KELAYAKAN INVESTASI ==================
-                doc.addPage();
-                y = 12;
+                y = doc.lastAutoTable.finalY + 10;
 
                 doc.setFontSize(11);
                 doc.text('Analisa Kelayakan Investasi', 14, y);
@@ -2161,12 +2160,7 @@
                 doc.setFont(undefined, 'normal');
 
                 // ================== SEGMENT 3: APPROVAL & SIGNATURES ==================
-                doc.addPage();
-                y = 12;
-
-                doc.setFontSize(12);
-                doc.text('Lembar Approval & Tanda Tangan Digital', 105, y, { align: 'center' });
-                y += 8;
+                y = doc.lastAutoTable.finalY + 8;
 
                 const currentDateTime = new Date().toLocaleDateString('id-ID', {
                     day: '2-digit',
@@ -3196,7 +3190,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.6.4 - May 8, 2026 - 14.16</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.6.7 - May 8, 2026 - 14.46</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
