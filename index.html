@@ -2142,12 +2142,12 @@
                 doc.autoTable({
                     startY: y,
                     body: evalBody,
-                    styles: { fontSize: 8, cellPadding: 2 },
+                    styles: { fontSize: 5.5, cellPadding: 0.8 },
                     theme: 'grid',
                     columnStyles: {
-                        0: { cellWidth: 90 },
-                        1: { cellWidth: 8, halign: 'center' },
-                        2: { cellWidth: 77 },
+                        0: { cellWidth: 88 },
+                        1: { cellWidth: 7, halign: 'center' },
+                        2: { cellWidth: 80 },
                     },
                     didDrawCell: (data) => {
                         if (data.section === 'body' && data.column.index === 2) {
