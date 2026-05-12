@@ -1863,6 +1863,21 @@
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('p', 'mm', 'a4');
 
+                // Helper: draw Telkom Indonesia logo text at top-right corner
+                const drawTelkomLogo = () => {
+                    const pw = doc.internal.pageSize.getWidth();
+                    const logoX = pw - 14; // right margin
+                    doc.setFontSize(11);
+                    doc.setFont(undefined, 'bold');
+                    doc.setTextColor(200, 16, 46); // Telkom red
+                    doc.text('Telkom', logoX, 12, { align: 'right' });
+                    doc.setFontSize(11);
+                    doc.setTextColor(88, 88, 88); // dark grey
+                    doc.text('Indonesia', logoX, 17, { align: 'right' });
+                    doc.setTextColor(0, 0, 0); // reset
+                    doc.setFont(undefined, 'normal');
+                };
+
                 const totalMonthlyRevenue = inputs.services.reduce(
                     (sum, service) => sum + service.monthlyRevenue,
                     0
@@ -2299,6 +2314,7 @@
                 doc.setFont(undefined, 'bold');
                 doc.text('BREAKDOWN REVENUE PROJECTION', 14, yBrk);
                 doc.setFont(undefined, 'normal');
+                drawTelkomLogo();
                 yBrk += 8;
 
                 // Build projection data per service
@@ -2515,6 +2531,7 @@
                 yCpx += 5;
                 doc.text('PROJECTION', 14, yCpx);
                 doc.setFont(undefined, 'normal');
+                drawTelkomLogo();
                 doc.setFontSize(7);
                 yCpx += 4;
                 doc.text('(dalam Bulan)', 14, yCpx);
@@ -3641,7 +3658,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.8.7 - May 12, 2026 - 11.10</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.8.8 - May 12, 2026 - 11.15</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
