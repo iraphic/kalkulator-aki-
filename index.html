@@ -1868,8 +1868,8 @@
 
                 const drawTelkomLogo = () => {
                     const pw = doc.internal.pageSize.getWidth();
-                    const logoW = 35; // Lebar logo (mm)
-                    const logoH = 15; // Tinggi logo (mm)
+                    const logoW = 22; // Lebar logo (mm) disesuaikan aspect ratio
+                    const logoH = 17; // Tinggi logo (mm) disesuaikan aspect ratio
                     const logoX = pw - logoW - 14; // Posisi X dari kanan
                     doc.addImage(LOGO_TELKOM_B64, 'PNG', logoX, 8, logoW, logoH, "logo_telkom", "FAST");
                 };
