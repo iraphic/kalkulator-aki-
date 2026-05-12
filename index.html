@@ -2384,13 +2384,14 @@
                                                 <div className="select">
                                                     <select value={periodType} onChange={(e) => handlePeriodTypeChange(e.target.value)} data-testid="input-period">
                                                         <option value="">Pilih periode kontrak</option>
-                                                        <option value="12">12 Bulan</option>
-                                                        <option value="24">24 Bulan</option>
-                                                        <option value="36">36 Bulan</option>
-                                                        <option value="48">48 Bulan</option>
-                                                        <option value="60">60 Bulan</option>
-                                                        <option value="72">72 Bulan</option>
-                                                        <option value="custom">Custom</option>
+                                                        <option value="1">1 Bulan</option>
+                                                        <option value="12">1 Tahun</option>
+                                                        <option value="24">2 Tahun</option>
+                                                        <option value="36">3 Tahun</option>
+                                                        <option value="48">4 Tahun</option>
+                                                        <option value="60">5 Tahun</option>
+                                                        <option value="72">6 Tahun</option>
+                                                        <option value="custom">Custom Bulan</option>
                                                     </select>
                                                 </div>
                                                 {periodType === 'custom' && (
