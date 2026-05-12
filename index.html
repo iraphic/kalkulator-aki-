@@ -1157,7 +1157,7 @@
                     idProposal: "LOP-2025001",
                     jumlahLop: "1",
                     idLop: "B26-123456",
-                    lokasiProgram: "STO CSN",
+                    lokasiProgram: "CSN",
                     penanggungJawab: "Mungkas Setyabadi",
                     nomorAccount: "980765",
                     pemilihanTeknologi: "FO",
@@ -2708,9 +2708,9 @@
                                     </div>
                                     <div className="form-group">
                                         <label className="block text-sm font-medium mb-2">Lokasi STO</label>
-                                        <input type="text" className="form-control" placeholder="Contoh: STO CSN"
-                                            value={programForm.lokasiProgram}
-                                            onChange={e => setProgramForm(p => ({ ...p, lokasiProgram: e.target.value }))} />
+                                        <input type="text" className="form-control" placeholder="Contoh: CSN"
+                                            value={`STO ${programForm.lokasiProgram}`}
+                                            onChange={e => setProgramForm(p => ({ ...p, lokasiProgram: e.target.value.replace(/^STO\s*/i, '') }))} />
                                     </div>
                                     <div className="form-group">
                                         <label className="block text-sm font-medium mb-2">Penanggung Jawab (AM / HOTD)</label>
