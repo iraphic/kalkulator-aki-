@@ -2685,6 +2685,207 @@
                     }
                 });
 
+
+                // ================== SEGMENT 6: DIRECT EXPENSE PROJECTION (LANDSCAPE) ==================
+                doc.addPage('a3', 'landscape');
+
+                let yDir = 12;
+
+                // Header
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('DIRECT EXPENSE PROJECTION', 14, yDir);
+                doc.setFont(undefined, 'normal');
+                drawTelkomLogo();
+                yDir += 12;
+
+                let dirMonthlyRev = 0;
+                let dirOtcCost = 0;
+                inputs.services.forEach(s => {
+                    const q = Number.isFinite(s.quantity) ? Math.max(s.quantity, 0) : 1;
+                    dirMonthlyRev += (s.monthlyRevenue || 0) * q;
+                    dirOtcCost += (s.otcCost || 0) * q;
+                });
+
+                const cogsOtc = dirOtcCost * 0.7;
+                const cogsMonthly = dirMonthlyRev * 0.7;
+
+                const dirInstalasiRow = ['', '    Instalasi', 'OTC'];
+                const dirBulananRow = ['', '    Bulanan', 'Recurring'];
+
+                // Unit Measurements
+                for (let yr = 1; yr <= 5; yr++) {
+                    dirInstalasiRow.push(yr === 1 ? '1' : '0');
+                    const m = Math.min(12, Math.max(0, inputs.contractPeriod - (yr - 1) * 12));
+                    dirBulananRow.push(m.toString());
+                }
+
+                // Price Per Unit
+                for (let yr = 1; yr <= 5; yr++) {
+                    dirInstalasiRow.push(yr === 1 ? formatCurrency(cogsOtc) : '-');
+                    dirBulananRow.push(formatCurrency(cogsMonthly));
+                }
+
+                // Total
+                for (let yr = 1; yr <= 5; yr++) {
+                    dirInstalasiRow.push(yr === 1 ? formatCurrency(cogsOtc) : '0');
+                    const m = Math.min(12, Math.max(0, inputs.contractPeriod - (yr - 1) * 12));
+                    dirBulananRow.push(formatCurrency(cogsMonthly * m));
+                }
+
+                const dirSubTotalRow = ['', 'SUB TOTAL', ''];
+                for (let i = 3; i < 18; i++) {
+                    if (i >= 3 && i <= 7) {
+                        // Unit total
+                        const yr = i - 2;
+                        const inst = yr === 1 ? 1 : 0;
+                        const bul = Math.min(12, Math.max(0, inputs.contractPeriod - (yr - 1) * 12));
+                        dirSubTotalRow.push((inst + bul).toString());
+                    } else if (i >= 8 && i <= 12) {
+                        // Price total
+                        const yr = i - 7;
+                        const inst = yr === 1 ? cogsOtc : 0;
+                        dirSubTotalRow.push(formatCurrency(inst + cogsMonthly));
+                    } else {
+                        // Total total
+                        const yr = i - 12;
+                        const inst = yr === 1 ? cogsOtc : 0;
+                        const bul = Math.min(12, Math.max(0, inputs.contractPeriod - (yr - 1) * 12));
+                        dirSubTotalRow.push(formatCurrency(inst + (cogsMonthly * bul)));
+                    }
+                }
+
+                // Mitra Rows (empty)
+                const mitraInstalasiRow = ['', '    Instalasi', 'OTC'];
+                const mitraBulananRow = ['', '    Bulanan', 'Recurring'];
+                for (let i = 0; i < 15; i++) {
+                    mitraInstalasiRow.push(i < 5 ? '0' : '-');
+                    mitraBulananRow.push(i < 5 ? '0' : '-');
+                }
+                const mitraSubTotalRow = ['', 'SUB TOTAL', ''];
+                for (let i = 0; i < 15; i++) {
+                    mitraSubTotalRow.push('0');
+                }
+
+                // Grand Total Row
+                const dirGrandTotalRow = ['', 'Grand Total', ''];
+                for (let i = 3; i < 18; i++) {
+                    dirGrandTotalRow.push(dirSubTotalRow[i]);
+                }
+
+                const dirBody = [
+                    [{ content: 'Layanan Telkom', colSpan: 18, styles: { fontStyle: 'bold', fillColor: [255, 255, 255] } }],
+                    dirInstalasiRow,
+                    dirBulananRow,
+                    ...Array.from({ length: 9 }).map(() => ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']),
+                    dirSubTotalRow,
+                    [{ content: 'Layanan Mitra', colSpan: 18, styles: { fontStyle: 'bold', fillColor: [255, 255, 255] } }],
+                    mitraInstalasiRow,
+                    mitraBulananRow,
+                    ...Array.from({ length: 6 }).map(() => ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']),
+                    mitraSubTotalRow,
+                    dirGrandTotalRow
+                ];
+
+                doc.autoTable({
+                    startY: yDir,
+                    head: [
+                        [
+                            { content: 'NO', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'EXPENSES GROUP', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'RECURRING/ ONE TIME', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'UNIT MEASUREMENTS', colSpan: 5, styles: { halign: 'center' } },
+                            { content: 'PRICE PER UNIT', colSpan: 5, styles: { halign: 'center' } },
+                            { content: 'TOTAL', colSpan: 5, styles: { halign: 'center' } },
+                        ],
+                        [
+                            'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5',
+                            'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5',
+                            'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5',
+                        ]
+                    ],
+                    body: dirBody,
+                    styles: { fontSize: 6, cellPadding: 2, lineWidth: 0.1, lineColor: [200, 200, 200] },
+                    headStyles: { fillColor: [240, 240, 240], textColor: 0, fontSize: 6, halign: 'center' },
+                    theme: 'grid',
+                    tableWidth: 'auto',
+                    columnStyles: {
+                        0: { cellWidth: 8, halign: 'center' },
+                        1: { cellWidth: 36 },
+                        2: { cellWidth: 20 },
+                        3: { cellWidth: 14, halign: 'center' },
+                        4: { cellWidth: 14, halign: 'center' },
+                        5: { cellWidth: 14, halign: 'center' },
+                        6: { cellWidth: 14, halign: 'center' },
+                        7: { cellWidth: 14, halign: 'center' },
+                        8: { cellWidth: 18, halign: 'right' },
+                        9: { cellWidth: 18, halign: 'right' },
+                        10: { cellWidth: 18, halign: 'right' },
+                        11: { cellWidth: 18, halign: 'right' },
+                        12: { cellWidth: 18, halign: 'right' },
+                        13: { cellWidth: 22, halign: 'right' },
+                        14: { cellWidth: 22, halign: 'right' },
+                        15: { cellWidth: 22, halign: 'right' },
+                        16: { cellWidth: 22, halign: 'right' },
+                        17: { cellWidth: 22, halign: 'right' },
+                    },
+                    didParseCell: (data) => {
+                        if (data.section === 'body') {
+                            const txt = String(data.cell.raw?.content ?? data.cell.raw ?? '');
+                            let isRowSubTotal = false;
+                            if (Array.isArray(data.row.raw)) {
+                                const col1Txt = String(data.row.raw[1]?.content ?? data.row.raw[1] ?? '');
+                                isRowSubTotal = (col1Txt === 'SUB TOTAL' || col1Txt === 'Grand Total');
+                            }
+                            
+                            if (isRowSubTotal || txt === 'SUB TOTAL' || txt === 'Grand Total') {
+                                data.cell.styles.fontStyle = 'bold';
+                                data.cell.styles.fillColor = [230, 240, 230];
+                            } else if (txt === 'Layanan Telkom' || txt === 'Layanan Mitra') {
+                                data.cell.styles.fillColor = [255, 255, 255];
+                            } else {
+                                if (data.column.index >= 3 && data.column.index <= 7) {
+                                    data.cell.styles.fillColor = [220, 235, 220];
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // ASSUMPTIONS section for DIRECT EXPENSE
+                yDir = doc.lastAutoTable.finalY + 6;
+                doc.setFontSize(7);
+                doc.setFont(undefined, 'bold');
+                doc.text('ASSUMPTIONS', 14, yDir);
+                yDir += 4;
+
+                doc.setFontSize(6);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(255, 0, 0);
+                doc.text('1    MACRO-ECONOMICS ASSUMPTIONS (DO NOT CHANGE)', 14, yDir);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont(undefined, 'normal');
+                yDir += 4;
+
+                doc.autoTable({
+                    startY: yDir,
+                    body: assumptionData2,
+                    styles: { fontSize: 6, cellPadding: 1.5 },
+                    theme: 'plain',
+                    tableWidth: 100,
+                    columnStyles: {
+                        0: { cellWidth: 50 },
+                        1: { cellWidth: 16, halign: 'center' },
+                        2: { cellWidth: 16, halign: 'center' },
+                        3: { cellWidth: 16, halign: 'center' },
+                    },
+                    didParseCell: (data) => {
+                        if (data.row.index === 0) {
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                });
+
                 doc.save(`AKI_PT_${customerNameForFile}_unsigned.pdf`);
             };
 
