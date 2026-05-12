@@ -2288,7 +2288,7 @@
 
                 // ================== SEGMENT 4: BREAKDOWN REVENUE PROJECTION (LANDSCAPE) ==================
                 // Add a new landscape page
-                doc.addPage('a4', 'landscape');
+                doc.addPage('a3', 'landscape');
 
                 const pgW = doc.internal.pageSize.getWidth();
                 const pgH = doc.internal.pageSize.getHeight();
@@ -2504,7 +2504,7 @@
                 });
 
                 // ================== SEGMENT 5: BREAKDOWN CAPEX PROJECTION (LANDSCAPE) ==================
-                doc.addPage('a4', 'landscape');
+                doc.addPage('a3', 'landscape');
 
                 let yCpx = 12;
 
@@ -2524,8 +2524,8 @@
                 const capexInvestment = inputs.investmentCost || 0;
                 const lifetimeMonths = inputs.contractPeriod || 12;
                 const lifetimeYears = Math.ceil(lifetimeMonths / 12);
-                const bopLakwasValue = progForm.bopLakwas || Math.round(capexInvestment * 0.004);
-                const bopLakwasRate = capexInvestment > 0 ? ((bopLakwasValue / capexInvestment) * 100).toFixed(2) + '%' : '0.40%';
+                const bopLakwasValue = progForm.bopLakwas || 0;
+                const bopLakwasRate = '0.40%';
                 const totalCapex = capexInvestment + bopLakwasValue;
 
                 // Annual depreciation for CAPEX
@@ -3641,7 +3641,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.8 - May 12, 2026 - 10.30</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.8.4 - May 12, 2026 - 11.01</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
