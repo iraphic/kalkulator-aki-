@@ -1120,7 +1120,7 @@
                 };
 
                 const dummyInputValues = {
-                    customerName: "PT ABCD",
+                    customerName: "ABCD",
                     investmentCost: formatInputCurrency("800000"),
                     contractPeriod: "12",
                     services: [{
@@ -2731,12 +2731,12 @@
                                         {/* Row 1: Nama Pelanggan | Total BOQ Biaya Investasi | Periode Kontrak */}
                                         <div className="form-group">
                                             <label htmlFor="customer-name" className="block text-sm font-medium text-foreground mb-2">
-                                                Nama Pelanggan
+                                                Nama Pelanggan (PT ...)
                                             </label>
                                             <input
                                                 type="text"
                                                 id="customer-name"
-                                                placeholder="Masukkan nama pelanggan"
+                                                placeholder="Masukkan nama pelanggan tanpa PT"
                                                 value={inputValues.customerName}
                                                 onChange={(e) => handleInputChange('customerName', e.target.value)}
                                                 className="form-control"
