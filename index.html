@@ -2286,6 +2286,392 @@
                     }
                 });
 
+                // ================== SEGMENT 4: BREAKDOWN REVENUE PROJECTION (LANDSCAPE) ==================
+                // Add a new landscape page
+                doc.addPage('a4', 'landscape');
+
+                const pgW = doc.internal.pageSize.getWidth();
+                const pgH = doc.internal.pageSize.getHeight();
+                let yBrk = 12;
+
+                // Header
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('BREAKDOWN REVENUE PROJECTION', 14, yBrk);
+                doc.setFont(undefined, 'normal');
+                yBrk += 8;
+
+                // Build projection data per service
+                const contractYears = Math.ceil((inputs.contractPeriod || 0) / 12);
+                const maxYears = Math.min(Math.max(contractYears, 1), 5);
+
+                // Calculate drivers (quantity) and revenue per unit for each year
+                const buildServiceRow = (service, idx) => {
+                    const qty = getSafeQuantity(service.quantity);
+                    const mrc = service.monthlyRevenue || 0;
+                    const otc = service.otcCost || 0;
+                    const label = service.serviceDetails || service.serviceType || `Layanan ${idx + 1}`;
+                    const bw = service.bandwidth ? `@${service.bandwidth}` : '';
+                    const qtyLabel = service.unit ? `${qty} ${service.unit}` : `${qty}`;
+
+                    // Determine display name
+                    const displayName = `${label} ${bw} ${qtyLabel}`.trim();
+
+                    const row = [(idx + 1).toString(), displayName];
+
+                    // DRIVERS columns (Tahun 1-5): quantity per year
+                    for (let yr = 1; yr <= 5; yr++) {
+                        row.push(yr <= maxYears ? qty.toString() : '0');
+                    }
+
+                    // REVENUE PER UNIT columns (Tahun 1-5): annual MRC per unit + OTC for year 1
+                    for (let yr = 1; yr <= 5; yr++) {
+                        if (yr <= maxYears) {
+                            let annualPerUnit = mrc * Math.min(12, Math.max(0, inputs.contractPeriod - (yr - 1) * 12));
+                            if (yr === 1) annualPerUnit += otc;
+                            row.push(formatCurrency(annualPerUnit));
+                        } else {
+                            row.push('-');
+                        }
+                    }
+
+                    // REVENUE (R) columns (Tahun 1-5): total revenue = per unit * qty
+                    for (let yr = 1; yr <= 5; yr++) {
+                        if (yr <= maxYears) {
+                            let annualPerUnit = mrc * Math.min(12, Math.max(0, inputs.contractPeriod - (yr - 1) * 12));
+                            if (yr === 1) annualPerUnit += otc;
+                            row.push(formatCurrency(annualPerUnit * qty));
+                        } else {
+                            row.push('0');
+                        }
+                    }
+
+                    return row;
+                };
+
+                const serviceRows = inputs.services.map((s, i) => buildServiceRow(s, i));
+
+                // Calculate SUB TOTAL row for Layanan Telkom
+                const subTotalRow = ['', 'SUB TOTAL'];
+                // DRIVERS total
+                for (let yr = 1; yr <= 5; yr++) {
+                    const totalQty = yr <= maxYears
+                        ? inputs.services.reduce((sum, s) => sum + getSafeQuantity(s.quantity), 0)
+                        : 0;
+                    subTotalRow.push(totalQty.toString());
+                }
+                // REVENUE PER UNIT total
+                for (let yr = 1; yr <= 5; yr++) {
+                    if (yr <= maxYears) {
+                        let total = 0;
+                        inputs.services.forEach(s => {
+                            let ann = (s.monthlyRevenue || 0) * Math.min(12, Math.max(0, inputs.contractPeriod - (yr - 1) * 12));
+                            if (yr === 1) ann += (s.otcCost || 0);
+                            total += ann;
+                        });
+                        subTotalRow.push(formatCurrency(total));
+                    } else {
+                        subTotalRow.push('-');
+                    }
+                }
+                // REVENUE total
+                for (let yr = 1; yr <= 5; yr++) {
+                    if (yr <= maxYears) {
+                        let total = 0;
+                        inputs.services.forEach(s => {
+                            let ann = (s.monthlyRevenue || 0) * Math.min(12, Math.max(0, inputs.contractPeriod - (yr - 1) * 12));
+                            if (yr === 1) ann += (s.otcCost || 0);
+                            total += ann * getSafeQuantity(s.quantity);
+                        });
+                        subTotalRow.push(formatCurrency(total));
+                    } else {
+                        subTotalRow.push('0');
+                    }
+                }
+
+                // Layanan Mitra sub total (empty)
+                const mitraSubTotal = ['', 'SUB TOTAL'];
+                for (let i = 0; i < 15; i++) mitraSubTotal.push(i < 5 ? '0' : '-');
+
+                // Grand Total = same as Layanan Telkom sub total
+                const grandTotalRow = ['', 'Grand Total', ...subTotalRow.slice(2)];
+
+                // Build full table body
+                const brkBody = [
+                    [{ content: '', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [255, 255, 255] } }, { content: 'Layanan Telkom', colSpan: 15, styles: { fontStyle: 'bold', fillColor: [255, 255, 255] } }],
+                    [{ content: '', colSpan: 2, styles: { fillColor: [255, 255, 255] } }, { content: 'Layanan yang Memerlukan JI', colSpan: 15, styles: { fontStyle: 'italic', fillColor: [255, 255, 255] } }],
+                    ...serviceRows,
+                    [{ content: '', colSpan: 17, styles: { fillColor: [255, 255, 255], minCellHeight: 2, cellPadding: 1 } }],
+                    subTotalRow,
+                    [{ content: '', colSpan: 17, styles: { fillColor: [255, 255, 255], minCellHeight: 2, cellPadding: 1 } }],
+                    [{ content: '', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [255, 255, 255] } }, { content: 'Layanan Mitra', colSpan: 15, styles: { fontStyle: 'bold', fillColor: [255, 255, 255] } }],
+                    [{ content: '', colSpan: 17, styles: { fillColor: [255, 255, 255], minCellHeight: 2, cellPadding: 1 } }],
+                    mitraSubTotal,
+                    grandTotalRow,
+                ];
+
+                doc.autoTable({
+                    startY: yBrk,
+                    head: [
+                        [
+                            { content: 'NO', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'STREAM PORTFOLIO', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'DRIVERS', colSpan: 5, styles: { halign: 'center' } },
+                            { content: 'REVENUE PER UNIT', colSpan: 5, styles: { halign: 'center' } },
+                            { content: 'REVENUE (R)', colSpan: 5, styles: { halign: 'center' } },
+                        ],
+                        [
+                            'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5',
+                            'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5',
+                            'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5',
+                        ]
+                    ],
+                    body: brkBody,
+                    styles: { fontSize: 6, cellPadding: 2, lineWidth: 0.1 },
+                    headStyles: { fillColor: [30, 64, 175], textColor: 255, fontSize: 6, halign: 'center' },
+                    theme: 'grid',
+                    tableWidth: 'auto',
+                    columnStyles: {
+                        0: { cellWidth: 8, halign: 'center' },
+                        1: { cellWidth: 40 },
+                        2: { cellWidth: 14, halign: 'center' },
+                        3: { cellWidth: 14, halign: 'center' },
+                        4: { cellWidth: 14, halign: 'center' },
+                        5: { cellWidth: 14, halign: 'center' },
+                        6: { cellWidth: 14, halign: 'center' },
+                        7: { cellWidth: 22, halign: 'right' },
+                        8: { cellWidth: 22, halign: 'right' },
+                        9: { cellWidth: 22, halign: 'right' },
+                        10: { cellWidth: 22, halign: 'right' },
+                        11: { cellWidth: 22, halign: 'right' },
+                        12: { cellWidth: 22, halign: 'right' },
+                        13: { cellWidth: 22, halign: 'right' },
+                        14: { cellWidth: 22, halign: 'right' },
+                        15: { cellWidth: 22, halign: 'right' },
+                        16: { cellWidth: 22, halign: 'right' },
+                    },
+                    didParseCell: (data) => {
+                        // Bold the SUB TOTAL and Grand Total rows
+                        if (data.section === 'body') {
+                            const txt = String(data.cell.raw?.content ?? data.cell.raw ?? '');
+                            if (txt === 'SUB TOTAL' || txt === 'Grand Total') {
+                                data.cell.styles.fontStyle = 'bold';
+                                data.cell.styles.fillColor = [230, 240, 230];
+                            }
+                        }
+                    }
+                });
+
+                // ASSUMPTIONS section
+                yBrk = doc.lastAutoTable.finalY + 6;
+                doc.setFontSize(7);
+                doc.setFont(undefined, 'bold');
+                doc.text('ASSUMPTIONS', 14, yBrk);
+                yBrk += 4;
+
+                doc.setFontSize(6);
+                doc.setFont(undefined, 'bold');
+                doc.text('1    MACRO-ECONOMICS ASSUMPTIONS (DO NOT CHANGE)', 14, yBrk);
+                doc.setFont(undefined, 'normal');
+                yBrk += 4;
+
+                const assumptionData = [
+                    ['', 'Tahun 1', 'Tahun 2', 'Tahun 3'],
+                    ['Local Currency (LC) Spot Interest Rate', '6.25%', '6.50%', '6.75%'],
+                    ['USD Spot Interest Rate', '0.90%', '0.70%', '1.00%'],
+                    ['Exchange Rate', '14.580', '15.148', '15.754'],
+                    ['Inflation', '3.30%', '3.47%', '3.48%'],
+                    ['Assumed Tax Rate', '25.00%', '25.00%', '25.00%'],
+                ];
+
+                doc.autoTable({
+                    startY: yBrk,
+                    body: assumptionData,
+                    styles: { fontSize: 6, cellPadding: 1.5 },
+                    theme: 'plain',
+                    tableWidth: 100,
+                    columnStyles: {
+                        0: { cellWidth: 50 },
+                        1: { cellWidth: 16, halign: 'center' },
+                        2: { cellWidth: 16, halign: 'center' },
+                        3: { cellWidth: 16, halign: 'center' },
+                    },
+                    didParseCell: (data) => {
+                        if (data.row.index === 0) {
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                });
+
+                // ================== SEGMENT 5: BREAKDOWN CAPEX PROJECTION (LANDSCAPE) ==================
+                doc.addPage('a4', 'landscape');
+
+                let yCpx = 12;
+
+                // Header
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('BREAKDOWN CAPEX', 14, yCpx);
+                yCpx += 5;
+                doc.text('PROJECTION', 14, yCpx);
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(7);
+                yCpx += 4;
+                doc.text('(dalam Bulan)', 14, yCpx);
+                yCpx += 6;
+
+                // Calculate values
+                const capexInvestment = inputs.investmentCost || 0;
+                const lifetimeMonths = inputs.contractPeriod || 12;
+                const lifetimeYears = Math.ceil(lifetimeMonths / 12);
+                const bopLakwasValue = progForm.bopLakwas || Math.round(capexInvestment * 0.004);
+                const bopLakwasRate = capexInvestment > 0 ? ((bopLakwasValue / capexInvestment) * 100).toFixed(2) + '%' : '0.40%';
+                const totalCapex = capexInvestment + bopLakwasValue;
+
+                // Annual depreciation for CAPEX
+                const capexDeprPerYear = lifetimeYears > 0 ? capexInvestment / lifetimeYears : 0;
+                const bopDeprPerYear = lifetimeYears > 0 ? bopLakwasValue / lifetimeYears : 0;
+
+                // Build CAPEX row
+                const capexRow = ['1', 'CAPEX', '', '', lifetimeMonths.toString()];
+                // UNIT MEASUREMENTS Tahun 1-5 (qty = 1 for year 1 only)
+                for (let yr = 1; yr <= 5; yr++) capexRow.push(yr === 1 ? '12' : (yr <= lifetimeYears ? '12' : '-'));
+                // TOTAL CAPEX Tahun 1-5
+                for (let yr = 1; yr <= 5; yr++) capexRow.push(yr === 1 ? formatCurrency(capexInvestment) : '-');
+                // DEPRECIATION EXPENSE Tahun 1-5
+                for (let yr = 1; yr <= 5; yr++) capexRow.push(yr <= lifetimeYears ? formatCurrency(capexDeprPerYear) : '-');
+
+                // Build BOP LAKWAS row
+                const bopRow = ['2', `BOP LAKWAS (${bopLakwasRate} dari Investasi)`, '', bopLakwasRate, lifetimeMonths.toString()];
+                for (let yr = 1; yr <= 5; yr++) bopRow.push(yr === 1 ? '12' : (yr <= lifetimeYears ? '12' : '-'));
+                for (let yr = 1; yr <= 5; yr++) bopRow.push(yr === 1 ? formatCurrency(bopLakwasValue) : '-');
+                for (let yr = 1; yr <= 5; yr++) bopRow.push(yr <= lifetimeYears ? formatCurrency(bopDeprPerYear) : '-');
+
+                // Total row (CAPEX + BOP)
+                const capexTotalRow = ['', 'TOTAL'];
+                // UNIT MEASUREMENTS
+                for (let yr = 1; yr <= 5; yr++) capexTotalRow.push('-');
+                // TOTAL CAPEX
+                for (let yr = 1; yr <= 5; yr++) capexTotalRow.push(yr === 1 ? formatCurrency(totalCapex) : '-');
+                // DEPRECIATION EXPENSE
+                for (let yr = 1; yr <= 5; yr++) capexTotalRow.push(yr <= lifetimeYears ? formatCurrency(capexDeprPerYear + bopDeprPerYear) : '-');
+
+                // SUB TOTAL row (empty / zeros for mitra section)
+                const capexSubTotal = ['', 'SUB TOTAL'];
+                for (let i = 0; i < 15; i++) capexSubTotal.push('0');
+
+                // Build body
+                const capexBody = [
+                    capexRow,
+                    bopRow,
+                    [{ content: '', colSpan: 17, styles: { fillColor: [255, 255, 255], minCellHeight: 2, cellPadding: 1 } }],
+                    capexTotalRow,
+                    [{ content: '', colSpan: 17, styles: { fillColor: [255, 255, 255], minCellHeight: 2, cellPadding: 1 } }],
+                    capexSubTotal,
+                    [{ content: '', colSpan: 17, styles: { fillColor: [255, 255, 255], minCellHeight: 2, cellPadding: 1 } }],
+                    // Final TOTAL
+                    ['', 'TOTAL', '-', '-', '-',
+                        ...Array(5).fill('-'),
+                        ...((() => { const r = []; for (let yr = 1; yr <= 5; yr++) r.push(yr === 1 ? formatCurrency(totalCapex) : '-'); return r; })()),
+                        ...((() => { const r = []; for (let yr = 1; yr <= 5; yr++) r.push(yr <= lifetimeYears ? formatCurrency(capexDeprPerYear + bopDeprPerYear) : '-'); return r; })()),
+                    ],
+                ];
+
+                doc.autoTable({
+                    startY: yCpx,
+                    head: [
+                        [
+                            { content: 'NO', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'ASSET\nGROUP', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'ITEM NAME', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'FIXED/\nINTANGIBLE', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'LIFETIME\n(MONTHS)', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'UNIT MEASUREMENTS', colSpan: 5, styles: { halign: 'center' } },
+                            { content: 'TOTAL CAPEX', colSpan: 5, styles: { halign: 'center' } },
+                            { content: 'DEPRECIATION EXPENSE', colSpan: 5, styles: { halign: 'center' } },
+                        ],
+                        [
+                            'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5',
+                            'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5',
+                            'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5',
+                        ]
+                    ],
+                    body: capexBody,
+                    styles: { fontSize: 6, cellPadding: 2, lineWidth: 0.1 },
+                    headStyles: { fillColor: [30, 64, 175], textColor: 255, fontSize: 6, halign: 'center' },
+                    theme: 'grid',
+                    tableWidth: 'auto',
+                    columnStyles: {
+                        0: { cellWidth: 8, halign: 'center' },
+                        1: { cellWidth: 36 },
+                        2: { cellWidth: 20 },
+                        3: { cellWidth: 14, halign: 'center' },
+                        4: { cellWidth: 14, halign: 'center' },
+                        5: { cellWidth: 14, halign: 'center' },
+                        6: { cellWidth: 14, halign: 'center' },
+                        7: { cellWidth: 14, halign: 'center' },
+                        8: { cellWidth: 14, halign: 'center' },
+                        9: { cellWidth: 14, halign: 'center' },
+                        10: { cellWidth: 20, halign: 'right' },
+                        11: { cellWidth: 20, halign: 'right' },
+                        12: { cellWidth: 20, halign: 'right' },
+                        13: { cellWidth: 20, halign: 'right' },
+                        14: { cellWidth: 20, halign: 'right' },
+                        15: { cellWidth: 20, halign: 'right' },
+                        16: { cellWidth: 20, halign: 'right' },
+                    },
+                    didParseCell: (data) => {
+                        if (data.section === 'body') {
+                            const txt = String(data.cell.raw?.content ?? data.cell.raw ?? '');
+                            if (txt === 'SUB TOTAL' || txt === 'TOTAL') {
+                                data.cell.styles.fontStyle = 'bold';
+                                data.cell.styles.fillColor = [230, 240, 230];
+                            }
+                        }
+                    }
+                });
+
+                // ASSUMPTIONS section
+                let yCpxA = doc.lastAutoTable.finalY + 6;
+                doc.setFontSize(7);
+                doc.setFont(undefined, 'bold');
+                doc.text('ASSUMPTIONS', 14, yCpxA);
+                yCpxA += 4;
+
+                doc.setFontSize(6);
+                doc.setFont(undefined, 'bold');
+                doc.text('1    MACRO-ECONOMICS ASSUMPTIONS (DO NOT CHANGE)', 14, yCpxA);
+                doc.setFont(undefined, 'normal');
+                yCpxA += 4;
+
+                const assumptionData2 = [
+                    ['', 'Tahun 1', 'Tahun 2', 'Tahun 3'],
+                    ['Local Currency (LC) Spot Interest Rate1', '6.25%', '6.50%', '6.75%'],
+                    ['USD Spot Interest Rate1', '0.90%', '0.70%', '1.00%'],
+                    ['USD/LC Rate', '14.580,66', '15.606,85', '15.691,38'],
+                    ['Inflation', '3.35%', '3.41%', '3.48%'],
+                    ['Assumed Tax Rate', '25.00%', '25.00%', '25.00%'],
+                ];
+
+                doc.autoTable({
+                    startY: yCpxA,
+                    body: assumptionData2,
+                    styles: { fontSize: 6, cellPadding: 1.5 },
+                    theme: 'plain',
+                    tableWidth: 100,
+                    columnStyles: {
+                        0: { cellWidth: 50 },
+                        1: { cellWidth: 16, halign: 'center' },
+                        2: { cellWidth: 16, halign: 'center' },
+                        3: { cellWidth: 16, halign: 'center' },
+                    },
+                    didParseCell: (data) => {
+                        if (data.row.index === 0) {
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                });
+
                 doc.save(`AKI_PT_${customerNameForFile}_unsigned.pdf`);
             };
 
