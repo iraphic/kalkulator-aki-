@@ -2524,7 +2524,7 @@
                 const capexInvestment = inputs.investmentCost || 0;
                 const lifetimeMonths = inputs.contractPeriod || 12;
                 const lifetimeYears = Math.ceil(lifetimeMonths / 12);
-                const bopLakwasValue = progForm.bopLakwas || 0;
+                const bopLakwasValue = Math.round(capexInvestment * 0.004);
                 const bopLakwasRate = '0.40%';
                 const totalCapex = capexInvestment + bopLakwasValue;
 
@@ -3641,7 +3641,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.8.4 - May 12, 2026 - 11.01</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.8.7 - May 12, 2026 - 11.10</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
