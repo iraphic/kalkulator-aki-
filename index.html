@@ -894,6 +894,31 @@
             return { years: 6, months: 12, totalMonths: 84 };
         }
 
+        // Profil penandatangan per Witel
+        const WITEL_PROFILES = {
+            'Jakarta Centrum': {
+                dibuat2: { nik: '960302', nama: 'MUHAMMAD RAFII NAUFAL', jabatan: 'OFF 2 SALES ENGINEER' },
+                diperiksa: { nik: '830064', nama: 'NOVITASARI KUSUMADEWI', jabatan: 'MGR WITEL BUSINESS SERVICE' },
+            },
+            'Jakarta Inner': {
+                dibuat2: { nik: '950609', nama: 'ALI ZAHAR', jabatan: 'OFF 3 SALES ENGINEER' },
+                diperiksa: { nik: '800030', nama: 'TRIAWAN SETIADI', jabatan: 'MGR WITEL BUSINESS SERVICE' },
+            },
+            'Jakarta Outer': {
+                dibuat2: { nik: '940426', nama: 'DWI FAJAR YULIANTO', jabatan: 'OFF 2 SALES ENGINEER' },
+                diperiksa: { nik: '870028', nama: 'NOVIANA PUTRI KUSUMASARI', jabatan: 'MGR WITEL BUSINESS SERVICE' },
+            },
+            'Banten': {
+                dibuat2: { nik: '930253', nama: 'DEVYTA ASTERINA', jabatan: 'OFF 1 SALES ENGINEER' },
+                diperiksa: { nik: '850076', nama: 'TITIN', jabatan: 'MGR WITEL BUSINESS SERVICE' },
+            },
+            'Bekasi Karawang': {
+                dibuat2: { nik: '960013', nama: 'ADI SAEPUL ANWAR', jabatan: 'OFF 1 SALES ENGINEER' },
+                diperiksa: { nik: '830122', nama: 'FENNY NOVITA', jabatan: 'MGR WITEL BUSINESS SERVICE' },
+            },
+        };
+        const DISETUJUI_DEFAULT = { nik: '730106', nama: 'AJI WIDYO UTOMO', jabatan: 'MGR SOLUTION & OFFERING' };
+
         // Komponen utama aplikasi
         function FinancialAnalysis() {
             const [inputs, setInputs] = React.useState({
@@ -949,6 +974,22 @@
                 diperiksa: { nik: "", nama: "", jabatan: "" },
                 disetujui: { nik: "", nama: "", jabatan: "" },
             });
+            const [selectedWitel, setSelectedWitel] = React.useState("");
+
+            const handleWitelSelect = (witelName) => {
+                setSelectedWitel(witelName);
+                if (!witelName) return;
+                const profile = WITEL_PROFILES[witelName];
+                if (profile) {
+                    setApprovalForm((prev) => ({
+                        ...prev,
+                        dibuat: [prev.dibuat[0], { ...profile.dibuat2 }],
+                        diperiksa: { ...profile.diperiksa },
+                        disetujui: { ...DISETUJUI_DEFAULT },
+                    }));
+                }
+            };
+
             const [programForm, setProgramForm] = React.useState({
                 idProposal: "",
                 jumlahLop: "1",
@@ -3213,7 +3254,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.7.5 - May 8, 2026 - 15.16</p><br></br>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.0.8 - May 12, 2026 - 10.30</p><br></br>
                             <p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p>
                         </footer>
@@ -3377,6 +3418,28 @@
                                 </div>
                                 <div className="sheet-content">
                                     <div>
+                                        <div className="ba-field" style={{ marginBottom: '1.25rem' }}>
+                                            <label className="block text-xs font-medium text-foreground mb-1" style={{ fontWeight: 600, fontSize: '0.8125rem' }}>📍 Pilih Witel (Autofill Profil)</label>
+                                            <div className="select">
+                                                <select
+                                                    value={selectedWitel}
+                                                    onChange={(e) => handleWitelSelect(e.target.value)}
+                                                    className="form-control"
+                                                    style={{ fontWeight: 500 }}
+                                                >
+                                                    <option value="">-- Pilih Witel --</option>
+                                                    {Object.keys(WITEL_PROFILES).map((name) => (
+                                                        <option key={name} value={name}>Witel {name}</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            {selectedWitel && (
+                                                <div style={{ marginTop: '0.5rem', padding: '0.4rem 0.75rem', background: '#eff6ff', borderRadius: '6px', fontSize: '0.75rem', color: '#1e40af', fontWeight: 500 }}>
+                                                    ✅ Profil Witel {selectedWitel} diterapkan — semua isian tetap bisa diedit manual.
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div style={{ borderTop: '1px solid #e5e7eb', marginBottom: '1rem' }}></div>
                                         <h3 className="font-semibold mb-4 text-sm">Dibuat oleh - Orang ke-1</h3>
                                         <div className="ba-field">
                                             <label className="block text-xs font-medium text-foreground mb-1">NIK</label>
