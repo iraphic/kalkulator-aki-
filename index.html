@@ -3353,7 +3353,7 @@
                 const rightX = 185;
                 const rightY = yAnalisa;
 
-                const capexTitle = `Simulasi Perhitungan Usulan Capex Delivery Penyediaan Jaringan Tambahan - Astinet ${inputs.customerName}`;
+                const capexTitle = `Simulasi Perhitungan Usulan Capex Delivery Penyediaan Jaringan Tambahan - ${inputs.customerName}`;
                 const pbString = `${results.paybackPeriod.years} Tahun ${results.paybackPeriod.months} Bulan`;
 
                 const rightData = [
@@ -3677,7 +3677,7 @@
                 doc.rect(14, yRev - 3, 100, 5, 'F');
                 doc.setFontSize(8);
                 doc.setFont(undefined, 'bold');
-                doc.text(`Penyediaan Jaringan Tambahan - Astinet ${inputs.customerName}`, 15, yRev + 0.5);
+                doc.text(`Penyediaan Jaringan Tambahan - ${inputs.customerName}`, 15, yRev + 0.5);
                 yRev += 4;
 
                 const revHead = [[
@@ -3777,7 +3777,7 @@
                 doc.text('INVESTASI', 14, yInv);
                 yInv += 4;
                 doc.setFontSize(7);
-                doc.text(`Penyediaan Jaringan Tambahan - Astinet ${inputs.customerName}`, 14, yInv);
+                doc.text(`Penyediaan Jaringan Tambahan - ${inputs.customerName}`, 14, yInv);
                 yInv += 4;
 
                 const invCapexBase = inputs.investmentCost;
@@ -3841,46 +3841,24 @@
                     head: invHead,
                     body: invBody,
                     styles: { fontSize: 7, cellPadding: 2, lineColor: [0, 0, 0], lineWidth: 0.1 },
+                    columnStyles: {
+                        0: { cellWidth: 22 },
+                        1: { cellWidth: 16 },
+                        2: { cellWidth: 12 },
+                        3: { cellWidth: 8, halign: 'center' },
+                        4: { cellWidth: 22 },
+                        5: { cellWidth: 12, halign: 'center' },
+                        6: { cellWidth: 18 },
+                        7: { cellWidth: 18 },
+                        8: { cellWidth: 18 },
+                        9: { cellWidth: 18 },
+                        10: { cellWidth: 18 }
+                    },
                     theme: 'grid',
                     margin: { left: 14, right: 14 }
                 });
 
-                let yArea = doc.lastAutoTable.finalY + 5;
 
-                const areaHead = [[
-                    { content: 'AREA', styles: { fillColor: [240, 200, 150], halign: 'center' } },
-                    { content: 'LOKASI / NAMA PROYEK', styles: { fillColor: [240, 200, 150], halign: 'center' } },
-                    { content: 'MATERIAL', styles: { fillColor: [240, 200, 150], halign: 'center' } },
-                    { content: 'JASA', styles: { fillColor: [240, 200, 150], halign: 'center' } },
-                    { content: 'TOTAL', styles: { fillColor: [240, 200, 150], halign: 'center' } },
-                    { content: 'STO', styles: { fillColor: [240, 200, 150], halign: 'center' } }
-                ]];
-
-                const areaBody = [
-                    [
-                        { content: 'REG 2', styles: { fillColor: [230, 230, 230] } },
-                        '',
-                        { content: '-', styles: { halign: 'right' } },
-                        { content: '-', styles: { halign: 'right' } },
-                        { content: formatCurrency(invCapexBase), styles: { halign: 'right' } },
-                        { content: programForm.lokasiProgram || 'JSA' }
-                    ],
-                    [
-                        { content: 'TOTAL', styles: { fontStyle: 'bold', halign: 'right' } },
-                        { content: ':', styles: { halign: 'center' } },
-                        { content: formatCurrency(invCapexBase), colSpan: 3, styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 150] } },
-                        { content: '' }
-                    ]
-                ];
-
-                doc.autoTable({
-                    startY: yArea,
-                    head: areaHead,
-                    body: areaBody,
-                    styles: { fontSize: 7, cellPadding: 2, lineColor: [0, 0, 0], lineWidth: 0.1 },
-                    theme: 'grid',
-                    margin: { left: 14, right: 14 }
-                });
 
                 doc.save(`AKI_PT_${customerNameForFile}_unsigned.pdf`);
             };
@@ -4851,7 +4829,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.5.2 - May 13, 2026 - 06.56</p>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.5.3 - May 13, 2026 - 06.56</p>
                             {/* <br></br><p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p> */}
                         </footer>
