@@ -3001,11 +3001,11 @@
                         7: { cellWidth: 12, halign: 'center' },
                         8: { cellWidth: 12, halign: 'center' },
                         9: { cellWidth: 12, halign: 'center' },
-                        10: { cellWidth: 16, halign: 'right' },
-                        11: { cellWidth: 16, halign: 'right' },
-                        12: { cellWidth: 16, halign: 'right' },
-                        13: { cellWidth: 16, halign: 'right' },
-                        14: { cellWidth: 16, halign: 'right' },
+                        10: { cellWidth: 20, halign: 'right' },
+                        11: { cellWidth: 20, halign: 'right' },
+                        12: { cellWidth: 20, halign: 'right' },
+                        13: { cellWidth: 20, halign: 'right' },
+                        14: { cellWidth: 20, halign: 'right' },
                         15: { cellWidth: 20, halign: 'right' },
                         16: { cellWidth: 20, halign: 'right' },
                         17: { cellWidth: 20, halign: 'right' },
@@ -3224,7 +3224,7 @@
                 doc.text(': Pengadaan Layanan Internet', 40, yAnalisa);
                 yAnalisa += 5;
                 doc.text('Nama Pelanggan', 14, yAnalisa);
-                doc.text(`: Penyediaan Jaringan Tambahan - Astinet ${inputs.customerName}`, 40, yAnalisa);
+                doc.text(`: Penyediaan Jaringan Tambahan - ${inputs.customerName}`, 40, yAnalisa);
                 yAnalisa += 5;
                 doc.text('Durasi Kontrak', 14, yAnalisa);
 
@@ -3317,7 +3317,7 @@
                     styles: { fontSize: 8, cellPadding: 2, lineColor: [0, 0, 0], lineWidth: 0.1 },
                     headStyles: { fillColor: [255, 242, 204], textColor: 0, halign: 'center', valign: 'middle', fontStyle: 'bold' },
                     columnStyles: {
-                        0: { fontStyle: 'bold', fillColor: [255, 242, 204], cellWidth: 35 },
+                        0: { fontStyle: 'bold', fillColor: [255, 242, 204], cellWidth: 38 },
                         1: { halign: 'right' },
                         2: { halign: 'right' },
                         3: { halign: 'right' },
@@ -3604,14 +3604,14 @@
                         { content: 'No', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
                         { content: 'Lokasi', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
                         { content: 'Deskripsi', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-                        { content: 'Tarif Harga', colSpan: 2, styles: { halign: 'center', fillColor: [220, 230, 245] } },
-                        { content: 'COGS', colSpan: 2, styles: { halign: 'center', fillColor: [220, 230, 245] } }
+                        { content: 'Tarif Harga', colSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'COGS', colSpan: 2, styles: { halign: 'center', valign: 'middle' } }
                     ],
                     [
-                        { content: 'Biaya Instalasi (Rp)', styles: { halign: 'center', fillColor: [220, 230, 245] } },
-                        { content: 'Biaya Bulanan (Rp)', styles: { halign: 'center', fillColor: [220, 230, 245] } },
-                        { content: 'Biaya Instalasi (Rp)', styles: { halign: 'center', fillColor: [220, 230, 245] } },
-                        { content: 'Biaya Bulanan (Rp)', styles: { halign: 'center', fillColor: [220, 230, 245] } }
+                        { content: 'Biaya Instalasi (Rp)', styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'Biaya Bulanan (Rp)', styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'Biaya Instalasi (Rp)', styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'Biaya Bulanan (Rp)', styles: { halign: 'center', valign: 'middle' } }
                     ]
                 ];
 
@@ -3772,11 +3772,11 @@
                 let yInv = doc.lastAutoTable.finalY + 10;
 
                 // 3. INVESTASI
-                doc.setFontSize(8);
+                doc.setFontSize(7);
                 doc.setFont(undefined, 'bold');
                 doc.text('INVESTASI', 14, yInv);
                 yInv += 4;
-                doc.setFontSize(8);
+                doc.setFontSize(7);
                 doc.text(`Penyediaan Jaringan Tambahan - Astinet ${inputs.customerName}`, 14, yInv);
                 yInv += 4;
 
@@ -4851,7 +4851,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.5.1 - May 13, 2026 - 06.56</p>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.5.2 - May 13, 2026 - 06.56</p>
                             {/* <br></br><p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p> */}
                         </footer>
