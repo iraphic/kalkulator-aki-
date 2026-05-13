@@ -2886,6 +2886,1002 @@
                     }
                 });
 
+
+                // ================== SEGMENT 7: OPERATING EXPENSE PROJECTION (LANDSCAPE) ==================
+                doc.addPage('a3', 'landscape');
+
+                let yOpex = 12;
+
+                // Header
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'bold');
+                doc.text('OPERATING EXPENSE PROJECTION', 14, yOpex);
+                doc.setFont(undefined, 'normal');
+                drawTelkomLogo();
+                yOpex += 12;
+
+                const contractYearsOpex = Math.ceil((inputs.contractPeriod || 0) / 12);
+                const maxYearsOpex = Math.min(Math.max(contractYearsOpex, 1), 5);
+
+                const bhpRow = ['1', 'BHP, Marketing, BUA, SDM', '', '', ''];
+                const omRow = ['', 'O & M (Include QE)', '', '', ''];
+
+                // Unit Measurements (Tahun 1-5)
+                for (let yr = 1; yr <= 5; yr++) {
+                    const unitBhp = (yr <= maxYearsOpex && (results.opexProjections[yr]?.marketingCost > 0)) ? '1,0' : '0,0';
+                    const unitOm = (yr <= maxYearsOpex && (results.opexProjections[yr]?.operationalCost > 0)) ? '1,0' : '0,0';
+                    bhpRow.push(unitBhp);
+                    omRow.push(unitOm);
+                }
+
+                const baseBhpPrice = results.opexProjections[1]?.marketingCost || 0;
+                const baseOmPrice = results.opexProjections[1]?.operationalCost || 0;
+
+                // Price Per Unit (Tahun 1-5)
+                for (let yr = 1; yr <= 5; yr++) {
+                    bhpRow.push(baseBhpPrice > 0 ? formatCurrency(baseBhpPrice) : '-');
+                    omRow.push(baseOmPrice > 0 ? formatCurrency(baseOmPrice) : '-');
+                }
+
+                // Total (Tahun 1-5)
+                for (let yr = 1; yr <= 5; yr++) {
+                    const bhpTotal = yr <= maxYearsOpex ? (results.opexProjections[yr]?.marketingCost || 0) : 0;
+                    const omTotal = yr <= maxYearsOpex ? (results.opexProjections[yr]?.operationalCost || 0) : 0;
+                    bhpRow.push(bhpTotal > 0 ? formatCurrency(bhpTotal) : '-');
+                    omRow.push(omTotal > 0 ? formatCurrency(omTotal) : '-');
+                }
+
+                const opexSubTotalRow = ['SUB TOTAL', '2. Persentase Beban O&M bisa disesuaikan dengan proyek layan', '', '', ''];
+                // Unit Total
+                for (let yr = 1; yr <= 5; yr++) {
+                    let u = 0;
+                    if (yr <= maxYearsOpex && (results.opexProjections[yr]?.marketingCost > 0)) u += 1;
+                    if (yr <= maxYearsOpex && (results.opexProjections[yr]?.operationalCost > 0)) u += 1;
+                    opexSubTotalRow.push(u > 0 ? `${u},0` : '0,0');
+                }
+                // Price Total (sum of base prices)
+                const totalBasePrice = baseBhpPrice + baseOmPrice;
+                for (let yr = 1; yr <= 5; yr++) {
+                    opexSubTotalRow.push(totalBasePrice > 0 ? formatCurrency(totalBasePrice) : '-');
+                }
+                // Total Total
+                for (let yr = 1; yr <= 5; yr++) {
+                    const bhpTotal = yr <= maxYearsOpex ? (results.opexProjections[yr]?.marketingCost || 0) : 0;
+                    const omTotal = yr <= maxYearsOpex ? (results.opexProjections[yr]?.operationalCost || 0) : 0;
+                    const tot = bhpTotal + omTotal;
+                    opexSubTotalRow.push(tot > 0 ? formatCurrency(tot) : '-');
+                }
+
+                const opexGrandTotalRow = ['Grand Total', '', '', '', ''];
+                for(let i=5; i<20; i++) {
+                    opexGrandTotalRow.push(opexSubTotalRow[i]);
+                }
+
+                const opexBody = [
+                    bhpRow,
+                    omRow,
+                    opexSubTotalRow,
+                    ...Array.from({ length: 8 }).map(() => Array(20).fill('')), 
+                    ['SUB TOTAL', '', '', '', '', ...Array(15).fill('-')],
+                    opexGrandTotalRow
+                ];
+
+                doc.autoTable({
+                    startY: yOpex,
+                    head: [
+                        [
+                            { content: 'NO', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'EXPENSES GROUP', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'ITEM NAME', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'DESCRIPTION', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'RECURRING/ ONE TIME', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                            { content: 'UNIT MEASUREMENTS', colSpan: 5, styles: { halign: 'center' } },
+                            { content: 'PRICE PER UNIT', colSpan: 5, styles: { halign: 'center' } },
+                            { content: 'TOTAL', colSpan: 5, styles: { halign: 'center' } },
+                        ],
+                        [
+                            'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5',
+                            'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5',
+                            'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5',
+                        ]
+                    ],
+                    body: opexBody,
+                    styles: { fontSize: 6, cellPadding: 2, lineWidth: 0.1, lineColor: [200, 200, 200] },
+                    headStyles: { fillColor: [240, 240, 240], textColor: 0, fontSize: 6, halign: 'center' },
+                    theme: 'grid',
+                    tableWidth: 'auto',
+                    columnStyles: {
+                        0: { cellWidth: 8, halign: 'center' },
+                        1: { cellWidth: 36 },
+                        2: { cellWidth: 20 },
+                        3: { cellWidth: 20 },
+                        4: { cellWidth: 20 },
+                        5: { cellWidth: 12, halign: 'center' },
+                        6: { cellWidth: 12, halign: 'center' },
+                        7: { cellWidth: 12, halign: 'center' },
+                        8: { cellWidth: 12, halign: 'center' },
+                        9: { cellWidth: 12, halign: 'center' },
+                        10: { cellWidth: 16, halign: 'right' },
+                        11: { cellWidth: 16, halign: 'right' },
+                        12: { cellWidth: 16, halign: 'right' },
+                        13: { cellWidth: 16, halign: 'right' },
+                        14: { cellWidth: 16, halign: 'right' },
+                        15: { cellWidth: 20, halign: 'right' },
+                        16: { cellWidth: 20, halign: 'right' },
+                        17: { cellWidth: 20, halign: 'right' },
+                        18: { cellWidth: 20, halign: 'right' },
+                        19: { cellWidth: 20, halign: 'right' },
+                    },
+                    didParseCell: (data) => {
+                        if (data.section === 'body') {
+                            const txt = String(data.cell.raw?.content ?? data.cell.raw ?? '');
+                            let isRowSubTotal = false;
+                            if (Array.isArray(data.row.raw)) {
+                                const col0Txt = String(data.row.raw[0]?.content ?? data.row.raw[0] ?? '');
+                                isRowSubTotal = (col0Txt === 'SUB TOTAL' || col0Txt === 'Grand Total');
+                            }
+                            
+                            if (isRowSubTotal || txt === 'SUB TOTAL' || txt === 'Grand Total') {
+                                data.cell.styles.fontStyle = 'bold';
+                                if (txt !== '2. Persentase Beban O&M bisa disesuaikan dengan proyek layan') {
+                                    data.cell.styles.fillColor = [230, 240, 230];
+                                }
+                            } else {
+                                if (data.column.index >= 5 && data.column.index <= 9) {
+                                    data.cell.styles.fillColor = [220, 235, 220]; // Light green
+                                }
+                            }
+                            
+                            if (txt === '2. Persentase Beban O&M bisa disesuaikan dengan proyek layan') {
+                                data.cell.styles.fontStyle = 'italic';
+                                data.cell.styles.fontSize = 5;
+                            }
+                        }
+                    }
+                });
+
+                yOpex = doc.lastAutoTable.finalY + 6;
+                const splitY = yOpex;
+
+                // --- LEFT SIDE: ASSUMPTIONS ---
+                doc.setFontSize(7);
+                doc.setFont(undefined, 'bold');
+                doc.text('ASSUMPTIONS', 14, yOpex);
+                yOpex += 4;
+
+                doc.setFontSize(6);
+                doc.setFont(undefined, 'bold');
+                doc.setTextColor(255, 0, 0);
+                doc.text('1    MACRO-ECONOMICS ASSUMPTIONS (DO NOT CHANGE)', 14, yOpex);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont(undefined, 'normal');
+                yOpex += 4;
+
+                doc.autoTable({
+                    startY: yOpex,
+                    body: assumptionData2,
+                    styles: { fontSize: 6, cellPadding: 1.5 },
+                    theme: 'plain',
+                    tableWidth: 100,
+                    margin: { left: 14 },
+                    columnStyles: {
+                        0: { cellWidth: 50 },
+                        1: { cellWidth: 16, halign: 'center' },
+                        2: { cellWidth: 16, halign: 'center' },
+                        3: { cellWidth: 16, halign: 'center' },
+                    },
+                    didParseCell: (data) => {
+                        if (data.row.index === 0) data.cell.styles.fontStyle = 'bold';
+                    }
+                });
+
+                yOpex = doc.lastAutoTable.finalY + 6;
+
+                // 2 PHYSICAL ASSUMPTIONS
+                doc.setFontSize(6);
+                doc.setFont(undefined, 'bold');
+                doc.text('2    PHYSICAL ASSUMPTIONS', 14, yOpex);
+                doc.setFont(undefined, 'normal');
+                yOpex += 6;
+
+                const totalOpexValue = results.totalOpex;
+                doc.text('Total Operational Cost :', 30, yOpex);
+                
+                doc.setFillColor(255, 255, 0);
+                doc.rect(70, yOpex - 3, 30, 4, 'F');
+                doc.setFont(undefined, 'bold');
+                doc.text(formatCurrency(totalOpexValue), 85, yOpex, { align: 'center' });
+                doc.setFont(undefined, 'normal');
+                yOpex += 4;
+
+                const physAssumpData = [
+                    ['', 'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5', 'TOTAL'],
+                    ['BHP, Marketing, BUA, SDM', 
+                        ...(Array(5).fill().map((_, i) => {
+                            const val = results.opexProjections[i+1]?.marketingCost || 0;
+                            return val > 0 ? formatCurrency(val) : '-';
+                        })), 
+                        formatCurrency(results.marketingCost)
+                    ],
+                    ['O & M (Include QE)', 
+                        ...(Array(5).fill().map((_, i) => {
+                            const val = results.opexProjections[i+1]?.operationalCost || 0;
+                            return val > 0 ? formatCurrency(val) : '-';
+                        })), 
+                        formatCurrency(results.operationalCost)
+                    ],
+                    ['', '', '', '', '', '', formatCurrency(results.totalOpex)]
+                ];
+
+                doc.autoTable({
+                    startY: yOpex,
+                    body: physAssumpData,
+                    styles: { fontSize: 6, cellPadding: 1.5, fillColor: [230, 245, 230] },
+                    theme: 'plain',
+                    tableWidth: 150,
+                    margin: { left: 14 },
+                    columnStyles: {
+                        0: { cellWidth: 40 },
+                        1: { cellWidth: 16, halign: 'center' },
+                        2: { cellWidth: 16, halign: 'center' },
+                        3: { cellWidth: 16, halign: 'center' },
+                        4: { cellWidth: 16, halign: 'center' },
+                        5: { cellWidth: 16, halign: 'center' },
+                        6: { cellWidth: 20, halign: 'right' },
+                    },
+                    didParseCell: (data) => {
+                        if (data.row.index === 0) {
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                        if (data.row.index === 3 && data.column.index === 6) {
+                            data.cell.styles.fillColor = [255, 200, 150]; 
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                });
+
+                yOpex = doc.lastAutoTable.finalY + 6;
+
+                doc.text('BHP, Marketing, BUA, SDM', 14, yOpex);
+                doc.setFont(undefined, 'bold');
+                doc.text('30,00%', 60, yOpex, { align: 'right' });
+                doc.setFont(undefined, 'normal');
+                doc.text('per tahun', 62, yOpex);
+                yOpex += 3;
+
+                doc.text('O & M (Include QE)', 14, yOpex);
+                doc.setFont(undefined, 'bold');
+                doc.text('20,00%', 60, yOpex, { align: 'right' });
+                doc.setFont(undefined, 'normal');
+                doc.text('per tahun', 62, yOpex);
+                yOpex += 4;
+
+                doc.setFontSize(5);
+                doc.text('NOTE:', 14, yOpex);
+                yOpex += 2.5;
+                doc.text('1. Apabila sudah memperhitungkan cost connectivity maka persentase beban BHP, Marketing dst % kan saja', 14, yOpex);
+                yOpex += 2.5;
+                doc.text('2. Persentase Beban O&M bisa disesuaikan dengan proyek layan', 14, yOpex);
+
+                // --- RIGHT SIDE: REVENUE GRAPH 5 YEARS PLAN ---
+                let graphX = 200;
+                let graphY = splitY + 10;
+                let graphW = 180;
+                let graphH = 60;
+
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'normal');
+                doc.text('REVENUE GRAPH 5 YEARS PLAN', graphX + graphW/2, graphY - 5, { align: 'center' });
+
+                doc.setDrawColor(200);
+                doc.line(graphX, graphY + graphH, graphX + graphW, graphY + graphH);
+
+                const revs = [];
+                for(let i=1; i<=5; i++) {
+                    revs.push(results.yearlyProjections[i]?.revenue || 0);
+                }
+                const maxRev = Math.max(...revs, 1); 
+
+                const barW = 15;
+                const spacing = (graphW - (5 * barW)) / 6;
+
+                for(let i=0; i<5; i++) {
+                    const rev = revs[i];
+                    const bx = graphX + spacing + i * (barW + spacing);
+                    
+                    if (rev > 0) {
+                        const bh = (rev / maxRev) * (graphH - 10);
+                        const by = graphY + graphH - bh;
+                        
+                        doc.setFillColor(70, 130, 180);
+                        doc.rect(bx, by, barW, bh, 'F');
+                        
+                        doc.setFontSize(5);
+                        doc.setTextColor(100);
+                        doc.text(formatCurrency(rev), bx + barW/2, by - 2, { align: 'center' });
+                    } else {
+                        doc.setFontSize(6);
+                        doc.setTextColor(100);
+                        doc.text('-', bx + barW/2, graphY + graphH - 2, { align: 'center' });
+                    }
+                    
+                    doc.setFontSize(6);
+                    doc.setTextColor(0);
+                    doc.text(`Tahun ${i+1}`, bx + barW/2, graphY + graphH + 4, { align: 'center' });
+                }
+
+
+
+                // ================== SEGMENT 8: ANALISA KELAYAKAN INVESTASI (A4 LANDSCAPE) ==================
+                doc.addPage('a4', 'landscape');
+
+                let yAnalisa = 12;
+
+                // Header Info
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'bold');
+                doc.text('Nama Project', 14, yAnalisa);
+                doc.text(': Pengadaan Layanan Internet', 40, yAnalisa);
+                yAnalisa += 5;
+                doc.text('Nama Pelanggan', 14, yAnalisa);
+                doc.text(`: Penyediaan Jaringan Tambahan - Astinet ${inputs.customerName}`, 40, yAnalisa);
+                yAnalisa += 5;
+                doc.text('Durasi Kontrak', 14, yAnalisa);
+                
+                const durasiTahun = Math.floor(inputs.contractPeriod / 12);
+                const durasiBulan = inputs.contractPeriod % 12;
+                doc.text(`: ${durasiTahun} Tahun ${durasiBulan} Bulan`, 40, yAnalisa);
+                
+                yAnalisa += 10;
+
+                // Summary Table 1
+                const summaryHead1 = [['Revenue', 'DIR', 'Gross Profit', 'GPM', 'Net Income', 'NIM', 'NPV', 'IRR', 'Payback Period']];
+                
+                const pbDecimal = (results.paybackPeriod.years + (results.paybackPeriod.months / 12)).toFixed(2);
+                
+                const summaryBody1 = [[
+                    formatCurrency(results.totalRevenue),
+                    formatCurrency(results.totalCogs),
+                    formatCurrency(results.grossProfit),
+                    formatPercentage(results.grossProfitMargin),
+                    formatCurrency(results.totalNetIncome),
+                    formatPercentage(results.netIncomeMargin),
+                    formatCurrency(results.npv),
+                    Number.isFinite(results.irr) ? formatPercentage(results.irr) : '#DIV/0!',
+                    pbDecimal.replace('.', ',')
+                ]];
+
+                doc.autoTable({
+                    startY: yAnalisa,
+                    head: summaryHead1,
+                    body: summaryBody1,
+                    styles: { fontSize: 8, cellPadding: 2, halign: 'center', valign: 'middle', lineColor: [0, 0, 0], lineWidth: 0.1 },
+                    headStyles: { fillColor: [195, 224, 181], textColor: 0, fontStyle: 'bold' },
+                    theme: 'grid',
+                    margin: { left: 14, right: 14 },
+                });
+
+                yAnalisa = doc.lastAutoTable.finalY + 10;
+
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'bold');
+                doc.text('Analisa Kelayakan Investasi ', 14, yAnalisa);
+                doc.setFont(undefined, 'normal');
+                doc.text('(dalam Rp , kecuali untuk angka persentase)', 60, yAnalisa);
+                yAnalisa += 3;
+
+                const yearsArray = [1, 2, 3, 4, 5];
+                
+                const getRowData = (key, formatFn) => {
+                    let total = 0;
+                    const row = yearsArray.map(y => {
+                        let val = 0;
+                        if (key === 'revenue') val = results.yearlyProjections[y]?.revenue || 0;
+                        if (key === 'directCost') val = results.cogsProjections.find(c => c.year === y)?.totalCogs || 0;
+                        if (key === 'grossMargin') val = (results.yearlyProjections[y]?.revenue || 0) - (results.cogsProjections.find(c => c.year === y)?.totalCogs || 0);
+                        if (key === 'badDebt') val = results.yearlyProjections[y]?.badDebt || 0;
+                        if (key === 'opex') val = results.yearlyProjections[y]?.opex || 0;
+                        if (key === 'tax') val = results.yearlyProjections[y]?.tax || 0;
+                        if (key === 'netIncome') val = results.yearlyProjections[y]?.netIncome || 0;
+                        if (key === 'capex') val = y === 1 ? (results.cashFlowProjections[0]?.capex || 0) : 0; 
+                        if (key === 'depreciation') val = results.yearlyProjections[y]?.depreciation || 0;
+                        
+                        total += val;
+                        return formatFn(val);
+                    });
+                    
+                    row.push(formatFn(total)); 
+                    return row;
+                };
+
+                const mainData = [
+                    ['Revenue', ...getRowData('revenue', formatCurrency)],
+                    ['Direct Cost', ...getRowData('directCost', formatCurrency)],
+                    ['Gross Margin', ...getRowData('grossMargin', formatCurrency)],
+                    ['GP Margin', '', '', '', '', '', formatPercentage(results.grossProfitMargin)], 
+                    ['Cost of BUD', ...getRowData('badDebt', formatCurrency)],
+                    ['Cost of Money', ...getRowData('opex', formatCurrency)],
+                    ['Tax 22%', ...getRowData('tax', formatCurrency)],
+                    ['Net Income', ...getRowData('netIncome', formatCurrency)],
+                    ['NI Margin', '', '', '', '', '', formatPercentage(results.netIncomeMargin)], 
+                    ['CAPEX', ...getRowData('capex', formatCurrency)],
+                    ['Depresiasi CAPEX', ...getRowData('depreciation', formatCurrency)]
+                ];
+
+                doc.autoTable({
+                    startY: yAnalisa,
+                    head: [[
+                        '', 'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5', 'TOTAL'
+                    ]],
+                    body: mainData,
+                    styles: { fontSize: 8, cellPadding: 2, lineColor: [0, 0, 0], lineWidth: 0.1 },
+                    headStyles: { fillColor: [255, 242, 204], textColor: 0, halign: 'center', valign: 'middle', fontStyle: 'bold' },
+                    columnStyles: {
+                        0: { fontStyle: 'bold', fillColor: [255, 242, 204], cellWidth: 35 },
+                        1: { halign: 'right' },
+                        2: { halign: 'right' },
+                        3: { halign: 'right' },
+                        4: { halign: 'right' },
+                        5: { halign: 'right' },
+                        6: { halign: 'right', fontStyle: 'bold' },
+                    },
+                    didParseCell: (data) => {
+                        if (data.section === 'head' && data.column.index === 6) {
+                            data.cell.styles.fillColor = [255, 242, 204];
+                        }
+                        if (data.section === 'body' && data.column.index === 6) {
+                            data.cell.styles.fillColor = [255, 242, 204];
+                        }
+                    },
+                    theme: 'grid',
+                    tableWidth: 160,
+                    margin: { left: 14 }
+                });
+
+                const yTextBelow = doc.lastAutoTable.finalY + 8;
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'bold');
+                doc.text('• NPV =', 20, yTextBelow);
+                doc.text('• IRR =', 20, yTextBelow + 5);
+                doc.text('• Payback Period =', 20, yTextBelow + 10);
+
+                doc.setFont(undefined, 'normal');
+                doc.text(formatCurrency(results.npv), 60, yTextBelow, { align: 'right' });
+                doc.text(Number.isFinite(results.irr) ? formatPercentage(results.irr) : '#DIV/0!', 60, yTextBelow + 5, { align: 'right' });
+                doc.text(pbDecimal.replace('.', ','), 60, yTextBelow + 10, { align: 'right' });
+
+                const rightX = 185;
+                const rightY = yAnalisa; 
+                
+                const capexTitle = `Simulasi Perhitungan Usulan Capex Delivery Penyediaan Jaringan Tambahan - Astinet ${inputs.customerName}`;
+                const pbString = `${results.paybackPeriod.years} Tahun ${results.paybackPeriod.months} Bulan`;
+
+                const rightData = [
+                    ['Revenue', formatCurrency(results.totalRevenue)],
+                    ['Direct Cost', formatCurrency(results.totalCogs)],
+                    ['Gross Profit', formatCurrency(results.grossProfit)],
+                    ['GPM', formatPercentage(results.grossProfitMargin)],
+                    ['Capex (incl BoP Lakwas)', formatCurrency(results.cashFlowProjections[0]?.capex || 0)],
+                    ['Net Income', formatCurrency(results.totalNetIncome)],
+                    ['NIM', formatPercentage(results.netIncomeMargin)],
+                    ['NPV', formatCurrency(results.npv)],
+                    ['IRR', Number.isFinite(results.irr) ? formatPercentage(results.irr) : '#DIV/0!'],
+                    ['Payback Period', pbString]
+                ];
+
+                doc.autoTable({
+                    startY: rightY,
+                    head: [[{ content: capexTitle, colSpan: 2, styles: { halign: 'center', valign: 'middle', minCellHeight: 15 } }]],
+                    body: rightData,
+                    styles: { fontSize: 8, cellPadding: 2, lineColor: [0, 0, 0], lineWidth: 0.1 },
+                    headStyles: { fillColor: [195, 224, 181], textColor: 0, fontStyle: 'bold' },
+                    theme: 'grid',
+                    margin: { left: rightX },
+                    tableWidth: 95,
+                    columnStyles: {
+                        0: { cellWidth: 45 },
+                        1: { cellWidth: 50, halign: 'right' }
+                    }
+                });
+
+                const yUpdate = doc.lastAutoTable.finalY + 5;
+                
+                doc.setFillColor(255, 255, 0);
+                doc.rect(rightX, yUpdate - 3, 95, 5, 'F');
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'normal');
+                doc.text(`Update: Nilai WACC yang terbaru adalah ${WACC * 100}%.`, rightX + 2, yUpdate + 0.5);
+                
+                doc.setFillColor(255, 255, 0);
+                doc.rect(rightX, yUpdate + 3, 95, 5, 'F');
+                doc.text('IRR minimal = WACC + 2%', rightX + 2, yUpdate + 6.5);
+
+
+
+                // ================== SEGMENT 9: LAMPIRAN VALUATION (A4 LANDSCAPE) ==================
+                doc.addPage('a4', 'landscape');
+
+                let yLampiran = 12;
+
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'bold');
+                doc.text('LAMPIRAN', 14, yLampiran);
+                yLampiran += 5;
+                doc.text('VALUATION (dalam Rupiah)', 14, yLampiran);
+                yLampiran += 6;
+
+                const getValData = (key) => {
+                    let total = 0;
+                    const row = yearsArray.map(y => {
+                        let val = 0;
+                        if (key === 'revenue') val = results.yearlyProjections[y]?.revenue || 0;
+                        if (key === 'directCost') val = results.cogsProjections.find(c => c.year === y)?.totalCogs || 0;
+                        if (key === 'opex') val = results.yearlyProjections[y]?.opex || 0;
+                        if (key === 'badDebt') val = results.yearlyProjections[y]?.badDebt || 0;
+                        if (key === 'ebitda') val = (results.yearlyProjections[y]?.revenue || 0) - (results.cogsProjections.find(c => c.year === y)?.totalCogs || 0) - (results.yearlyProjections[y]?.opex || 0) - (results.yearlyProjections[y]?.badDebt || 0);
+                        if (key === 'depreciation') val = results.yearlyProjections[y]?.depreciation || 0;
+                        if (key === 'ebit') val = results.yearlyProjections[y]?.ebit || 0;
+                        if (key === 'tax') val = results.yearlyProjections[y]?.tax || 0;
+                        if (key === 'netIncome') val = results.yearlyProjections[y]?.netIncome || 0;
+                        if (key === 'wc') val = 0; 
+                        if (key === 'netCashFlow') val = (results.yearlyProjections[y]?.netIncome || 0) + (results.yearlyProjections[y]?.depreciation || 0); 
+                        if (key === 'capex') val = y === 1 ? -(results.cashFlowProjections[0]?.capex || 0) : 0; 
+                        if (key === 'fcf') {
+                            const ebitda = (results.yearlyProjections[y]?.revenue || 0) - (results.cogsProjections.find(c => c.year === y)?.totalCogs || 0) - (results.yearlyProjections[y]?.opex || 0) - (results.yearlyProjections[y]?.badDebt || 0);
+                            const ebit = ebitda - (results.yearlyProjections[y]?.depreciation || 0);
+                            const tax = ebit > 0 ? ebit * TAX_RATE : 0;
+                            const ni = ebit - tax;
+                            const ncf = ni + (results.yearlyProjections[y]?.depreciation || 0);
+                            const cx = y === 1 ? -(results.cashFlowProjections[0]?.capex || 0) : 0;
+                            val = ncf + cx;
+                        }
+                        total += val;
+                        return val;
+                    });
+                    return { row, total };
+                };
+
+                const revData = getValData('revenue');
+                const expData = getValData('directCost');
+                const opexData = getValData('opex');
+                const ebitdaData = getValData('ebitda');
+                const depData = getValData('depreciation');
+                const ebitData = getValData('ebit');
+                const taxData = getValData('tax');
+                const niData = getValData('netIncome');
+                
+                const wcData = getValData('wc');
+                const ncfData = getValData('netCashFlow'); 
+                const capexData = getValData('capex'); 
+                const fcfData = getValData('fcf');
+
+                const accFcfRow = [];
+                let runningFcf = 0;
+                for (let i = 0; i < 5; i++) {
+                    runningFcf += fcfData.row[i];
+                    accFcfRow.push(runningFcf);
+                }
+
+                const dfRow = yearsArray.map(y => 1 / Math.pow(1 + WACC, y));
+                const pvFcfRow = fcfData.row.map((fcf, i) => fcf * dfRow[i]);
+                const totalPvFcf = pvFcfRow.reduce((a, b) => a + b, 0);
+
+                const formatRow = (name, dataObj, formatFn = formatCurrency) => {
+                    return [name, formatFn(dataObj.total), ...dataObj.row.map(v => formatFn(v))];
+                };
+
+                const lampiranData = [
+                    ['', { content: 'TOTAL', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } }, 
+                         { content: 'Tahun 1', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } },
+                         { content: 'Tahun 2', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } },
+                         { content: 'Tahun 3', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } },
+                         { content: 'Tahun 4', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } },
+                         { content: 'Tahun 5', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } }],
+
+                    [{ content: 'Tahun ke', styles: { fillColor: [200, 200, 200], fontStyle: 'bold' } }, 
+                     { content: '', styles: { fillColor: [200, 200, 200] } }, 
+                     { content: '1', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } },
+                     { content: '2', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } },
+                     { content: '3', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } },
+                     { content: '4', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } },
+                     { content: '5', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } }],
+                    
+                    [{ content: 'PROFIT & LOSS PROJECTION', colSpan: 7, styles: { fontStyle: 'bold' } }],
+                    formatRow('Revenue', revData),
+                    formatRow('Expenses (w/o depreciation)', expData),
+                    formatRow('Operating Expense', opexData),
+                    ['EBITDA', formatCurrency(ebitdaData.total), ...ebitdaData.row.map(v => formatCurrency(v))],
+                    formatRow('Depreciation', depData),
+                    ['EBIT', formatCurrency(ebitData.total), ...ebitData.row.map(v => formatCurrency(v))],
+                    ['Taxes (22%)', '', '22%', '22%', '22%', '22%', '22%'],
+                    formatRow('Taxes (Rp)', taxData),
+                    ['NET INCOME', formatCurrency(niData.total), ...niData.row.map(v => formatCurrency(v))],
+                    
+                    [{ content: ' ', colSpan: 7, styles: { minCellHeight: 4, lineWidth: 0 } }], 
+                    
+                    [{ content: 'CASH FLOW FOR VALUATION', colSpan: 7, styles: { fontStyle: 'bold', textDecoration: 'underline' } }],
+                    formatRow('EBIT + (after tax)', niData),
+                    formatRow('WC (incr)/decr', wcData),
+                    formatRow('Depreciation', depData),
+                    formatRow('Net Cash Flow', ncfData),
+                    formatRow('Investment/CAPEX', capexData),
+                    
+                    [{ content: ' ', colSpan: 7, styles: { minCellHeight: 4, lineWidth: 0 } }],
+                    
+                    formatRow('Free Cash Flow', fcfData),
+                    ['accumulated Free Cash Flow', '', ...accFcfRow.map(v => formatCurrency(v))],
+                    
+                    [{ content: ' ', colSpan: 7, styles: { minCellHeight: 4, lineWidth: 0 } }],
+                    
+                    [{ content: 'FEASIBILITY ANALYSIS', colSpan: 7, styles: { fontStyle: 'bold' } }],
+                    ['Discount Rate', { content: formatPercentage(WACC * 100), styles: { fontStyle: 'bold', halign: 'right', lineWidth: 0.5 } }, ...dfRow.map(v => v.toFixed(2).replace('.', ','))],
+                    ['PV of Free Cash Flow', formatCurrency(totalPvFcf), ...pvFcfRow.map(v => formatCurrency(v))],
+                    
+                    ['NPV', formatCurrency(results.npv), { content: 'Layak Jika Positif', colSpan: 5 }],
+                    ['IRR', Number.isFinite(results.irr) ? formatPercentage(results.irr) : '#DIV/0!', { content: 'Layak Jika > dari (WACC + Margin)', colSpan: 5 }],
+                    ['Payback Period', pbDecimal.replace('.', ','), { content: 'Layak Jika < dari Masa Kontrak', colSpan: 5 }]
+                ];
+
+                doc.autoTable({
+                    startY: yLampiran,
+                    body: lampiranData,
+                    styles: { fontSize: 8, cellPadding: 2, lineColor: [0, 0, 0], lineWidth: 0.1 },
+                    columnStyles: {
+                        0: { cellWidth: 50 },
+                        1: { cellWidth: 35, halign: 'right' },
+                        2: { cellWidth: 35, halign: 'right' },
+                        3: { cellWidth: 35, halign: 'right' },
+                        4: { cellWidth: 35, halign: 'right' },
+                        5: { cellWidth: 35, halign: 'right' },
+                        6: { cellWidth: 35, halign: 'right' },
+                    },
+                    didParseCell: (data) => {
+                        if (data.section === 'body') {
+                            const firstCol = String(data.row.raw[0]?.content ?? data.row.raw[0] ?? '');
+                            
+                            if (firstCol === 'EBITDA' || firstCol === 'EBIT' || firstCol === 'NET INCOME') {
+                                data.cell.styles.fillColor = [230, 235, 245];
+                                data.cell.styles.fontStyle = 'italic';
+                            }
+                            
+                            if (firstCol === 'NPV' || firstCol === 'IRR' || firstCol === 'Payback Period') {
+                                data.cell.styles.fillColor = [180, 180, 180];
+                                data.cell.styles.fontStyle = 'bold';
+                            }
+
+                            if (data.column.index > 0) {
+                                const valStr = String(data.cell.raw?.content ?? data.cell.raw ?? '');
+                                if (valStr.match(/^(Rp\s*)?-/)) {
+                                    data.cell.styles.textColor = [255, 0, 0];
+                                }
+                            }
+                        }
+                    },
+                    theme: 'grid',
+                    margin: { left: 14 }
+                });
+
+                let yBottom = doc.lastAutoTable.finalY + 8;
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'normal');
+                
+                doc.text('Discount Rate = WACC (ditetapkan oleh perusahaan)', 14, yBottom);
+                doc.text(formatPercentage(WACC * 100), 90, yBottom, { align: 'right' });
+                yBottom += 5;
+                
+                doc.text('Net Income Margin', 14, yBottom);
+                doc.setFont(undefined, 'bold');
+                doc.text('2,00%', 90, yBottom, { align: 'right' });
+                doc.setFont(undefined, 'italic');
+                doc.text('Mengikuti ketentuan RKAP', 95, yBottom);
+                yBottom += 5;
+                
+                doc.setFillColor(255, 255, 0);
+                doc.rect(14, yBottom - 3, 80, 5, 'F');
+                doc.setFont(undefined, 'bold');
+                doc.text('MINIMAL IRR', 15, yBottom);
+                doc.text(formatPercentage((WACC + 0.02) * 100), 90, yBottom, { align: 'right' });
+                yBottom += 5;
+                
+                doc.setFont(undefined, 'normal');
+                doc.text('Pajak Perusahaan', 14, yBottom);
+                doc.text('22%', 90, yBottom, { align: 'right' });
+
+
+
+                // ================== SEGMENT 10: COGS & REVENUE & INVESTASI (A4 PORTRAIT) ==================
+                doc.addPage('a4', 'portrait');
+                let yCogs = 14;
+
+                // 1. COGS Table
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'bold');
+                doc.text('COGS', 14, yCogs);
+                yCogs += 4;
+
+                const cogsHead = [
+                    [
+                        { content: 'No', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'Lokasi', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'Deskripsi', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'Tarif Harga', colSpan: 2, styles: { halign: 'center', fillColor: [220, 230, 245] } },
+                        { content: 'COGS', colSpan: 2, styles: { halign: 'center', fillColor: [220, 230, 245] } }
+                    ],
+                    [
+                        { content: 'Biaya Instalasi (Rp)', styles: { halign: 'center', fillColor: [220, 230, 245] } },
+                        { content: 'Biaya Bulanan (Rp)', styles: { halign: 'center', fillColor: [220, 230, 245] } },
+                        { content: 'Biaya Instalasi (Rp)', styles: { halign: 'center', fillColor: [220, 230, 245] } },
+                        { content: 'Biaya Bulanan (Rp)', styles: { halign: 'center', fillColor: [220, 230, 245] } }
+                    ]
+                ];
+
+                const cogsBody = [
+                    [{ content: 'Layanan yang Memerlukan JT', colSpan: 7, styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } }]
+                ];
+
+                let sumTarifInstalasi = 0;
+                let sumTarifBulanan = 0;
+                let sumCogsInstalasi = 0;
+                let sumCogsBulanan = 0;
+
+                inputs.services.forEach((svc, index) => {
+                    const tInstalasi = svc.otcCost;
+                    const tBulanan = svc.monthlyRevenue;
+                    const cInstalasi = svc.otcCost * 0.7;
+                    const cBulanan = svc.monthlyRevenue * 0.7;
+
+                    sumTarifInstalasi += tInstalasi;
+                    sumTarifBulanan += tBulanan;
+                    sumCogsInstalasi += cInstalasi;
+                    sumCogsBulanan += cBulanan;
+
+                    cogsBody.push([
+                        { content: (index + 1).toString(), styles: { halign: 'center' } },
+                        { content: programForm.lokasiProgram || 'STO JSA', styles: { halign: 'center' } },
+                        { content: `${svc.serviceType} ${svc.bandwidth || ''} ${svc.serviceDetails || ''}`.trim() },
+                        { content: formatCurrency(tInstalasi), styles: { halign: 'right' } },
+                        { content: formatCurrency(tBulanan), styles: { halign: 'right' } },
+                        { content: formatCurrency(cInstalasi), styles: { halign: 'right' } },
+                        { content: formatCurrency(cBulanan), styles: { halign: 'right' } }
+                    ]);
+                });
+
+                cogsBody.push(['', '', '', '', '', '', '']);
+                cogsBody.push(['', '', '', '', '', '', '']);
+
+                cogsBody.push([
+                    { content: 'TOTAL', colSpan: 3, styles: { halign: 'center', fontStyle: 'bold' } },
+                    { content: formatCurrency(sumTarifInstalasi), styles: { halign: 'right', fontStyle: 'bold' } },
+                    { content: formatCurrency(sumTarifBulanan), styles: { halign: 'right', fontStyle: 'bold' } },
+                    { content: formatCurrency(sumCogsInstalasi), styles: { halign: 'right', fontStyle: 'bold' } },
+                    { content: formatCurrency(sumCogsBulanan), styles: { halign: 'right', fontStyle: 'bold' } }
+                ]);
+
+                doc.autoTable({
+                    startY: yCogs,
+                    head: cogsHead,
+                    body: cogsBody,
+                    styles: { fontSize: 7, cellPadding: 2, lineColor: [0, 0, 0], lineWidth: 0.1 },
+                    theme: 'grid',
+                    margin: { left: 14, right: 14 }
+                });
+
+                let yRev = doc.lastAutoTable.finalY + 10;
+
+                // 2. Perhitungan Revenue
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'normal');
+                doc.text('Perhitungan Revenue', 14, yRev);
+                yRev += 4;
+                doc.setFillColor(255, 235, 215); 
+                doc.rect(14, yRev - 3, 100, 5, 'F');
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'bold');
+                doc.text(`Penyediaan Jaringan Tambahan - Astinet ${inputs.customerName}`, 15, yRev + 0.5);
+                yRev += 4;
+
+                const revHead = [[
+                    { content: 'Add Subscriber Projection', colSpan: 2, styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Lokasi', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Tahun 1', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Tahun 2', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Tahun 3', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Tahun 4', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Tahun 5', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Keterangan', styles: { halign: 'center', fillColor: [240, 200, 150] } }
+                ]];
+
+                const revBody = [
+                    [
+                        { content: 'Jumlah bulan', colSpan: 2, styles: { halign: 'center' } },
+                        { content: '' },
+                        { content: '12', styles: { halign: 'center' } },
+                        { content: '12', styles: { halign: 'center' } },
+                        { content: '12', styles: { halign: 'center' } },
+                        { content: '12', styles: { halign: 'center' } },
+                        { content: '12', styles: { halign: 'center' } },
+                        { content: '' }
+                    ],
+                    [{ content: 'Layanan yang Memerlukan JT', colSpan: 9, styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } }]
+                ];
+
+                inputs.services.forEach(svc => {
+                    revBody.push([
+                        { content: `${svc.serviceType} ${svc.bandwidth || ''}`.trim() },
+                        { content: svc.unit || 'SSL', styles: { halign: 'center' } },
+                        { content: programForm.lokasiProgram || 'STO JSA', styles: { halign: 'center' } },
+                        { content: (svc.quantity || 1).toString(), styles: { halign: 'right' } },
+                        { content: '-', styles: { halign: 'center' } },
+                        { content: '-', styles: { halign: 'center' } },
+                        { content: '-', styles: { halign: 'center' } },
+                        { content: '-', styles: { halign: 'center' } },
+                        { content: 'PSB' }
+                    ]);
+                });
+
+                for(let i=0; i<3; i++) revBody.push(['', '', '', '', '', '', '', '', '']);
+
+                revBody.push([{ content: 'Revenue', colSpan: 9, styles: { fontStyle: 'bold', fillColor: [240, 200, 150] } }]);
+                revBody.push([{ content: 'Layanan yang Memerlukan JT', colSpan: 9, styles: { fontStyle: 'bold', fillColor: [255, 255, 150] } }]);
+
+                const getRevForSvc = (svc, year) => {
+                    if (year === 1) {
+                        const mRev = Math.min(svc.monthlyRevenue * 12, svc.monthlyRevenue * inputs.contractPeriod);
+                        return mRev + svc.otcCost;
+                    } else if (year <= Math.ceil(inputs.contractPeriod / 12)) {
+                        const remainingMonths = inputs.contractPeriod - (12 * (year - 1));
+                        const mRev = svc.monthlyRevenue * Math.min(12, remainingMonths);
+                        return mRev;
+                    }
+                    return 0;
+                };
+
+                inputs.services.forEach(svc => {
+                    revBody.push([
+                        { content: `${svc.serviceType} ${svc.bandwidth || ''}`.trim() },
+                        { content: formatCurrency(svc.monthlyRevenue), styles: { halign: 'right' } },
+                        { content: '' },
+                        { content: formatCurrency(getRevForSvc(svc, 1)), styles: { halign: 'right', fillColor: [255, 255, 150] } },
+                        { content: formatCurrency(getRevForSvc(svc, 2)), styles: { halign: 'right', fillColor: [255, 255, 150] } },
+                        { content: formatCurrency(getRevForSvc(svc, 3)), styles: { halign: 'right', fillColor: [255, 255, 150] } },
+                        { content: formatCurrency(getRevForSvc(svc, 4)), styles: { halign: 'right', fillColor: [255, 255, 150] } },
+                        { content: formatCurrency(getRevForSvc(svc, 5)), styles: { halign: 'right', fillColor: [255, 255, 150] } },
+                        { content: 'Pasang Baru', styles: { fillColor: [255, 255, 150] } }
+                    ]);
+                });
+
+                revBody.push([
+                    { content: 'Total Revenue', colSpan: 3, styles: { fontStyle: 'bold', fillColor: [240, 200, 150] } },
+                    { content: formatCurrency(results.yearlyProjections[1]?.revenue || 0), styles: { halign: 'right', fontStyle: 'bold', fillColor: [240, 200, 150] } },
+                    { content: formatCurrency(results.yearlyProjections[2]?.revenue || 0), styles: { halign: 'right', fontStyle: 'bold', fillColor: [240, 200, 150] } },
+                    { content: formatCurrency(results.yearlyProjections[3]?.revenue || 0), styles: { halign: 'right', fontStyle: 'bold', fillColor: [240, 200, 150] } },
+                    { content: formatCurrency(results.yearlyProjections[4]?.revenue || 0), styles: { halign: 'right', fontStyle: 'bold', fillColor: [240, 200, 150] } },
+                    { content: formatCurrency(results.yearlyProjections[5]?.revenue || 0), styles: { halign: 'right', fontStyle: 'bold', fillColor: [240, 200, 150] } },
+                    { content: '', styles: { fillColor: [240, 200, 150] } }
+                ]);
+
+                doc.autoTable({
+                    startY: yRev,
+                    head: revHead,
+                    body: revBody,
+                    styles: { fontSize: 7, cellPadding: 2, lineColor: [0, 0, 0], lineWidth: 0.1 },
+                    theme: 'grid',
+                    margin: { left: 14, right: 14 }
+                });
+
+                let yInv = doc.lastAutoTable.finalY + 10;
+
+                // 3. INVESTASI
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'bold');
+                doc.text('INVESTASI', 14, yInv);
+                yInv += 4;
+                doc.setFontSize(8);
+                doc.text(`Penyediaan Jaringan Tambahan - Astinet ${inputs.customerName}`, 14, yInv);
+                yInv += 4;
+
+                const capexBase = inputs.investmentCost;
+                const capexBop = capexBase * 0.004;
+                const totalCapex = capexBase + capexBop;
+
+                const invHead = [[
+                    { content: 'Nama program', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'sub-system', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'satuan', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'vol', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Nilai Invest.', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Umur prkt\n(tahun)', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Tahun 1', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Tahun 2', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Tahun 3', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Tahun 4', styles: { halign: 'center', fillColor: [240, 200, 150] } },
+                    { content: 'Tahun 5', styles: { halign: 'center', fillColor: [240, 200, 150] } }
+                ]];
+
+                const depBase = capexBase / 5;
+                const depBop = capexBop / 5;
+                const depTotal = totalCapex / 5;
+
+                const formatDep = (val) => formatCurrency(val);
+
+                const invBody = [
+                    [
+                        'Investasi New', 'JT FO', 'Paket', '1', 
+                        { content: formatCurrency(capexBase), styles: { halign: 'right' } }, '5',
+                        { content: formatDep(depBase), styles: { halign: 'right' } },
+                        { content: formatDep(depBase), styles: { halign: 'right' } },
+                        { content: formatDep(depBase), styles: { halign: 'right' } },
+                        { content: formatDep(depBase), styles: { halign: 'right' } },
+                        { content: formatDep(depBase), styles: { halign: 'right' } }
+                    ],
+                    [
+                        'BOP Lakwas', 'Support', 'Lot', '1', 
+                        { content: formatCurrency(capexBop), styles: { halign: 'right' } }, '5',
+                        { content: formatDep(depBop), styles: { halign: 'right' } },
+                        { content: formatDep(depBop), styles: { halign: 'right' } },
+                        { content: formatDep(depBop), styles: { halign: 'right' } },
+                        { content: formatDep(depBop), styles: { halign: 'right' } },
+                        { content: formatDep(depBop), styles: { halign: 'right' } }
+                    ],
+                    ['IKG', '', '', '', '', '', '', '', '', '', ''],
+                    [
+                        { content: 'Jumlah', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [255, 230, 200] } },
+                        { content: formatCurrency(totalCapex), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
+                        { content: '', styles: { fillColor: [255, 230, 200] } },
+                        { content: formatDep(depTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
+                        { content: formatDep(depTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
+                        { content: formatDep(depTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
+                        { content: formatDep(depTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
+                        { content: formatDep(depTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } }
+                    ]
+                ];
+
+                doc.autoTable({
+                    startY: yInv,
+                    head: invHead,
+                    body: invBody,
+                    styles: { fontSize: 7, cellPadding: 2, lineColor: [0, 0, 0], lineWidth: 0.1 },
+                    theme: 'grid',
+                    margin: { left: 14, right: 14 }
+                });
+
+                let yArea = doc.lastAutoTable.finalY + 5;
+
+                const areaHead = [[
+                    { content: 'AREA', styles: { fillColor: [240, 200, 150], halign: 'center' } },
+                    { content: 'LOKASI / NAMA PROYEK', styles: { fillColor: [240, 200, 150], halign: 'center' } },
+                    { content: 'MATERIAL', styles: { fillColor: [240, 200, 150], halign: 'center' } },
+                    { content: 'JASA', styles: { fillColor: [240, 200, 150], halign: 'center' } },
+                    { content: 'TOTAL', styles: { fillColor: [240, 200, 150], halign: 'center' } },
+                    { content: 'STO', styles: { fillColor: [240, 200, 150], halign: 'center' } }
+                ]];
+
+                const areaBody = [
+                    [
+                        { content: 'REG 2', styles: { fillColor: [230, 230, 230] } },
+                        '',
+                        { content: '-', styles: { halign: 'right' } }, 
+                        { content: '-', styles: { halign: 'right' } }, 
+                        { content: formatCurrency(capexBase), styles: { halign: 'right' } },
+                        { content: programForm.lokasiProgram || 'JSA' }
+                    ],
+                    [
+                        { content: 'TOTAL', styles: { fontStyle: 'bold', halign: 'right' } },
+                        { content: ':', styles: { halign: 'center' } },
+                        { content: formatCurrency(capexBase), colSpan: 3, styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 150] } },
+                        { content: '' }
+                    ]
+                ];
+
+                doc.autoTable({
+                    startY: yArea,
+                    head: areaHead,
+                    body: areaBody,
+                    styles: { fontSize: 7, cellPadding: 2, lineColor: [0, 0, 0], lineWidth: 0.1 },
+                    theme: 'grid',
+                    margin: { left: 14, right: 14 }
+                });
+
                 doc.save(`AKI_PT_${customerNameForFile}_unsigned.pdf`);
             };
 
