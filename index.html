@@ -2953,7 +2953,7 @@
                 }
 
                 const opexGrandTotalRow = ['Grand Total', '', '', '', ''];
-                for(let i=5; i<20; i++) {
+                for (let i = 5; i < 20; i++) {
                     opexGrandTotalRow.push(opexSubTotalRow[i]);
                 }
 
@@ -2961,7 +2961,7 @@
                     bhpRow,
                     omRow,
                     opexSubTotalRow,
-                    ...Array.from({ length: 8 }).map(() => Array(20).fill('')), 
+                    ...Array.from({ length: 8 }).map(() => Array(20).fill('')),
                     ['SUB TOTAL', '', '', '', '', ...Array(15).fill('-')],
                     opexGrandTotalRow
                 ];
@@ -3020,7 +3020,7 @@
                                 const col0Txt = String(data.row.raw[0]?.content ?? data.row.raw[0] ?? '');
                                 isRowSubTotal = (col0Txt === 'SUB TOTAL' || col0Txt === 'Grand Total');
                             }
-                            
+
                             if (isRowSubTotal || txt === 'SUB TOTAL' || txt === 'Grand Total') {
                                 data.cell.styles.fontStyle = 'bold';
                                 if (txt !== '2. Persentase Beban O&M bisa disesuaikan dengan proyek layan') {
@@ -3031,7 +3031,7 @@
                                     data.cell.styles.fillColor = [220, 235, 220]; // Light green
                                 }
                             }
-                            
+
                             if (txt === '2. Persentase Beban O&M bisa disesuaikan dengan proyek layan') {
                                 data.cell.styles.fontStyle = 'italic';
                                 data.cell.styles.fontSize = 5;
@@ -3086,7 +3086,7 @@
 
                 const totalOpexValue = results.totalOpex;
                 doc.text('Total Operational Cost :', 30, yOpex);
-                
+
                 doc.setFillColor(255, 255, 0);
                 doc.rect(70, yOpex - 3, 30, 4, 'F');
                 doc.setFont(undefined, 'bold');
@@ -3096,18 +3096,18 @@
 
                 const physAssumpData = [
                     ['', 'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5', 'TOTAL'],
-                    ['BHP, Marketing, BUA, SDM', 
+                    ['BHP, Marketing, BUA, SDM',
                         ...(Array(5).fill().map((_, i) => {
-                            const val = results.opexProjections[i+1]?.marketingCost || 0;
+                            const val = results.opexProjections[i + 1]?.marketingCost || 0;
                             return val > 0 ? formatCurrency(val) : '-';
-                        })), 
+                        })),
                         formatCurrency(results.marketingCost)
                     ],
-                    ['O & M (Include QE)', 
+                    ['O & M (Include QE)',
                         ...(Array(5).fill().map((_, i) => {
-                            const val = results.opexProjections[i+1]?.operationalCost || 0;
+                            const val = results.opexProjections[i + 1]?.operationalCost || 0;
                             return val > 0 ? formatCurrency(val) : '-';
-                        })), 
+                        })),
                         formatCurrency(results.operationalCost)
                     ],
                     ['', '', '', '', '', '', formatCurrency(results.totalOpex)]
@@ -3134,7 +3134,7 @@
                             data.cell.styles.fontStyle = 'bold';
                         }
                         if (data.row.index === 3 && data.column.index === 6) {
-                            data.cell.styles.fillColor = [255, 200, 150]; 
+                            data.cell.styles.fillColor = [255, 200, 150];
                             data.cell.styles.fontStyle = 'bold';
                         }
                     }
@@ -3171,43 +3171,43 @@
 
                 doc.setFontSize(8);
                 doc.setFont(undefined, 'normal');
-                doc.text('REVENUE GRAPH 5 YEARS PLAN', graphX + graphW/2, graphY - 5, { align: 'center' });
+                doc.text('REVENUE GRAPH 5 YEARS PLAN', graphX + graphW / 2, graphY - 5, { align: 'center' });
 
                 doc.setDrawColor(200);
                 doc.line(graphX, graphY + graphH, graphX + graphW, graphY + graphH);
 
                 const revs = [];
-                for(let i=1; i<=5; i++) {
+                for (let i = 1; i <= 5; i++) {
                     revs.push(results.yearlyProjections[i]?.revenue || 0);
                 }
-                const maxRev = Math.max(...revs, 1); 
+                const maxRev = Math.max(...revs, 1);
 
                 const barW = 15;
                 const spacing = (graphW - (5 * barW)) / 6;
 
-                for(let i=0; i<5; i++) {
+                for (let i = 0; i < 5; i++) {
                     const rev = revs[i];
                     const bx = graphX + spacing + i * (barW + spacing);
-                    
+
                     if (rev > 0) {
                         const bh = (rev / maxRev) * (graphH - 10);
                         const by = graphY + graphH - bh;
-                        
+
                         doc.setFillColor(70, 130, 180);
                         doc.rect(bx, by, barW, bh, 'F');
-                        
+
                         doc.setFontSize(5);
                         doc.setTextColor(100);
-                        doc.text(formatCurrency(rev), bx + barW/2, by - 2, { align: 'center' });
+                        doc.text(formatCurrency(rev), bx + barW / 2, by - 2, { align: 'center' });
                     } else {
                         doc.setFontSize(6);
                         doc.setTextColor(100);
-                        doc.text('-', bx + barW/2, graphY + graphH - 2, { align: 'center' });
+                        doc.text('-', bx + barW / 2, graphY + graphH - 2, { align: 'center' });
                     }
-                    
+
                     doc.setFontSize(6);
                     doc.setTextColor(0);
-                    doc.text(`Tahun ${i+1}`, bx + barW/2, graphY + graphH + 4, { align: 'center' });
+                    doc.text(`Tahun ${i + 1}`, bx + barW / 2, graphY + graphH + 4, { align: 'center' });
                 }
 
 
@@ -3227,18 +3227,18 @@
                 doc.text(`: Penyediaan Jaringan Tambahan - Astinet ${inputs.customerName}`, 40, yAnalisa);
                 yAnalisa += 5;
                 doc.text('Durasi Kontrak', 14, yAnalisa);
-                
+
                 const durasiTahun = Math.floor(inputs.contractPeriod / 12);
                 const durasiBulan = inputs.contractPeriod % 12;
                 doc.text(`: ${durasiTahun} Tahun ${durasiBulan} Bulan`, 40, yAnalisa);
-                
+
                 yAnalisa += 10;
 
                 // Summary Table 1
                 const summaryHead1 = [['Revenue', 'DIR', 'Gross Profit', 'GPM', 'Net Income', 'NIM', 'NPV', 'IRR', 'Payback Period']];
-                
+
                 const pbDecimal = (results.paybackPeriod.years + (results.paybackPeriod.months / 12)).toFixed(2);
-                
+
                 const summaryBody1 = [[
                     formatCurrency(results.totalRevenue),
                     formatCurrency(results.totalCogs),
@@ -3271,7 +3271,7 @@
                 yAnalisa += 3;
 
                 const yearsArray = [1, 2, 3, 4, 5];
-                
+
                 const getRowData = (key, formatFn) => {
                     let total = 0;
                     const row = yearsArray.map(y => {
@@ -3283,14 +3283,14 @@
                         if (key === 'opex') val = results.yearlyProjections[y]?.opex || 0;
                         if (key === 'tax') val = results.yearlyProjections[y]?.tax || 0;
                         if (key === 'netIncome') val = results.yearlyProjections[y]?.netIncome || 0;
-                        if (key === 'capex') val = y === 1 ? (results.cashFlowProjections[0]?.capex || 0) : 0; 
+                        if (key === 'capex') val = y === 1 ? (results.cashFlowProjections[0]?.capex || 0) : 0;
                         if (key === 'depreciation') val = results.yearlyProjections[y]?.depreciation || 0;
-                        
+
                         total += val;
                         return formatFn(val);
                     });
-                    
-                    row.push(formatFn(total)); 
+
+                    row.push(formatFn(total));
                     return row;
                 };
 
@@ -3298,12 +3298,12 @@
                     ['Revenue', ...getRowData('revenue', formatCurrency)],
                     ['Direct Cost', ...getRowData('directCost', formatCurrency)],
                     ['Gross Margin', ...getRowData('grossMargin', formatCurrency)],
-                    ['GP Margin', '', '', '', '', '', formatPercentage(results.grossProfitMargin)], 
+                    ['GP Margin', '', '', '', '', '', formatPercentage(results.grossProfitMargin)],
                     ['Cost of BUD', ...getRowData('badDebt', formatCurrency)],
                     ['Cost of Money', ...getRowData('opex', formatCurrency)],
                     ['Tax 22%', ...getRowData('tax', formatCurrency)],
                     ['Net Income', ...getRowData('netIncome', formatCurrency)],
-                    ['NI Margin', '', '', '', '', '', formatPercentage(results.netIncomeMargin)], 
+                    ['NI Margin', '', '', '', '', '', formatPercentage(results.netIncomeMargin)],
                     ['CAPEX', ...getRowData('capex', formatCurrency)],
                     ['Depresiasi CAPEX', ...getRowData('depreciation', formatCurrency)]
                 ];
@@ -3351,8 +3351,8 @@
                 doc.text(pbDecimal.replace('.', ','), 60, yTextBelow + 10, { align: 'right' });
 
                 const rightX = 185;
-                const rightY = yAnalisa; 
-                
+                const rightY = yAnalisa;
+
                 const capexTitle = `Simulasi Perhitungan Usulan Capex Delivery Penyediaan Jaringan Tambahan - Astinet ${inputs.customerName}`;
                 const pbString = `${results.paybackPeriod.years} Tahun ${results.paybackPeriod.months} Bulan`;
 
@@ -3385,13 +3385,13 @@
                 });
 
                 const yUpdate = doc.lastAutoTable.finalY + 5;
-                
+
                 doc.setFillColor(255, 255, 0);
                 doc.rect(rightX, yUpdate - 3, 95, 5, 'F');
                 doc.setFontSize(8);
                 doc.setFont(undefined, 'normal');
                 doc.text(`Update: Nilai WACC yang terbaru adalah ${WACC * 100}%.`, rightX + 2, yUpdate + 0.5);
-                
+
                 doc.setFillColor(255, 255, 0);
                 doc.rect(rightX, yUpdate + 3, 95, 5, 'F');
                 doc.text('IRR minimal = WACC + 2%', rightX + 2, yUpdate + 6.5);
@@ -3423,9 +3423,9 @@
                         if (key === 'ebit') val = results.yearlyProjections[y]?.ebit || 0;
                         if (key === 'tax') val = results.yearlyProjections[y]?.tax || 0;
                         if (key === 'netIncome') val = results.yearlyProjections[y]?.netIncome || 0;
-                        if (key === 'wc') val = 0; 
-                        if (key === 'netCashFlow') val = (results.yearlyProjections[y]?.netIncome || 0) + (results.yearlyProjections[y]?.depreciation || 0); 
-                        if (key === 'capex') val = y === 1 ? -(results.cashFlowProjections[0]?.capex || 0) : 0; 
+                        if (key === 'wc') val = 0;
+                        if (key === 'netCashFlow') val = (results.yearlyProjections[y]?.netIncome || 0) + (results.yearlyProjections[y]?.depreciation || 0);
+                        if (key === 'capex') val = y === 1 ? -(results.cashFlowProjections[0]?.capex || 0) : 0;
                         if (key === 'fcf') {
                             const ebitda = (results.yearlyProjections[y]?.revenue || 0) - (results.cogsProjections.find(c => c.year === y)?.totalCogs || 0) - (results.yearlyProjections[y]?.opex || 0) - (results.yearlyProjections[y]?.badDebt || 0);
                             const ebit = ebitda - (results.yearlyProjections[y]?.depreciation || 0);
@@ -3449,10 +3449,10 @@
                 const ebitData = getValData('ebit');
                 const taxData = getValData('tax');
                 const niData = getValData('netIncome');
-                
+
                 const wcData = getValData('wc');
-                const ncfData = getValData('netCashFlow'); 
-                const capexData = getValData('capex'); 
+                const ncfData = getValData('netCashFlow');
+                const capexData = getValData('capex');
                 const fcfData = getValData('fcf');
 
                 const accFcfRow = [];
@@ -3471,21 +3471,21 @@
                 };
 
                 const lampiranData = [
-                    ['', { content: 'TOTAL', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } }, 
-                         { content: 'Tahun 1', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } },
-                         { content: 'Tahun 2', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } },
-                         { content: 'Tahun 3', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } },
-                         { content: 'Tahun 4', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } },
-                         { content: 'Tahun 5', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } }],
+                    ['', { content: 'TOTAL', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } },
+                        { content: 'Tahun 1', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } },
+                        { content: 'Tahun 2', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } },
+                        { content: 'Tahun 3', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } },
+                        { content: 'Tahun 4', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } },
+                        { content: 'Tahun 5', styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 255] } }],
 
-                    [{ content: 'Tahun ke', styles: { fillColor: [200, 200, 200], fontStyle: 'bold' } }, 
-                     { content: '', styles: { fillColor: [200, 200, 200] } }, 
-                     { content: '1', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } },
-                     { content: '2', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } },
-                     { content: '3', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } },
-                     { content: '4', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } },
-                     { content: '5', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } }],
-                    
+                    [{ content: 'Tahun ke', styles: { fillColor: [200, 200, 200], fontStyle: 'bold' } },
+                    { content: '', styles: { fillColor: [200, 200, 200] } },
+                    { content: '1', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } },
+                    { content: '2', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } },
+                    { content: '3', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } },
+                    { content: '4', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } },
+                    { content: '5', styles: { fillColor: [200, 200, 200], halign: 'center', fontStyle: 'bold' } }],
+
                     [{ content: 'PROFIT & LOSS PROJECTION', colSpan: 7, styles: { fontStyle: 'bold' } }],
                     formatRow('Revenue', revData),
                     formatRow('Expenses (w/o depreciation)', expData),
@@ -3496,27 +3496,27 @@
                     ['Taxes (22%)', '', '22%', '22%', '22%', '22%', '22%'],
                     formatRow('Taxes (Rp)', taxData),
                     ['NET INCOME', formatCurrency(niData.total), ...niData.row.map(v => formatCurrency(v))],
-                    
-                    [{ content: ' ', colSpan: 7, styles: { minCellHeight: 4, lineWidth: 0 } }], 
-                    
+
+                    [{ content: ' ', colSpan: 7, styles: { minCellHeight: 4, lineWidth: 0 } }],
+
                     [{ content: 'CASH FLOW FOR VALUATION', colSpan: 7, styles: { fontStyle: 'bold', textDecoration: 'underline' } }],
                     formatRow('EBIT + (after tax)', niData),
                     formatRow('WC (incr)/decr', wcData),
                     formatRow('Depreciation', depData),
                     formatRow('Net Cash Flow', ncfData),
                     formatRow('Investment/CAPEX', capexData),
-                    
+
                     [{ content: ' ', colSpan: 7, styles: { minCellHeight: 4, lineWidth: 0 } }],
-                    
+
                     formatRow('Free Cash Flow', fcfData),
                     ['accumulated Free Cash Flow', '', ...accFcfRow.map(v => formatCurrency(v))],
-                    
+
                     [{ content: ' ', colSpan: 7, styles: { minCellHeight: 4, lineWidth: 0 } }],
-                    
+
                     [{ content: 'FEASIBILITY ANALYSIS', colSpan: 7, styles: { fontStyle: 'bold' } }],
                     ['Discount Rate', { content: formatPercentage(WACC * 100), styles: { fontStyle: 'bold', halign: 'right', lineWidth: 0.5 } }, ...dfRow.map(v => v.toFixed(2).replace('.', ','))],
                     ['PV of Free Cash Flow', formatCurrency(totalPvFcf), ...pvFcfRow.map(v => formatCurrency(v))],
-                    
+
                     ['NPV', formatCurrency(results.npv), { content: 'Layak Jika Positif', colSpan: 5 }],
                     ['IRR', Number.isFinite(results.irr) ? formatPercentage(results.irr) : '#DIV/0!', { content: 'Layak Jika > dari (WACC + Margin)', colSpan: 5 }],
                     ['Payback Period', pbDecimal.replace('.', ','), { content: 'Layak Jika < dari Masa Kontrak', colSpan: 5 }]
@@ -3538,12 +3538,12 @@
                     didParseCell: (data) => {
                         if (data.section === 'body') {
                             const firstCol = String(data.row.raw[0]?.content ?? data.row.raw[0] ?? '');
-                            
+
                             if (firstCol === 'EBITDA' || firstCol === 'EBIT' || firstCol === 'NET INCOME') {
                                 data.cell.styles.fillColor = [230, 235, 245];
                                 data.cell.styles.fontStyle = 'italic';
                             }
-                            
+
                             if (firstCol === 'NPV' || firstCol === 'IRR' || firstCol === 'Payback Period') {
                                 data.cell.styles.fillColor = [180, 180, 180];
                                 data.cell.styles.fontStyle = 'bold';
@@ -3564,25 +3564,25 @@
                 let yBottom = doc.lastAutoTable.finalY + 8;
                 doc.setFontSize(8);
                 doc.setFont(undefined, 'normal');
-                
+
                 doc.text('Discount Rate = WACC (ditetapkan oleh perusahaan)', 14, yBottom);
                 doc.text(formatPercentage(WACC * 100), 90, yBottom, { align: 'right' });
                 yBottom += 5;
-                
+
                 doc.text('Net Income Margin', 14, yBottom);
                 doc.setFont(undefined, 'bold');
                 doc.text('2,00%', 90, yBottom, { align: 'right' });
                 doc.setFont(undefined, 'italic');
                 doc.text('Mengikuti ketentuan RKAP', 95, yBottom);
                 yBottom += 5;
-                
+
                 doc.setFillColor(255, 255, 0);
                 doc.rect(14, yBottom - 3, 80, 5, 'F');
                 doc.setFont(undefined, 'bold');
                 doc.text('MINIMAL IRR', 15, yBottom);
                 doc.text(formatPercentage((WACC + 0.02) * 100), 90, yBottom, { align: 'right' });
                 yBottom += 5;
-                
+
                 doc.setFont(undefined, 'normal');
                 doc.text('Pajak Perusahaan', 14, yBottom);
                 doc.text('22%', 90, yBottom, { align: 'right' });
@@ -3673,7 +3673,7 @@
                 doc.setFont(undefined, 'normal');
                 doc.text('Perhitungan Revenue', 14, yRev);
                 yRev += 4;
-                doc.setFillColor(255, 235, 215); 
+                doc.setFillColor(255, 235, 215);
                 doc.rect(14, yRev - 3, 100, 5, 'F');
                 doc.setFontSize(8);
                 doc.setFont(undefined, 'bold');
@@ -3719,7 +3719,7 @@
                     ]);
                 });
 
-                for(let i=0; i<3; i++) revBody.push(['', '', '', '', '', '', '', '', '']);
+                for (let i = 0; i < 3; i++) revBody.push(['', '', '', '', '', '', '', '', '']);
 
                 revBody.push([{ content: 'Revenue', colSpan: 9, styles: { fontStyle: 'bold', fillColor: [240, 200, 150] } }]);
                 revBody.push([{ content: 'Layanan yang Memerlukan JT', colSpan: 9, styles: { fontStyle: 'bold', fillColor: [255, 255, 150] } }]);
@@ -3780,9 +3780,9 @@
                 doc.text(`Penyediaan Jaringan Tambahan - Astinet ${inputs.customerName}`, 14, yInv);
                 yInv += 4;
 
-                const capexBase = inputs.investmentCost;
-                const capexBop = capexBase * 0.004;
-                const totalCapex = capexBase + capexBop;
+                const invCapexBase = inputs.investmentCost;
+                const invCapexBop = invCapexBase * 0.004;
+                const invTotalCapex = invCapexBase + invCapexBop;
 
                 const invHead = [[
                     { content: 'Nama program', styles: { halign: 'center', fillColor: [240, 200, 150] } },
@@ -3798,41 +3798,41 @@
                     { content: 'Tahun 5', styles: { halign: 'center', fillColor: [240, 200, 150] } }
                 ]];
 
-                const depBase = capexBase / 5;
-                const depBop = capexBop / 5;
-                const depTotal = totalCapex / 5;
+                const invDepBase = invCapexBase / 5;
+                const invDepBop = invCapexBop / 5;
+                const invDepTotal = invTotalCapex / 5;
 
                 const formatDep = (val) => formatCurrency(val);
 
                 const invBody = [
                     [
-                        'Investasi New', 'JT FO', 'Paket', '1', 
-                        { content: formatCurrency(capexBase), styles: { halign: 'right' } }, '5',
-                        { content: formatDep(depBase), styles: { halign: 'right' } },
-                        { content: formatDep(depBase), styles: { halign: 'right' } },
-                        { content: formatDep(depBase), styles: { halign: 'right' } },
-                        { content: formatDep(depBase), styles: { halign: 'right' } },
-                        { content: formatDep(depBase), styles: { halign: 'right' } }
+                        'Investasi New', 'JT FO', 'Paket', '1',
+                        { content: formatCurrency(invCapexBase), styles: { halign: 'right' } }, '5',
+                        { content: formatDep(invDepBase), styles: { halign: 'right' } },
+                        { content: formatDep(invDepBase), styles: { halign: 'right' } },
+                        { content: formatDep(invDepBase), styles: { halign: 'right' } },
+                        { content: formatDep(invDepBase), styles: { halign: 'right' } },
+                        { content: formatDep(invDepBase), styles: { halign: 'right' } }
                     ],
                     [
-                        'BOP Lakwas', 'Support', 'Lot', '1', 
-                        { content: formatCurrency(capexBop), styles: { halign: 'right' } }, '5',
-                        { content: formatDep(depBop), styles: { halign: 'right' } },
-                        { content: formatDep(depBop), styles: { halign: 'right' } },
-                        { content: formatDep(depBop), styles: { halign: 'right' } },
-                        { content: formatDep(depBop), styles: { halign: 'right' } },
-                        { content: formatDep(depBop), styles: { halign: 'right' } }
+                        'BOP Lakwas', 'Support', 'Lot', '1',
+                        { content: formatCurrency(invCapexBop), styles: { halign: 'right' } }, '5',
+                        { content: formatDep(invDepBop), styles: { halign: 'right' } },
+                        { content: formatDep(invDepBop), styles: { halign: 'right' } },
+                        { content: formatDep(invDepBop), styles: { halign: 'right' } },
+                        { content: formatDep(invDepBop), styles: { halign: 'right' } },
+                        { content: formatDep(invDepBop), styles: { halign: 'right' } }
                     ],
                     ['IKG', '', '', '', '', '', '', '', '', '', ''],
                     [
                         { content: 'Jumlah', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [255, 230, 200] } },
-                        { content: formatCurrency(totalCapex), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
+                        { content: formatCurrency(invTotalCapex), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
                         { content: '', styles: { fillColor: [255, 230, 200] } },
-                        { content: formatDep(depTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
-                        { content: formatDep(depTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
-                        { content: formatDep(depTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
-                        { content: formatDep(depTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
-                        { content: formatDep(depTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } }
+                        { content: formatDep(invDepTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
+                        { content: formatDep(invDepTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
+                        { content: formatDep(invDepTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
+                        { content: formatDep(invDepTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } },
+                        { content: formatDep(invDepTotal), styles: { halign: 'right', fontStyle: 'bold', fillColor: [255, 230, 200] } }
                     ]
                 ];
 
@@ -3860,8 +3860,8 @@
                     [
                         { content: 'REG 2', styles: { fillColor: [230, 230, 230] } },
                         '',
-                        { content: '-', styles: { halign: 'right' } }, 
-                        { content: '-', styles: { halign: 'right' } }, 
+                        { content: '-', styles: { halign: 'right' } },
+                        { content: '-', styles: { halign: 'right' } },
                         { content: formatCurrency(capexBase), styles: { halign: 'right' } },
                         { content: programForm.lokasiProgram || 'JSA' }
                     ],
@@ -4851,7 +4851,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.3 - May 12, 2026 - 16.56</p>
+                            <p>Copyright © 2025, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.5 - May 13, 2026 - 06.56</p>
                             {/* <br></br><p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p> */}
                         </footer>
