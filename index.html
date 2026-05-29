@@ -1181,6 +1181,24 @@
                 const picContact = (beritaAcaraForm.picContact || "").trim();
                 const contractPeriod = Number(inputs.contractPeriod || 0);
 
+                const serviceRows = inputs.services
+                    .filter((service) => {
+                        const detail = service.serviceType === 'custom' ? service.serviceDetails : service.serviceType;
+                        return detail && detail.trim();
+                    })
+                    .map((service, index) => {
+                        const detail = service.serviceType === 'custom' ? service.serviceDetails : service.serviceType || service.serviceDetails;
+                        return new TableRow({
+                            children: [
+                                new TableCell({ children: [new Paragraph({ text: String(index + 1) })] }),
+                                new TableCell({ children: [new Paragraph({ text: detail || '-' })] }),
+                                new TableCell({ children: [new Paragraph({ text: service.bandwidth || '-' })] }),
+                                new TableCell({ children: [new Paragraph({ text: service.quantity ? String(service.quantity) : '-' })] }),
+                                new TableCell({ children: [new Paragraph({ text: service.unit || '-' })] }),
+                            ],
+                        });
+                    });
+
                 const dateText = new Date().toLocaleDateString('id-ID', {
                     day: '2-digit',
                     month: 'long',
@@ -1194,32 +1212,27 @@
                             new Paragraph({
                                 children: [
                                     new TextRun({
-                                        text: "BERITA ACARA KESEDIAAN BERLANGGANAN",
+                                        text: "SURAT PERNYATAAN BERLANGGANAN",
                                         bold: true,
-                                        size: 32, // 16pt
+                                        size: 32,
                                     }),
                                 ],
                                 alignment: AlignmentType.CENTER,
-                                spacing: { after: 400 },
+                                spacing: { after: 360 },
                             }),
                             new Paragraph({
                                 children: [
                                     new TextRun({
                                         text: `Tanggal: ${dateText}`,
-                                        size: 20, // 10pt
+                                        size: 20,
                                     }),
                                 ],
                                 alignment: AlignmentType.CENTER,
-                                spacing: { after: 400 },
+                                spacing: { after: 360 },
                             }),
                             new Paragraph({
-                                children: [
-                                    new TextRun({
-                                        text: `Saya selaku calon pelanggan Telkom bersedia untuk berlangganan layanan ${inputs.services.map(s => s.serviceDetails).filter(Boolean).join(", ")} selama ${contractPeriod} bulan untuk memenuhi perhitungan kelayakan investasi yang berlaku di lingkungan Telkom.`,
-                                        size: 22, // 11pt
-                                    }),
-                                ],
-                                spacing: { after: 400 },
+                                text: "Yang bertanda tangan di bawah ini:",
+                                spacing: { after: 200 },
                             }),
                             new Table({
                                 width: {
@@ -1231,10 +1244,9 @@
                                         children: [
                                             new TableCell({
                                                 children: [new Paragraph({ text: "Nama Pelanggan", bold: true })],
-                                                width: { size: 35, type: WidthType.PERCENTAGE },
                                             }),
                                             new TableCell({
-                                                children: [new Paragraph({ text: customerName })],
+                                                children: [new Paragraph({ text: customerName || '-' })],
                                             }),
                                         ],
                                     }),
@@ -1244,7 +1256,7 @@
                                                 children: [new Paragraph({ text: "Nama PIC Pelanggan", bold: true })],
                                             }),
                                             new TableCell({
-                                                children: [new Paragraph({ text: picName })],
+                                                children: [new Paragraph({ text: picName || '-' })],
                                             }),
                                         ],
                                     }),
@@ -1254,7 +1266,7 @@
                                                 children: [new Paragraph({ text: "Jabatan", bold: true })],
                                             }),
                                             new TableCell({
-                                                children: [new Paragraph({ text: picTitle })],
+                                                children: [new Paragraph({ text: picTitle || '-' })],
                                             }),
                                         ],
                                     }),
@@ -1264,13 +1276,50 @@
                                                 children: [new Paragraph({ text: "Kontak", bold: true })],
                                             }),
                                             new TableCell({
-                                                children: [new Paragraph({ text: picContact })],
+                                                children: [new Paragraph({ text: picContact || '-' })],
                                             }),
                                         ],
                                     }),
                                 ],
                             }),
-                            new Paragraph({ text: "", spacing: { after: 800 } }),
+                            new Paragraph({ text: "", spacing: { after: 320 } }),
+                            new Paragraph({
+                                text: "Dengan ini menyatakan bahwa saya selaku calon pelanggan Telkom bersedia untuk berlangganan layanan sebagai berikut:",
+                                spacing: { after: 240 },
+                            }),
+                            new Paragraph({
+                                text: `Periode berlangganan: ${contractPeriod} bulan.`,
+                                spacing: { after: 240 },
+                            }),
+                            ...(serviceRows.length > 0 ? [
+                                new Paragraph({
+                                    text: "Detail layanan:",
+                                    spacing: { after: 160 },
+                                }),
+                                new Table({
+                                    width: {
+                                        size: 100,
+                                        type: WidthType.PERCENTAGE,
+                                    },
+                                    rows: [
+                                        new TableRow({
+                                            children: [
+                                                new TableCell({ children: [new Paragraph({ text: "No", bold: true })] }),
+                                                new TableCell({ children: [new Paragraph({ text: "Layanan", bold: true })] }),
+                                                new TableCell({ children: [new Paragraph({ text: "Bandwidth", bold: true })] }),
+                                                new TableCell({ children: [new Paragraph({ text: "Qty", bold: true })] }),
+                                                new TableCell({ children: [new Paragraph({ text: "Unit", bold: true })] }),
+                                            ],
+                                        }),
+                                        ...serviceRows,
+                                    ],
+                                }),
+                                new Paragraph({ text: "", spacing: { after: 320 } }),
+                            ] : []),
+                            new Paragraph({
+                                text: "Demikian surat pernyataan ini dibuat dengan sebenarnya dan dapat dipergunakan sebagaimana mestinya.",
+                                spacing: { after: 320 },
+                            }),
                             new Table({
                                 width: {
                                     size: 100,
@@ -1289,25 +1338,25 @@
                                         children: [
                                             new TableCell({
                                                 children: [
-                                                    new Paragraph({ text: "Pelanggan,", alignment: AlignmentType.CENTER }),
-                                                    new Paragraph({ text: "", spacing: { after: 1500 } }), // Space for signature
+                                                    new Paragraph({ text: "Pelanggan", alignment: AlignmentType.CENTER, bold: true }),
+                                                    new Paragraph({ text: "", spacing: { after: 1200 } }),
                                                     new Paragraph({
-                                                        children: [new TextRun({ text: picName, bold: true, underline: {} })],
-                                                        alignment: AlignmentType.CENTER
+                                                        children: [new TextRun({ text: picName || '(........................................)', underline: {} })],
+                                                        alignment: AlignmentType.CENTER,
                                                     }),
-                                                    new Paragraph({ text: picTitle, alignment: AlignmentType.CENTER }),
+                                                    new Paragraph({ text: picTitle || '', alignment: AlignmentType.CENTER }),
                                                 ],
                                                 width: { size: 50, type: WidthType.PERCENTAGE },
                                             }),
                                             new TableCell({
                                                 children: [
-                                                    new Paragraph({ text: "Telkom,", alignment: AlignmentType.CENTER }),
-                                                    new Paragraph({ text: "", spacing: { after: 1500 } }), // Space for signature
+                                                    new Paragraph({ text: "Telkom", alignment: AlignmentType.CENTER, bold: true }),
+                                                    new Paragraph({ text: "", spacing: { after: 1200 } }),
                                                     new Paragraph({
-                                                        children: [new TextRun({ text: "(........................................)", bold: true })],
-                                                        alignment: AlignmentType.CENTER
+                                                        children: [new TextRun({ text: '(........................................)', underline: {} })],
+                                                        alignment: AlignmentType.CENTER,
                                                     }),
-                                                    new Paragraph({ text: "(........................................)", alignment: AlignmentType.CENTER }),
+                                                    new Paragraph({ text: '(........................................)', alignment: AlignmentType.CENTER }),
                                                 ],
                                                 width: { size: 50, type: WidthType.PERCENTAGE },
                                             }),
@@ -1320,7 +1369,7 @@
                 });
 
                 Packer.toBlob(doc).then((blob) => {
-                    saveAs(blob, `Berita_Acara_${customerName.replace(/[^a-zA-Z0-9]/g, "_")}.docx`);
+                    saveAs(blob, `Surat_Pernyataan_Berlangganan_${customerName.replace(/[^a-zA-Z0-9]/g, "_")}.docx`);
                 });
             };
 
@@ -4829,7 +4878,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.5.6 - May 13, 2026 - 08.20</p>
+                            <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.5.7 - May 29, 2026 - 08.20</p>
                             {/* <br></br><p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p> */}
                         </footer>
