@@ -1153,6 +1153,8 @@
                     customerName: "PT ABCD",
                     picName: "Mungkas Setyabadi",
                     picTitle: "Head of Telkom Daerah Cibinong",
+                    picIdNumber: "1234567890123456",
+                    picAddress: "Jl. Gatot Subroto No. 123, Jakarta Selatan",
                     picContact: "081234567890",
                 });
                 setProgramForm({
@@ -4798,7 +4800,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.6 - May 29, 2026 - 13.20</p>
+                            <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.6.1 - May 29, 2026 - 13.20</p>
                             {/* <br></br><p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p> */}
                         </footer>
@@ -4954,12 +4956,12 @@
                                                 className="btn btn-primary"
                                                 onClick={generateBeritaAcaraDocx}
                                                 disabled={
-                                                    !beritaAcaraForm.customerName.trim() ||
-                                                    !beritaAcaraForm.picName.trim() ||
-                                                    !beritaAcaraForm.picTitle.trim() ||
-                                                    !beritaAcaraForm.picIdNumber.trim() ||
-                                                    !beritaAcaraForm.picAddress.trim() ||
-                                                    !beritaAcaraForm.picContact.trim() ||
+                                                    !beritaAcaraForm?.customerName?.trim() ||
+                                                    !beritaAcaraForm?.picName?.trim() ||
+                                                    !beritaAcaraForm?.picTitle?.trim() ||
+                                                    !beritaAcaraForm?.picIdNumber?.trim() ||
+                                                    !beritaAcaraForm?.picAddress?.trim() ||
+                                                    !beritaAcaraForm?.picContact?.trim() ||
                                                     !inputs.contractPeriod
                                                 }
                                             >
