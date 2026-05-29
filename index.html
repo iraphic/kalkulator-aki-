@@ -962,6 +962,8 @@
                 customerName: "",
                 picName: "",
                 picTitle: "",
+                picIdNumber: "",
+                picAddress: "",
                 picContact: "",
             });
 
@@ -1178,27 +1180,30 @@
                 const customerName = (beritaAcaraForm.customerName || inputs.customerName || "").trim();
                 const picName = (beritaAcaraForm.picName || "").trim();
                 const picTitle = (beritaAcaraForm.picTitle || "").trim();
+                const picIdNumber = (beritaAcaraForm.picIdNumber || "").trim();
+                const picAddress = (beritaAcaraForm.picAddress || "").trim();
                 const picContact = (beritaAcaraForm.picContact || "").trim();
                 const contractPeriod = Number(inputs.contractPeriod || 0);
 
-                const serviceRows = inputs.services
+                const serviceDetails = inputs.services
                     .filter((service) => {
                         const detail = service.serviceType === 'custom' ? service.serviceDetails : service.serviceType;
                         return detail && detail.trim();
                     })
-                    .map((service, index) => {
-                        const detail = service.serviceType === 'custom' ? service.serviceDetails : service.serviceType || service.serviceDetails;
-                        return new TableRow({
-                            children: [
-                                new TableCell({ children: [new Paragraph({ text: String(index + 1) })] }),
-                                new TableCell({ children: [new Paragraph({ text: detail || '-' })] }),
-                                new TableCell({ children: [new Paragraph({ text: service.bandwidth || '-' })] }),
-                                new TableCell({ children: [new Paragraph({ text: service.quantity ? String(service.quantity) : '-' })] }),
-                                new TableCell({ children: [new Paragraph({ text: service.unit || '-' })] }),
-                            ],
-                        });
-                    });
+                    .map((service) => {
+                        return service.serviceType === 'custom'
+                            ? service.serviceDetails
+                            : service.serviceType || service.serviceDetails;
+                    })
+                    .filter(Boolean)
+                    .join(', ');
 
+                const totalQuantity = inputs.services.reduce((sum, service) => {
+                    const quantity = Number(service.quantity) || 0;
+                    return sum + quantity;
+                }, 0);
+
+                const installAddress = programForm.lokasiProgram || picAddress || '-';
                 const dateText = new Date().toLocaleDateString('id-ID', {
                     day: '2-digit',
                     month: 'long',
@@ -1211,151 +1216,66 @@
                         children: [
                             new Paragraph({
                                 children: [
-                                    new TextRun({
-                                        text: "SURAT PERNYATAAN BERLANGGANAN",
-                                        bold: true,
-                                        size: 32,
-                                    }),
+                                    new TextRun({ text: 'SURAT PERNYATAAN KOMITMEN', bold: true, size: 28 }),
                                 ],
                                 alignment: AlignmentType.CENTER,
-                                spacing: { after: 360 },
+                                spacing: { after: 240 },
                             }),
                             new Paragraph({
                                 children: [
-                                    new TextRun({
-                                        text: `Tanggal: ${dateText}`,
-                                        size: 20,
-                                    }),
+                                    new TextRun({ text: `NAMA PELANGGAN: ${customerName || '..........................................................'}`, bold: true, size: 24 }),
                                 ],
                                 alignment: AlignmentType.CENTER,
-                                spacing: { after: 360 },
+                                spacing: { after: 400 },
                             }),
-                            new Paragraph({
-                                text: "Yang bertanda tangan di bawah ini:",
-                                spacing: { after: 200 },
-                            }),
+                            new Paragraph({ text: 'Saya yang bertanda tangan di bawah ini:', spacing: { after: 200 } }),
+                            new Paragraph({ text: `Nama Lengkap           : ${picName || '...........................................................................'}` }),
+                            new Paragraph({ text: `Jabatan                     : ${picTitle || '...........................................................................'}` }),
+                            new Paragraph({ text: `No Kartu Identitas : ${picIdNumber || '...........................................................................'}` }),
+                            new Paragraph({ text: `Alamat                      : ${picAddress || '...........................................................................'}` }),
+                            new Paragraph({ text: `No. Handphone         : ${picContact || '...........................................................................'}` }),
+                            new Paragraph({ text: `Selanjutnya disebut sebagai Pihak I atau Perwakilan Pelanggan ${customerName ? `(${customerName})` : ''}.`, spacing: { after: 240 } }),
+                            new Paragraph({ text: 'Dengan ini secara sadar dan tanpa tekanan menyatakan hal-hal berikut:', spacing: { after: 240 } }),
+                            new Paragraph({ text: '1. Pihak I bersedia melakukan PSB (Pasang Baru) layanan berikut dengan detail sebagai berikut:' }),
+                            new Paragraph({ text: `   a. Nama Usaha           : ${customerName || '...........................................................................'}` }),
+                            new Paragraph({ text: `   b. Paket Layanan        : ${serviceDetails || '...........................................................................'}` }),
+                            new Paragraph({ text: `   c. Jumlah Titik           : ${totalQuantity > 0 ? totalQuantity : '...........................................................................'}` }),
+                            new Paragraph({ text: `   d. Alamat Instalasi      : ${installAddress || '...........................................................................'}` }),
+                            new Paragraph({ text: `   e. Lama Berlangganan     : ${contractPeriod > 0 ? `${contractPeriod} bulan` : '...........................................................................'}` }),
+                            new Paragraph({ text: '2. Pihak I berkomitmen untuk melakukan pembayaran tagihan layanan setiap bulannya selama berstatus aktif berlangganan (maksimal tanggal 20 setiap bulannya) atau sesuai dengan ketentuan pembayaran layanan segmen bisnis/enterprise.', spacing: { after: 200 } }),
+                            new Paragraph({ text: '3. Pihak I akan bertanggung jawab menyelesaikan kewajiban dan keperluan administrasi yang dibutuhkan sesuai ketentuan dalam kontrak berlangganan dan/atau ketentuan yang berlaku di PT Telkom Indonesia (Persero) Tbk jika kemudian saya memutuskan berhenti berlangganan layanan.' , spacing: { after: 200 } }),
+                            new Paragraph({ text: '4. Pihak I sepakat untuk berlangganan minimum sesuai poin (1e) dan apabila melakukan pencabutan sebelum masa berakhirnya berlangganan tersebut, maka pelanggan berkenan membayar denda Rp 1.000.000,- dikali jumlah titik instalasi.', spacing: { after: 200 } }),
+                            new Paragraph({ text: '5. Pihak I tidak akan melakukan penjualan kembali baik sebagian maupun keseluruhan layanan Layanan tersebut, dan tidak akan melakukan penyalahgunaan apapun terhadap jaringan dan layanan Layanan tersebut.', spacing: { after: 200 } }),
+                            new Paragraph({ text: '6. Pihak I telah mengetahui dan memahami ketentuan-ketentuan berlangganan Layanan tersebut, termasuk yang tercantum pada kontrak berlangganan layanan Layanan tersebut.', spacing: { after: 320 } }),
+                            new Paragraph({ text: 'Demikian surat pernyataan ini dibuat dengan sebenar-benarnya, secara sadar dan tanpa tekanan. Serta menjadi dasar untuk pembangunan (deployment) alpro baru di lokasi tersebut.', spacing: { after: 320 } }),
+                            new Paragraph({ text: `(Lokasi), ${dateText}`, spacing: { after: 360 } }),
                             new Table({
-                                width: {
-                                    size: 100,
-                                    type: WidthType.PERCENTAGE,
-                                },
-                                rows: [
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [new Paragraph({ text: "Nama Pelanggan", bold: true })],
-                                            }),
-                                            new TableCell({
-                                                children: [new Paragraph({ text: customerName || '-' })],
-                                            }),
-                                        ],
-                                    }),
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [new Paragraph({ text: "Nama PIC Pelanggan", bold: true })],
-                                            }),
-                                            new TableCell({
-                                                children: [new Paragraph({ text: picName || '-' })],
-                                            }),
-                                        ],
-                                    }),
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [new Paragraph({ text: "Jabatan", bold: true })],
-                                            }),
-                                            new TableCell({
-                                                children: [new Paragraph({ text: picTitle || '-' })],
-                                            }),
-                                        ],
-                                    }),
-                                    new TableRow({
-                                        children: [
-                                            new TableCell({
-                                                children: [new Paragraph({ text: "Kontak", bold: true })],
-                                            }),
-                                            new TableCell({
-                                                children: [new Paragraph({ text: picContact || '-' })],
-                                            }),
-                                        ],
-                                    }),
-                                ],
-                            }),
-                            new Paragraph({ text: "", spacing: { after: 320 } }),
-                            new Paragraph({
-                                text: "Dengan ini menyatakan bahwa saya selaku calon pelanggan Telkom bersedia untuk berlangganan layanan sebagai berikut:",
-                                spacing: { after: 240 },
-                            }),
-                            new Paragraph({
-                                text: `Periode berlangganan: ${contractPeriod} bulan.`,
-                                spacing: { after: 240 },
-                            }),
-                            ...(serviceRows.length > 0 ? [
-                                new Paragraph({
-                                    text: "Detail layanan:",
-                                    spacing: { after: 160 },
-                                }),
-                                new Table({
-                                    width: {
-                                        size: 100,
-                                        type: WidthType.PERCENTAGE,
-                                    },
-                                    rows: [
-                                        new TableRow({
-                                            children: [
-                                                new TableCell({ children: [new Paragraph({ text: "No", bold: true })] }),
-                                                new TableCell({ children: [new Paragraph({ text: "Layanan", bold: true })] }),
-                                                new TableCell({ children: [new Paragraph({ text: "Bandwidth", bold: true })] }),
-                                                new TableCell({ children: [new Paragraph({ text: "Qty", bold: true })] }),
-                                                new TableCell({ children: [new Paragraph({ text: "Unit", bold: true })] }),
-                                            ],
-                                        }),
-                                        ...serviceRows,
-                                    ],
-                                }),
-                                new Paragraph({ text: "", spacing: { after: 320 } }),
-                            ] : []),
-                            new Paragraph({
-                                text: "Demikian surat pernyataan ini dibuat dengan sebenarnya dan dapat dipergunakan sebagaimana mestinya.",
-                                spacing: { after: 320 },
-                            }),
-                            new Table({
-                                width: {
-                                    size: 100,
-                                    type: WidthType.PERCENTAGE,
-                                },
+                                width: { size: 100, type: WidthType.PERCENTAGE },
                                 borders: {
-                                    top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                                    bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                                    left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                                    right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                                    insideHorizontal: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
-                                    insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+                                    top: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                                    bottom: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                                    left: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                                    right: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                                    insideHorizontal: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
+                                    insideVertical: { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' },
                                 },
                                 rows: [
                                     new TableRow({
                                         children: [
                                             new TableCell({
                                                 children: [
-                                                    new Paragraph({ text: "Pelanggan", alignment: AlignmentType.CENTER, bold: true }),
-                                                    new Paragraph({ text: "", spacing: { after: 1200 } }),
-                                                    new Paragraph({
-                                                        children: [new TextRun({ text: picName || '(........................................)', underline: {} })],
-                                                        alignment: AlignmentType.CENTER,
-                                                    }),
+                                                    new Paragraph({ text: 'Pelanggan (Pihak I)', alignment: AlignmentType.CENTER, bold: true }),
+                                                    new Paragraph({ text: '', spacing: { after: 1200 } }),
+                                                    new Paragraph({ children: [new TextRun({ text: picName || '(........................................)', underline: {} })], alignment: AlignmentType.CENTER }),
                                                     new Paragraph({ text: picTitle || '', alignment: AlignmentType.CENTER }),
                                                 ],
                                                 width: { size: 50, type: WidthType.PERCENTAGE },
                                             }),
                                             new TableCell({
                                                 children: [
-                                                    new Paragraph({ text: "Telkom", alignment: AlignmentType.CENTER, bold: true }),
-                                                    new Paragraph({ text: "", spacing: { after: 1200 } }),
-                                                    new Paragraph({
-                                                        children: [new TextRun({ text: '(........................................)', underline: {} })],
-                                                        alignment: AlignmentType.CENTER,
-                                                    }),
+                                                    new Paragraph({ text: 'Telkom', alignment: AlignmentType.CENTER, bold: true }),
+                                                    new Paragraph({ text: '', spacing: { after: 1200 } }),
+                                                    new Paragraph({ children: [new TextRun({ text: '(........................................)', underline: {} })], alignment: AlignmentType.CENTER }),
                                                     new Paragraph({ text: '(........................................)', alignment: AlignmentType.CENTER }),
                                                 ],
                                                 width: { size: 50, type: WidthType.PERCENTAGE },
@@ -1369,7 +1289,7 @@
                 });
 
                 Packer.toBlob(doc).then((blob) => {
-                    saveAs(blob, `Surat_Pernyataan_Berlangganan_${customerName.replace(/[^a-zA-Z0-9]/g, "_")}.docx`);
+                    saveAs(blob, `Surat_Pernyataan_Komitmen_${customerName.replace(/[^a-zA-Z0-9]/g, '_')}.docx`);
                 });
             };
 
@@ -3686,7 +3606,7 @@
 
                     cogsBody.push([
                         { content: (index + 1).toString(), styles: { halign: 'center' } },
-                        { content: programForm.lokasiProgram || 'STO JSA', styles: { halign: 'center' } },
+                        { content: programForm.lokasiProgram || 'STO KMY', styles: { halign: 'center' } },
                         { content: `${svc.serviceType} ${svc.bandwidth || ''} ${svc.serviceDetails || ''}`.trim() },
                         { content: formatCurrency(tInstalasi), styles: { halign: 'right' } },
                         { content: formatCurrency(tBulanan), styles: { halign: 'right' } },
@@ -3758,7 +3678,7 @@
                     revBody.push([
                         { content: `${svc.serviceType} ${svc.bandwidth || ''}`.trim() },
                         { content: svc.unit || 'SSL', styles: { halign: 'center' } },
-                        { content: programForm.lokasiProgram || 'STO JSA', styles: { halign: 'center' } },
+                        { content: programForm.lokasiProgram || 'STO KMY', styles: { halign: 'center' } },
                         { content: (svc.quantity || 1).toString(), styles: { halign: 'right' } },
                         { content: '-', styles: { halign: 'center' } },
                         { content: '-', styles: { halign: 'center' } },
@@ -4332,8 +4252,8 @@
                                     </div>
                                     <div className="form-group">
                                         <label className="block text-sm font-medium mb-2">Lokasi STO</label>
-                                        <input type="text" className="form-control" placeholder="Contoh: CSN"
-                                            value={`STO ${programForm.lokasiProgram}`}
+                                        <input type="text" className="form-control" placeholder="Contoh: STO KMY"
+                                            value={`STO ... ${programForm.lokasiProgram}`}
                                             onChange={e => setProgramForm(p => ({ ...p, lokasiProgram: e.target.value.replace(/^STO\s*/i, '') }))} />
                                     </div>
                                     <div className="form-group">
@@ -4878,7 +4798,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.5.7 - May 29, 2026 - 08.20</p>
+                            <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.5.8 - May 29, 2026 - 13.20</p>
                             {/* <br></br><p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p> */}
                         </footer>
@@ -4991,6 +4911,32 @@
 
                                         <div className="ba-field">
                                             <label className="block text-sm font-medium text-foreground mb-2">
+                                                No Kartu Identitas
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={beritaAcaraForm.picIdNumber}
+                                                onChange={(e) => setBeritaAcaraForm((prev) => ({ ...prev, picIdNumber: e.target.value }))}
+                                                className="form-control"
+                                                placeholder="KTP / SIM / Passport"
+                                            />
+                                        </div>
+
+                                        <div className="ba-field">
+                                            <label className="block text-sm font-medium text-foreground mb-2">
+                                                Alamat
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={beritaAcaraForm.picAddress}
+                                                onChange={(e) => setBeritaAcaraForm((prev) => ({ ...prev, picAddress: e.target.value }))}
+                                                className="form-control"
+                                                placeholder="Alamat pelanggan"
+                                            />
+                                        </div>
+
+                                        <div className="ba-field">
+                                            <label className="block text-sm font-medium text-foreground mb-2">
                                                 Kontak
                                             </label>
                                             <input
@@ -5011,6 +4957,8 @@
                                                     !beritaAcaraForm.customerName.trim() ||
                                                     !beritaAcaraForm.picName.trim() ||
                                                     !beritaAcaraForm.picTitle.trim() ||
+                                                    !beritaAcaraForm.picIdNumber.trim() ||
+                                                    !beritaAcaraForm.picAddress.trim() ||
                                                     !beritaAcaraForm.picContact.trim() ||
                                                     !inputs.contractPeriod
                                                 }
