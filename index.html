@@ -4253,7 +4253,7 @@
                                     <div className="form-group">
                                         <label className="block text-sm font-medium mb-2">Lokasi STO</label>
                                         <input type="text" className="form-control" placeholder="Contoh: STO KMY"
-                                            value={`STO ... ${programForm.lokasiProgram}`}
+                                            value={`STO ${programForm.lokasiProgram}`}
                                             onChange={e => setProgramForm(p => ({ ...p, lokasiProgram: e.target.value.replace(/^STO\s*/i, '') }))} />
                                     </div>
                                     <div className="form-group">
