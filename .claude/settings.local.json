@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"--- exit: $?\")",
+      "Bash(xattr -l index.html)",
+      "Bash(head -c 50 index2.html)",
+      "Bash(head -c 50 README.md)",
+      "Bash(/usr/bin/stat -f \"%N flags=%Sf size=%z blocks=%b\" index.html index2.html README.md)"
+    ]
+  }
+}

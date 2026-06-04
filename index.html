@@ -1021,7 +1021,9 @@
                 idProposal: "",
                 jumlahLop: "1",
                 idLop: "",
+                idIhld: "",
                 lokasiProgram: "",
+                lokasiPemasangan: "",
                 penanggungJawab: "",
                 nomorAccount: "",
                 pemilihanTeknologi: "FO",
@@ -1187,7 +1189,9 @@
                     idProposal: "LOP-2025001",
                     jumlahLop: "1",
                     idLop: "B26-123456",
+                    idIhld: "IHLD-2026001",
                     lokasiProgram: "KMY",
+                    lokasiPemasangan: "-6.175110, 106.865039",
                     penanggungJawab: "Mungkas Setyabadi",
                     nomorAccount: "980765",
                     pemilihanTeknologi: "FO",
@@ -2124,6 +2128,17 @@
                     headStyles: { fillColor: [30, 64, 175], textColor: 255 },
                     theme: 'grid'
                 });
+
+                y = doc.lastAutoTable.finalY + 8;
+                doc.setFontSize(10);
+                doc.setFont(undefined, 'bold');
+                doc.text('Detail Tambahan', 14, y);
+                doc.setFont(undefined, 'normal');
+                y += 4;
+                doc.setFontSize(9);
+                doc.text(`ID IHLD: ${progForm.idIhld || '-'}`, 14, y);
+                y += 5;
+                doc.text(`Lokasi Pemasangan (titik koordinat): ${progForm.lokasiPemasangan || '-'}`, 14, y);
 
                 // ================== SEGMENT 2.5: HASIL EVALUASI AKI CAPEX ==================
                 doc.addPage();
@@ -4279,6 +4294,18 @@
                                             onChange={e => setProgramForm(p => ({ ...p, idLop: e.target.value }))} />
                                     </div>
                                     <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">ID IHLD</label>
+                                        <input type="text" className="form-control" placeholder="Contoh: IHLD-2026001"
+                                            value={programForm.idIhld}
+                                            onChange={e => setProgramForm(p => ({ ...p, idIhld: e.target.value }))} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="block text-sm font-medium mb-2">Lokasi Pemasangan (titik koordinat)</label>
+                                        <input type="text" className="form-control" placeholder="Contoh: -6.175110, 106.865039"
+                                            value={programForm.lokasiPemasangan}
+                                            onChange={e => setProgramForm(p => ({ ...p, lokasiPemasangan: e.target.value }))} />
+                                    </div>
+                                    <div className="form-group">
                                         <label className="block text-sm font-medium mb-2">Lokasi STO <span style={{ color: '#dc2626' }}>*</span></label>
                                         <input type="text" className="form-control" placeholder="Contoh: STO KMY"
                                             value={programForm.lokasiProgram ? `STO ${programForm.lokasiProgram}` : ''}
@@ -4831,7 +4858,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.6.3 - May 29, 2026 - 16.20</p>
+                            <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.6.4 - June 04, 2026 - 15.20</p>
                             {/* <br></br><p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p> */}
                         </footer>
