@@ -4725,6 +4725,12 @@
                                                             IRR: {results.irr >= 0.15 ? 'Layak' : 'Tidak Layak'}
                                                         </div>
                                                     </div>
+                                                    <div className={`p-3 rounded-md border ${results.c2rViable ? 'status-badge success' : 'status-badge danger'
+                                                        }`}>
+                                                        <div className="font-medium text-sm">
+                                                            C2R: {results.c2rViable ? 'Layak' : 'Tidak Layak'} ({results.c2r.toFixed(2)}%)
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -4860,6 +4866,42 @@
                                                 </div>
                                             </div>
 
+                                            {/* C2R Analysis */}
+                                            <div className="mt-8">
+                                                <div className="card">
+                                                    <div className="card-header">
+                                                        <h2 className="text-lg font-semibold">Analisis C2R (Cost to Revenue Ratio)</h2>
+                                                    </div>
+                                                    <div className="card-content">
+                                                        <div className={`p-4 rounded-lg border-2 ${results.c2rViable ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50'}`}>
+                                                            <div className="text-sm text-muted-foreground mb-1">
+                                                                (Total Kebutuhan CAPEX / Total Shared Revenue Order) ≤ 31%
+                                                            </div>
+                                                            <div className="text-2xl font-bold mt-1" style={{color: results.c2rViable ? '#16a34a' : '#dc2626'}}>
+                                                                {results.c2r.toFixed(2)}%
+                                                            </div>
+                                                            <div className={`mt-2 text-sm font-semibold ${results.c2rViable ? 'text-green-700' : 'text-red-700'}`}>
+                                                                {results.c2rViable ? '✓ LAYAK — C2R ≤ 31%' : '✗ TIDAK LAYAK — C2R > 31%'}
+                                                            </div>
+                                                        </div>
+                                                        <div className="mt-4 grid grid-cols-1 md-grid-cols-3 gap-3 text-sm">
+                                                            <div className="p-3 bg-muted/30 rounded-md">
+                                                                <div className="text-muted-foreground">Total Kebutuhan CAPEX</div>
+                                                                <div className="font-semibold">{formatCurrency(inputs.investmentCost * 1.007)}</div>
+                                                            </div>
+                                                            <div className="p-3 bg-muted/30 rounded-md">
+                                                                <div className="text-muted-foreground">Total Shared Revenue Order</div>
+                                                                <div className="font-semibold">{formatCurrency(results.totalRevenue)}</div>
+                                                            </div>
+                                                            <div className="p-3 bg-muted/30 rounded-md">
+                                                                <div className="text-muted-foreground">Batas Kelayakan</div>
+                                                                <div className="font-semibold">≤ 31%</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             {/* Revenue Recommendation Table */}
                                             <div className="mt-8">
                                                 <RevenueRecommendationTable results={results} inputs={inputs} />
@@ -4872,7 +4914,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.6.5 - June 10, 2026 - 13.20</p>
+                            <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.6.6 - June 10, 2026 - 14.20</p>
                             {/* <br></br><p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p> */}
                         </footer>
