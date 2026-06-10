@@ -801,8 +801,14 @@
             const totalNetIncome = yearlyProjections.reduce((sum, projection) => sum + projection.netIncome, 0);
             const netIncomeMargin = totalRevenue > 0 ? (totalNetIncome / totalRevenue) * 100 : 0;
 
+            // C2R: Cost to Revenue Ratio (Total Kebutuhan CAPEX / Total Shared Revenue Order)
+            const c2r = totalRevenue > 0 ? (actualCapex / totalRevenue) * 100 : 0;
+            const c2rViable = c2r <= 31;
+
             return {
                 totalRevenue,
+                c2r,
+                c2rViable,
                 otcRevenue,
                 monthlyTotal,
                 otcCogs,
@@ -2139,6 +2145,19 @@
                 doc.text(`ID IHLD: ${progForm.idIhld || '-'}`, 14, y);
                 y += 5;
                 doc.text(`Lokasi Pemasangan (titik koordinat): ${progForm.lokasiPemasangan || '-'}`, 14, y);
+                y += 6;
+
+                // C2R Calculation
+                const c2rValue = results.c2r;
+                const c2rLabel = `C2R (Total Kebutuhan CAPEX / Total Shared Revenue Order) = ${c2rValue.toFixed(2)}%`;
+                const c2rStatus = results.c2rViable ? 'LAYAK (≤ 31%)' : 'TIDAK LAYAK (> 31%)';
+                doc.setFont(undefined, 'bold');
+                doc.text(c2rLabel, 14, y);
+                y += 5;
+                doc.setTextColor(results.c2rViable ? 0 : 200, results.c2rViable ? 150 : 0, 0);
+                doc.text(`Status C2R: ${c2rStatus}`, 14, y);
+                doc.setTextColor(0, 0, 0);
+                doc.setFont(undefined, 'normal');
 
                 // ================== SEGMENT 2.5: HASIL EVALUASI AKI CAPEX ==================
                 doc.addPage();
@@ -3658,9 +3677,6 @@
                     ]);
                 });
 
-                cogsBody.push(['', '', '', '', '', '', '']);
-                cogsBody.push(['', '', '', '', '', '', '']);
-
                 cogsBody.push([
                     { content: 'TOTAL', colSpan: 3, styles: { halign: 'center', fontStyle: 'bold' } },
                     { content: formatCurrency(sumTarifInstalasi), styles: { halign: 'right', fontStyle: 'bold' } },
@@ -3730,8 +3746,6 @@
                         { content: 'PSB' }
                     ]);
                 });
-
-                for (let i = 0; i < 3; i++) revBody.push(['', '', '', '', '', '', '', '', '']);
 
                 revBody.push([{ content: 'Revenue', colSpan: 9, styles: { fontStyle: 'bold', fillColor: [240, 200, 150] } }]);
                 revBody.push([{ content: 'Layanan yang Memerlukan JT', colSpan: 9, styles: { fontStyle: 'bold', fillColor: [255, 255, 150] } }]);
@@ -4858,7 +4872,7 @@
 
                         {/* Footer */}
                         <footer className="footer">
-                            <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.6.4 - June 04, 2026 - 15.20</p>
+                            <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.6.5 - June 10, 2026 - 13.20</p>
                             {/* <br></br><p><a href="/index2.html">Another Version Calc </a> |
                                 <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p> */}
                         </footer>
