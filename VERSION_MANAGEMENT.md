@@ -8,7 +8,7 @@ AKICalc uses **semantic versioning** with 4 version components:
 - **Patch**: Bug fixes
 - **Build**: Auto-increment patches/builds
 
-**Format**: `MAJOR.MINOR.PATCH.BUILD` (e.g., `1.1.6.6`)
+**Format**: `MAJOR.MINOR.PATCH.BUILD` (e.g., `1.1.6.9`)
 
 ---
 
