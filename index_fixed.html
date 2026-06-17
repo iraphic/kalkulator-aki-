@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>AKICalc - by Raf</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 1.125rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: #1e40af;
+            color: white;
+            padding: 1rem 1.5rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #1e40af;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3a8a;
+        }
+
+        .refresh-btn {
+            position: fixed;
+            left: 1rem;
+            bottom: 1rem;
+            z-index: 999;
+            padding: 0.5rem 0.75rem;
+            border-radius: 9999px;
+            background: #1e40af;
+            color: white;
+            font-size: 0.85rem;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .refresh-btn:hover {
+            background: #1e3a8a;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-size: 1.125rem;
+            color: #64748b;
+        }
+
+        .error {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-size: 1.125rem;
+            color: #dc2626;
+            text-align: center;
+            padding: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <!-- Refresh Button -->
+    <button class="refresh-btn" onclick="hardRefresh()">🔄 Clear Cache</button>
+
+    <script>
+        // Fungsi untuk hard refresh dengan clear cache
+        function hardRefresh() {
+            console.log('Clearing cache and refreshing...');
+            if ('caches' in window) {
+                caches.keys().then(function (names) {
+                    names.forEach(function (name) {
+                        caches.delete(name);
+                    });
+                    console.log('All caches cleared');
+                });
+            }
+            window.location.reload(true);
+        }
+
+        window.addEventListener('load', function () {
+            console.log('Page loaded - cache management active');
+        });
+
+        const timestamp = new Date().getTime();
+        console.log(`App version: ${timestamp}`);
+    </script>
+
+    <script type="text/babel">
+        // Placeholder App - Load external script
+        function App() {
+            return (
+                <div className="loading">
+                    <p>Loading application...</p>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+
+        // Load the main application from external file
+        (function() {
+            setTimeout(() => {
+                const script = document.createElement('script');
+                script.src = './app.js?v=' + timestamp;
+                script.type = 'text/babel';
+                script.onload = function() {
+                    console.log('App loaded successfully');
+                };
+                script.onerror = function() {
+                    console.error('Failed to load app.js');
+                    document.getElementById('root').innerHTML = '<div class="error">Error loading application. Please <button onclick="location.reload()">reload</button>.</div>';
+                };
+                document.body.appendChild(script);
+            }, 100);
+        })();
+    </script>
+</body>
+
+</html>
