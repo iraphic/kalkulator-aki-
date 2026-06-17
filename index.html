@@ -576,7 +576,7 @@
     <div id="root"></div>
 
     <!-- Version Badge -->
-    <div class="version-badge" id="versionBadge" onclick="toggleVersionTooltip()">v1.1.6.6</div>
+    <div class="version-badge" id="versionBadge" onclick="toggleVersionTooltip()">v1.1.6.8</div>
     <div class="version-tooltip" id="versionTooltip"></div>
 
     <!-- Refresh Button -->
@@ -665,21 +665,26 @@
             </div>
         );
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<PlaceholderApp />);
+        window._appRoot = ReactDOM.createRoot(document.getElementById('root'));
+        window._appRoot.render(<PlaceholderApp />);
 
-        // Dynamic import of main app script
-        setTimeout(() => {
-            const mainScript = document.createElement('script');
-            mainScript.src = './app.js?v=' + timestamp;
-            mainScript.type = 'text/babel';
-            mainScript.onload = () => console.log('✓ Main app loaded');
-            mainScript.onerror = () => {
-                console.error('✗ Failed to load app.js');
+        // Fetch, transform, and execute app.js explicitly
+        fetch('./app.js?v=' + timestamp)
+            .then(r => {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.text();
+            })
+            .then(code => {
+                const transformed = Babel.transform(code, { presets: ['react'] }).code;
+                const script = document.createElement('script');
+                script.textContent = transformed;
+                document.body.appendChild(script);
+                console.log('✓ Main app loaded');
+            })
+            .catch(err => {
+                console.error('✗ Failed to load app.js', err);
                 document.getElementById('root').innerHTML = '<div style="padding: 2rem; color: #dc2626;"><h2>Error</h2><p>Failed to load application. Please <button onclick="location.reload()">reload</button>.</p></div>';
-            };
-            document.body.appendChild(mainScript);
-        }, 100);
+            });
     </script>
 </body>
 

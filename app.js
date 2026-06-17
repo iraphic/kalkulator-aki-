@@ -696,5 +696,4 @@ const FinancialAnalysis = () => {
 };
 
 // Render aplikasi
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<FinancialAnalysis />);
+window._appRoot.render(<FinancialAnalysis />);
