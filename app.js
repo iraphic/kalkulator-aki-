@@ -4339,7 +4339,7 @@ function FinancialAnalysis() {
 
                 {/* Footer */}
                 <footer className="footer">
-                    <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>. Build version 1.1.6.6 - June 10, 2026 - 14.20</p>
+                    <p>Copyright © 2026, Made by <a href="https://github.com/iraphic" target="_blank" rel="noopener noreferrer">Raf</a>.</p>
                     {/* <br></br><p><a href="/index2.html">Another Version Calc </a> |
                         <a href="/astinet-fit-calc.html"> Astinet Fit Calc</a> | <a href="/kalk-ncix.html"> Neucentrix Calc</a></p> */}
                 </footer>

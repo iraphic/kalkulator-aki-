@@ -623,7 +623,7 @@
                 const badge = document.getElementById('versionBadge');
                 const tooltip = document.getElementById('versionTooltip');
                 badge.textContent = 'v' + data.version;
-                const lastUpdated = new Date(data.lastUpdated).toLocaleString('id-ID');
+                const lastUpdated = new Date(data.lastUpdated).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }) + ' WIB';
                 tooltip.innerHTML = `<strong>Version ${data.version}</strong><br/>Updated: ${lastUpdated}`;
                 console.log('✓ Version loaded:', data.version, 'at', lastUpdated);
             })
