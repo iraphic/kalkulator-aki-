@@ -57,11 +57,19 @@ switch (versionType) {
         break;
 }
 
-const newVersion = `${newMajor}.${newMinor}.${newPatch}.${newBuild}`;
-const currentDate = new Date().toISOString();
+const now = new Date();
+const wibOffset = 7 * 60; // UTC+7 in minutes
+const wibTime = new Date(now.getTime() + (wibOffset + now.getTimezoneOffset()) * 60000);
+const pad = (n) => String(n).padStart(2, '0');
+const currentDate = wibTime.getFullYear() + '-' +
+    pad(wibTime.getMonth() + 1) + '-' +
+    pad(wibTime.getDate()) + 'T' +
+    pad(wibTime.getHours()) + ':' +
+    pad(wibTime.getMinutes()) + ':' +
+    pad(wibTime.getSeconds()) + '+07:00';
 
 console.log(`📝 New version: ${newVersion}`);
-console.log(`⏰ Updated at: ${currentDate}`);
+console.log(`⏰ Updated at: ${currentDate} WIB`);
 
 // Update version data
 versionData.version = newVersion;

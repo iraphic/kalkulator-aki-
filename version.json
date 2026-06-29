@@ -1,7 +1,23 @@
 {
-  "version": "1.1.7.0",
-  "lastUpdated": "2026-06-29T18:30:00Z",
+  "version": "1.1.7.3",
+  "lastUpdated": "2026-06-29T18:39:07+07:00",
   "changelog": [
+    {
+      "version": "1.1.7.3",
+      "date": "2026-06-29",
+      "changes": [
+        "Auto-updated on commit"
+      ]
+    },
+    {
+      "version": "1.1.7.2",
+      "date": "2026-06-29",
+      "changes": [
+        "Added auto version update on commit",
+        "Fixed timezone to WIB (UTC+7)",
+        "Removed build version from footer"
+      ]
+    },
     {
       "version": "1.1.7.0",
       "date": "2026-06-29",
