@@ -329,7 +329,7 @@ function calculatePaybackPeriod(cashFlowProjections) {
 const WITEL_PROFILES = {
     'Jakarta Centrum': {
         dibuat2: { nik: '960302', nama: 'MUHAMMAD RAFII NAUFAL', jabatan: 'OFF 2 SALES ENGINEER' },
-        diperiksa: { nik: '830064', nama: 'NOVITASARI KUSUMADEWI', jabatan: 'MGR WITEL BUSINESS SERVICE' },
+        diperiksa: { nik: '900086', nama: 'ARIEF RIFQI PUTRANTO', jabatan: 'MGR WITEL BUSINESS SERVICE' },
     },
     'Jakarta Inner': {
         dibuat2: { nik: '950609', nama: 'ALI ZAHAR', jabatan: 'OFF 3 SALES ENGINEER' },
@@ -706,7 +706,7 @@ function FinancialAnalysis() {
                     new Paragraph({ text: `   d. Alamat Instalasi      : ${installAddress || '...........................................................................'}` }),
                     new Paragraph({ text: `   e. Lama Berlangganan     : ${contractPeriod > 0 ? `${contractPeriod} bulan` : '...........................................................................'}`, spacing: { after: 200 } }),
                     new Paragraph({ text: '2. Pihak I berkomitmen untuk melakukan pembayaran tagihan layanan setiap bulannya selama berstatus aktif berlangganan (maksimal tanggal 20 setiap bulannya) atau sesuai dengan ketentuan pembayaran layanan segmen bisnis/enterprise.', spacing: { after: 200 } }),
-                    new Paragraph({ text: '3. Pihak I akan bertanggung jawab menyelesaikan kewajiban dan keperluan administrasi yang dibutuhkan sesuai ketentuan dalam kontrak berlangganan dan/atau ketentuan yang berlaku di PT Telkom Indonesia (Persero) Tbk jika kemudian saya memutuskan berhenti berlangganan layanan.' , spacing: { after: 200 } }),
+                    new Paragraph({ text: '3. Pihak I akan bertanggung jawab menyelesaikan kewajiban dan keperluan administrasi yang dibutuhkan sesuai ketentuan dalam kontrak berlangganan dan/atau ketentuan yang berlaku di PT Telkom Indonesia (Persero) Tbk jika kemudian saya memutuskan berhenti berlangganan layanan.', spacing: { after: 200 } }),
                     new Paragraph({ text: '4. Pihak I sepakat untuk berlangganan minimum sesuai poin (1e) dan apabila melakukan pencabutan sebelum masa berakhirnya berlangganan tersebut, maka pelanggan berkenan membayar denda Rp 1.000.000,- dikali jumlah titik instalasi.', spacing: { after: 200 } }),
                     new Paragraph({ text: '5. Pihak I tidak akan melakukan penjualan kembali baik sebagian maupun keseluruhan layanan Layanan tersebut, dan tidak akan melakukan penyalahgunaan apapun terhadap jaringan dan layanan Layanan tersebut.', spacing: { after: 200 } }),
                     new Paragraph({ text: '6. Pihak I telah mengetahui dan memahami ketentuan-ketentuan berlangganan Layanan tersebut, termasuk yang tercantum pada kontrak berlangganan layanan Layanan tersebut.', spacing: { after: 320 } }),
@@ -4302,7 +4302,7 @@ function FinancialAnalysis() {
                                                     <div className="text-sm text-muted-foreground mb-1">
                                                         (Total Kebutuhan CAPEX / Total Shared Revenue Order) ≤ 31%
                                                     </div>
-                                                    <div className="text-2xl font-bold mt-1" style={{color: results.c2rViable ? '#16a34a' : '#dc2626'}}>
+                                                    <div className="text-2xl font-bold mt-1" style={{ color: results.c2rViable ? '#16a34a' : '#dc2626' }}>
                                                         {results.c2r.toFixed(2)}%
                                                     </div>
                                                     <div className={`mt-2 text-sm font-semibold ${results.c2rViable ? 'text-green-700' : 'text-red-700'}`}>

@@ -1,10 +1,10 @@
 {
-  "version": "1.1.6.6",
-  "lastUpdated": "2026-06-17T00:00:00Z",
+  "version": "1.1.7.0",
+  "lastUpdated": "2026-06-29T18:30:00Z",
   "changelog": [
     {
-      "version": "1.1.6.6",
-      "date": "2026-06-17",
+      "version": "1.1.7.0",
+      "date": "2026-06-29",
       "changes": [
         "Fixed Babel 500KB transpilation limit",
         "Implemented code splitting with external app.js",
